@@ -2,65 +2,52 @@ package seedu.duke;
 
 import java.util.Scanner;
 
+import seedu.duke.command.Command;
 import seedu.duke.model.Category;
 import seedu.duke.model.Inventory;
-import seedu.duke.model.items.Fruit;
+import seedu.duke.parser.Parser;
 
 public class Duke {
-    /**
-     * Main entry-point for the java.duke.Duke application.
-     */
     public static void main(String[] args) {
-//        String logo = " ____        _        \n"
-//                + "|  _ \\ _   _| | _____ \n"
-//                + "| | | | | | | |/ / _ \\\n"
-//                + "| |_| | |_| |   <  __/\n"
-//                + "|____/ \\__,_|_|\\_\\___|\n";
-//        System.out.println("Hello from\n" + logo);
-//        System.out.println("What is your name?");
-//
-//        Scanner in = new Scanner(System.in);
-//        System.out.println("Hello " + in.nextLine());
+        String logo = " ____        _        \n"
+                + "|  _ \\ _   _| | _____ \n"
+                + "| | | | | | | |/ / _ \\\n"
+                + "| |_| | |_| |   <  __/\n"
+                + "|____/ \\__,_|_|\\_\\___|\n";
+
         Inventory inventory = new Inventory();
 
-        // Create categories
-        Category fruitsCategory = new Category("Fruits");
-        // Category toiletriesCategory = new Category("Toiletries");
+        Category fruitsCategory = new Category("fruits");
+        Category vegetablesCategory = new Category("vegetables");
+        Category toiletriesCategory = new Category("toiletries");
+        Category snacksCategory = new Category("snacks");
 
-        // Create items
-        fruitsCategory.addItem(new Fruit("apple",40,"A-10","10-03-2026","big",true));
-        fruitsCategory.addItem(new Fruit("banana",30,"B-10","9-03-2026","small",true));
+        // fruitsCategory.addItem(new Fruit("apple", 40, "A-10", "10-03-2026", "big", true));
+        // fruitsCategory.addItem(new Fruit("banana", 30, "B-10", "09-03-2026", "small", true));
 
-        // Add into inventory
-        inventory.addCategories((fruitsCategory));
+        inventory.addCategories(fruitsCategory);
+        inventory.addCategories(vegetablesCategory);
+        inventory.addCategories(toiletriesCategory);
+        inventory.addCategories(snacksCategory);
 
-//        tasks.addAll(storage.load());
-//
-//        System.out.println("Hello! Welcome to InventoryDock!");
-//        System.out.println("What can I do for you?");
-//
-//        Scanner scanner = new Scanner(System.in);
-//
-//        while (true) {
-//            try {
-//                Input input = getUserInput(scanner); // process user input
-//
-//                ErrorChecker.checkErrors(input.command(), input.description(), tasks);
-//
-//                CommandHandler.execute(input.command(), input.description(), tasks, storage);
-//
-//            } catch (SixSevenException e) {
-//                System.out.println(e.getMessage());
-//            }
-//        }
+        Parser parser = new Parser();
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("Hello from\n" + logo);
+        System.out.println("Hello! Welcome to InventoryDock!");
+        System.out.println("What can I do for you?");
+
+        while (scanner.hasNextLine()) {
+            String input = scanner.nextLine();
+            Command command = parser.parse(input);
+
+            if (command == null) {
+                continue;
+            }
+
+            command.execute(inventory);
+        }
+
+        scanner.close();
     }
-//    private static Input getUserInput(Scanner scanner) {
-//        String line = scanner.nextLine();
-//
-//        String[] input = line.split(" ", 2);
-//        String command = input[0];
-//        String description = input.length > 1 ? input[1] : "";
-//        return new Input(command, description);
-//    }
-//    private record Input(String command, String description) {}
 }
