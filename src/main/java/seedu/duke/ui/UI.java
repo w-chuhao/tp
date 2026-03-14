@@ -14,14 +14,17 @@ import java.util.Scanner;
 public class UI {
 
     private static final String DIVIDER =
-            "_________________________________________________________________________________________________________";
+            "_________________________________________"
+            + "________________________________"
+            + "________________________________";
     private static final String LOGO =
-            " _____       _____  \n"
-                    + "|_   _|     |  __ \\ \n"
-                    + "  | |       | |  | |\n"
-                    + "  | |       | |  | |\n"
-                    + "  | |   _   | |__| |\n"
-                    + "|_____||_|  |_____/ \n";
+            " _____       _____\n"
+            + "|_   _|     |  __ \\\n"
+            + "  | |       | |  | |\n"
+            + "  | |       | |  | |\n"
+            + "  | |   _   | |__| |\n"
+            + "|_____||_|  |_____/\n";
+
     private final Scanner scanner;
 
     public UI() {
@@ -44,7 +47,6 @@ public class UI {
     }
 
     public void showGoodbye() {
-        showDivider();
         System.out.println("Goodbye! See you next time!");
         showDivider();
     }
