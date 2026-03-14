@@ -1,5 +1,6 @@
 package seedu.duke.command;
 
+import seedu.duke.exception.DukeException;
 import seedu.duke.model.Category;
 import seedu.duke.model.Inventory;
 import seedu.duke.model.Item;
@@ -36,19 +37,17 @@ public class AddItemCommand extends Command {
     }
 
     @Override
-    public void execute(Inventory inventory) {
+    public void execute(Inventory inventory) throws DukeException {
         Category category = inventory.findCategoryByName(categoryName);
 
         if (category == null) {
-            System.out.println("Category not found: " + categoryName);
-            return;
+            throw new DukeException("Category not found: " + categoryName);
         }
 
         Item item = createItemByCategory(categoryName);
 
         if (item == null) {
-            System.out.println("Unsupported category: " + categoryName);
-            return;
+            throw new DukeException("Unsupported category: " + categoryName);
         }
 
         category.addItem(item);
@@ -57,7 +56,7 @@ public class AddItemCommand extends Command {
                 + category.getName() + " at bin " + bin);
     }
 
-    private Item createItemByCategory(String categoryName) {
+    private Item createItemByCategory(String categoryName) throws DukeException {
         switch (categoryName.toLowerCase()) {
         case "fruits":
             return new Fruit(itemName, quantity, bin, expiryDate, size, isRipe);
@@ -68,8 +67,7 @@ public class AddItemCommand extends Command {
         case "snacks":
             return new Snack(itemName, quantity, bin, brand, expiryDate);
         default:
-            System.out.println("Unsupported category: " + categoryName);
-            return null;
+            throw new DukeException("Unsupported category: " + categoryName);
         }
     }
 }
