@@ -18,19 +18,7 @@ public class Duke {
                 + "|____/ \\__,_|_|\\_\\___|\n";
 
         Inventory inventory = new Inventory();
-
-        Category fruitsCategory = new Category("fruits");
-        Category vegetablesCategory = new Category("vegetables");
-        Category toiletriesCategory = new Category("toiletries");
-        Category snacksCategory = new Category("snacks");
-
-        // fruitsCategory.addItem(new Fruit("apple", 40, "A-10", "10-03-2026", "big", true));
-        // fruitsCategory.addItem(new Fruit("banana", 30, "B-10", "09-03-2026", "small", true));
-
-        inventory.addCategories(fruitsCategory);
-        inventory.addCategories(vegetablesCategory);
-        inventory.addCategories(toiletriesCategory);
-        inventory.addCategories(snacksCategory);
+        addDefaultCategories(inventory);
 
         Parser parser = new Parser();
         Scanner scanner = new Scanner(System.in);
@@ -57,5 +45,17 @@ public class Duke {
         }
 
         scanner.close();
+    }
+
+    private static void addDefaultCategories(Inventory inventory) {
+        Category fruitsCategory = new Category("fruits");
+        Category vegetablesCategory = new Category("vegetables");
+        Category toiletriesCategory = new Category("toiletries");
+        Category snacksCategory = new Category("snacks");
+
+        inventory.addCategories(fruitsCategory);
+        inventory.addCategories(vegetablesCategory);
+        inventory.addCategories(toiletriesCategory);
+        inventory.addCategories(snacksCategory);
     }
 }
