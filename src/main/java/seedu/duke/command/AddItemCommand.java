@@ -37,20 +37,13 @@ public class AddItemCommand extends Command {
 
     @Override
     public void execute(Inventory inventory) {
-        Category category = inventory.findCategoryByName(categoryName);
-
-        if (category == null) {
+        if (!inventory.hasCategory(categoryName)) {
             System.out.println("Category not found: " + categoryName);
             return;
         }
 
+        Category category = inventory.findCategoryByName(categoryName);
         Item item = createItemByCategory(categoryName);
-
-        if (item == null) {
-            System.out.println("Unsupported category: " + categoryName);
-            return;
-        }
-
         category.addItem(item);
 
         System.out.println("Added item " + itemName + " (qty: " + quantity + ") to category "
