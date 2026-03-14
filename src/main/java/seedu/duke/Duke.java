@@ -1,53 +1,50 @@
 package seedu.duke;
 
-import java.util.Scanner;
-
 import seedu.duke.command.Command;
 import seedu.duke.model.Category;
 import seedu.duke.model.Inventory;
 import seedu.duke.parser.Parser;
+import seedu.duke.ui.UI;
 
 public class Duke {
-    public static void main(String[] args) {
-        String logo = " ____        _        \n"
-                + "|  _ \\ _   _| | _____ \n"
-                + "| | | | | | | |/ / _ \\\n"
-                + "| |_| | |_| |   <  __/\n"
-                + "|____/ \\__,_|_|\\_\\___|\n";
+    private final Inventory inventory;
+    private final UI ui;
+    private final Parser parser;
 
-        Inventory inventory = new Inventory();
+    public Duke() {
+        ui = new UI();
+        inventory = new Inventory();
+        parser = new Parser(ui);
 
-        Category fruitsCategory = new Category("fruits");
-        Category vegetablesCategory = new Category("vegetables");
-        Category toiletriesCategory = new Category("toiletries");
-        Category snacksCategory = new Category("snacks");
+        inventory.addCategories(new Category("fruits"));
+        inventory.addCategories(new Category("vegetables"));
+        inventory.addCategories(new Category("toiletries"));
+        inventory.addCategories(new Category("snacks"));
+    }
 
-        // fruitsCategory.addItem(new Fruit("apple", 40, "A-10", "10-03-2026", "big", true));
-        // fruitsCategory.addItem(new Fruit("banana", 30, "B-10", "09-03-2026", "small", true));
+    public void run() {
+        ui.showWelcome();
 
-        inventory.addCategories(fruitsCategory);
-        inventory.addCategories(vegetablesCategory);
-        inventory.addCategories(toiletriesCategory);
-        inventory.addCategories(snacksCategory);
-
-        Parser parser = new Parser();
-        Scanner scanner = new Scanner(System.in);
-
-        System.out.println("Hello from\n" + logo);
-        System.out.println("Hello! Welcome to InventoryDock!");
-        System.out.println("What can I do for you?");
-
-        while (scanner.hasNextLine()) {
-            String input = scanner.nextLine();
+        String input;
+        while ((input = ui.readCommand()) != null) {
             Command command = parser.parse(input);
 
             if (command == null) {
                 continue;
             }
 
-            command.execute(inventory);
+            if (command.isExit()) {
+                break;
+            }
+
+            command.execute(inventory, ui);
         }
 
-        scanner.close();
+        ui.showGoodbye();
+        ui.close();
+    }
+
+    public static void main(String[] args) {
+        new Duke().run();
     }
 }
