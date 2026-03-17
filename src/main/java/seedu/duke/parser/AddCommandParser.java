@@ -3,18 +3,26 @@ package seedu.duke.parser;
 import seedu.duke.command.Command;
 import seedu.duke.exception.DukeException;
 import seedu.duke.ui.UI;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class AddCommandParser {
+    private static final Logger logger = Logger.getLogger(AddCommandParser.class.getName());
 
     private final UI ui;
 
     public AddCommandParser(UI ui) {
+        assert ui != null : "AddCommandParser received null UI.";
         this.ui = ui;
     }
 
     public Command parse(String input) throws DukeException {
+        assert input != null : "AddCommandParser received null input.";
+        logger.log(Level.INFO, "Parsing add command input.");
+
         String trimmedInput = input.trim();
         if (trimmedInput.isEmpty()) {
+            logger.log(Level.WARNING, "Add command input is empty.");
             throw new DukeException("Input is empty.");
         }
 
@@ -39,14 +47,17 @@ public class AddCommandParser {
         }
 
         if (itemName == null || itemName.isEmpty()) {
+            logger.log(Level.WARNING, "Missing item name in add command.");
             throw new DukeException("Missing item name.");
         }
 
         if (category == null || category.isEmpty()) {
+            logger.log(Level.WARNING, "Missing category in add command.");
             throw new DukeException("Missing category.");
         }
 
         AddItemCommandParser parser = new AddItemCommandParser();
+        logger.log(Level.INFO, "Dispatching add command for category: " + category);
 
         switch (category) {
         case "fruits":
@@ -58,6 +69,7 @@ public class AddCommandParser {
         case "vegetables":
             return parser.handleVegetables(trimmedInput);
         default:
+            logger.log(Level.WARNING, "Unknown add command category: " + category);
             throw new DukeException("Unknown category: " + category);
         }
     }
