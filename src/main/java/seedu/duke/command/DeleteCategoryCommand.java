@@ -50,8 +50,6 @@ public class DeleteCategoryCommand extends Command {
             logger.log(Level.INFO, "Cleared items in category: " + categoryName);
             ui.showCategoryItemsCleared(categoryName);
         }
-
-        inventory.getCategories().remove(category);
         logger.log(Level.INFO, "Deleted category: " + categoryName);
         ui.showCategoryDeleted(categoryName);
     }
