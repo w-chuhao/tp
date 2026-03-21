@@ -3,24 +3,14 @@ package seedu.duke.model.items;
 import seedu.duke.model.Item;
 
 public class Fruit extends Item {
-    private String expiryDate;
     private String size;
     private boolean isRipe;
 
     public Fruit(String name, int quantity, String binLocation,
                  String expiryDate, String size, boolean isRipe) {
-        super(name, quantity, binLocation);
-        this.expiryDate = expiryDate;
+        super(name, quantity, binLocation,expiryDate);
         this.size = size;
         this.isRipe = isRipe;
-    }
-
-    public String getExpiryDate() {
-        return expiryDate;
-    }
-
-    public void setExpiryDate(String expiryDate) {
-        this.expiryDate = expiryDate;
     }
 
     public String getSize() {
@@ -43,7 +33,6 @@ public class Fruit extends Item {
     public String toString() {
         return "[Fruit] " + super.toString()
                 + ", Size: " + size
-                + ", Ripe: " + isRipe
-                + ", Expiry: " + expiryDate;
+                + ", Ripe: " + isRipe;
     }
 }

@@ -4,10 +4,6 @@ import seedu.duke.exception.DukeException;
 import seedu.duke.model.Category;
 import seedu.duke.model.Inventory;
 import seedu.duke.model.Item;
-import seedu.duke.model.items.Fruit;
-import seedu.duke.model.items.Snack;
-import seedu.duke.model.items.Toiletries;
-import seedu.duke.model.items.Vegetable;
 import seedu.duke.parser.DateParser;
 import seedu.duke.ui.UI;
 
@@ -41,7 +37,7 @@ public class FindItemByExpiryDateCommand extends Command {
 
         for (Category category : categories) {
             for (Item item : category.getItems()) {
-                String itemExpiryDate = getExpiryDate(item);
+                String itemExpiryDate = item.getExpiryDate();
                 if (itemExpiryDate == null) {
                     continue;
                 }
@@ -65,21 +61,5 @@ public class FindItemByExpiryDateCommand extends Command {
             ui.showMessage((i + 1) + ". " + matches.get(i));
         }
         ui.showDivider();
-    }
-
-    private String getExpiryDate(Item item) {
-        if (item instanceof Fruit) {
-            return ((Fruit) item).getExpiryDate();
-        }
-        if (item instanceof Vegetable) {
-            return ((Vegetable) item).getExpiryDate();
-        }
-        if (item instanceof Snack) {
-            return ((Snack) item).getExpiryDate();
-        }
-        if (item instanceof Toiletries) {
-            return ((Toiletries) item).getExpiryDate();
-        }
-        return null;
     }
 }
