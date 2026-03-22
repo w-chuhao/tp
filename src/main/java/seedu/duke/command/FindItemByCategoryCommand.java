@@ -6,15 +6,14 @@ import seedu.duke.model.Inventory;
 import seedu.duke.model.Item;
 import seedu.duke.ui.UI;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class FindItemByCategoryCommand extends Command {
-    private final String categoryInput;
     private static final Logger logger = Logger.getLogger(FindItemByCategoryCommand.class.getName());
+    private final String categoryInput;
 
     public FindItemByCategoryCommand(String categoryInput) {
         this.categoryInput = categoryInput;
