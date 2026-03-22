@@ -12,11 +12,13 @@ public class SweetsParser {
     public final String expiryDate;
     public final String brand;
     public final String ingradient;
+    public final String sweetnessLevel;
 
-    public SweetsParser(String expiryDate, String brand, String ingradient) {
+    public SweetsParser(String expiryDate, String brand, String ingradient, String sweetnessLevel) {
         this.expiryDate = expiryDate;
         this.brand = brand;
         this.ingradient = ingradient;
+        this.sweetnessLevel = sweetnessLevel;
     }
 
     public static SweetsParser parse(String input) throws DukeException {
@@ -36,13 +38,19 @@ public class SweetsParser {
             throw new DukeException("Missing brand for sweets.");
         }
 
-        String ingradient = FieldParser.extractField(input, "ingradient/", null);
+        String ingradient = FieldParser.extractField(input, "ingradient/", "sweetnessLevel/");
         if (ingradient == null || ingradient.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing ingradient for sweets.");
             throw new DukeException("Missing ingradient for sweets.");
         }
 
+        String sweetnessLevel = FieldParser.extractField(input, "sweetnessLevel/", null);
+        if (sweetnessLevel == null || sweetnessLevel.trim().isEmpty()) {
+            logger.log(Level.WARNING, "Missing sweetness level for sweets.");
+            throw new DukeException("Missing sweetness level for sweets.");
+        }
+
         logger.log(Level.INFO, "End of processing sweets.");
-        return new SweetsParser(expiryDate, brand, ingradient);
+        return new SweetsParser(expiryDate, brand, ingradient, sweetnessLevel);
     }
 }
