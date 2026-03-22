@@ -22,6 +22,7 @@ public class Storage {
     private final File dataFile;
 
     public Storage(String filePath) {
+        assert filePath != null : "Storage received null file path.";
         this.dataFile = new File(filePath);
     }
 
@@ -37,6 +38,8 @@ public class Storage {
     }
 
     public void load(Inventory inventory, UI ui) throws DukeException {
+        assert inventory != null : "Storage.load received null inventory.";
+        assert ui != null : "Storage.load received null ui.";
         try {
             createFile();
             List<String> lines = Files.readAllLines(dataFile.toPath());
@@ -56,6 +59,8 @@ public class Storage {
     }
 
     private Command parseStoredLine(String line, AddItemCommandParser parser) throws DukeException {
+        assert line != null : "Storage.parseStoredLine received null line.";
+        assert parser != null : "Storage.parseStoredLine received null parser.";
         String category = extractCategory(line);
 
         switch (category) {
@@ -73,6 +78,7 @@ public class Storage {
     }
 
     private String extractCategory(String line) throws DukeException {
+        assert line != null : "Storage.extractCategory received null line.";
         String[] tokens = line.trim().split(" ");
 
         for (String token : tokens) {
@@ -85,6 +91,7 @@ public class Storage {
     }
 
     public void save(Inventory inventory) throws DukeException {
+        assert inventory != null : "Storage.save received null inventory.";
         List<String> lines = new ArrayList<>();
 
         for (Category category : inventory.getCategories()) {
@@ -102,6 +109,8 @@ public class Storage {
     }
 
     private String formatItem(Item item, String categoryName) {
+        assert item != null : "Storage.formatItem received null item.";
+        assert categoryName != null : "Storage.formatItem received null categoryName.";
         String base = "item/" + item.getName()
                 + " category/" + categoryName
                 + " bin/" + item.getBinLocation()
