@@ -3,6 +3,7 @@ package seedu.duke.parser.category;
 import seedu.duke.exception.DukeException;
 import seedu.duke.parser.DateParser;
 import seedu.duke.parser.FieldParser;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -12,13 +13,11 @@ public class SeafoodParser {
     public final String expiryDate;
     public final String seafoodType;
     public final String origin;
-    public final boolean isFrozen;
 
-    public SeafoodParser(String expiryDate, String seafoodType, String origin, boolean isFrozen) {
+    public SeafoodParser(String expiryDate, String seafoodType, String origin) {
         this.expiryDate = expiryDate;
         this.seafoodType = seafoodType;
         this.origin = origin;
-        this.isFrozen = isFrozen;
     }
 
     public static SeafoodParser parse(String input) throws DukeException {
@@ -38,25 +37,13 @@ public class SeafoodParser {
             throw new DukeException("Missing seafoodType for seafood.");
         }
 
-        String origin = FieldParser.extractField(input, "origin/", "isFrozen/");
+        String origin = FieldParser.extractField(input, "origin/", null);
         if (origin == null || origin.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing origin for seafood.");
             throw new DukeException("Missing origin for seafood.");
         }
 
-        String frozenString = FieldParser.extractField(input, "isFrozen/", null);
-        if (frozenString == null || frozenString.trim().isEmpty()) {
-            logger.log(Level.WARNING, "Missing frozen status for seafood.");
-            throw new DukeException("Missing frozen status for seafood.");
-        }
-
-        if (!(frozenString.equalsIgnoreCase("true") || frozenString.equalsIgnoreCase("false"))) {
-            logger.log(Level.WARNING, "isFrozen must be true or false");
-            throw new DukeException("isFrozen must be true or false");
-        }
-        boolean isFrozen = Boolean.parseBoolean(frozenString);
-
         logger.log(Level.INFO, "End of processing seafood.");
-        return new SeafoodParser(expiryDate, seafoodType, origin, isFrozen);
+        return new SeafoodParser(expiryDate, seafoodType, origin);
     }
 }
