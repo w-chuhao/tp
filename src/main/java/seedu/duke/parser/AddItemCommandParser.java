@@ -11,7 +11,7 @@ import seedu.duke.model.items.Accessories;
 import seedu.duke.model.items.Burger;
 import seedu.duke.model.items.Drinks;
 import seedu.duke.model.items.Fruit;
-import seedu.duke.model.items.Icecream;
+import seedu.duke.model.items.IceCream;
 import seedu.duke.model.items.Meat;
 import seedu.duke.model.items.PetFood;
 import seedu.duke.model.items.Seafood;
@@ -25,7 +25,7 @@ import seedu.duke.parser.category.BurgerParser;
 import seedu.duke.parser.category.CommonFieldParser;
 import seedu.duke.parser.category.DrinksParser;
 import seedu.duke.parser.category.FruitParser;
-import seedu.duke.parser.category.IcecreamParser;
+import seedu.duke.parser.category.IceCreamParser;
 import seedu.duke.parser.category.InputValidator;
 import seedu.duke.parser.category.MeatParser;
 import seedu.duke.parser.category.PetFoodParser;
@@ -114,8 +114,8 @@ public class AddItemCommandParser {
                 "expiryDate/", "flavour/", "isDairyFree/");
 
         CommonFieldParser commonFields = CommonFieldParser.parse(input, "expiryDate/");
-        IcecreamParser icecreamFields = IcecreamParser.parse(input);
-        Item item = new Icecream(commonFields.itemName, commonFields.quantity, commonFields.bin,
+        IceCreamParser icecreamFields = IceCreamParser.parse(input);
+        Item item = new IceCream(commonFields.itemName, commonFields.quantity, commonFields.bin,
                 icecreamFields.expiryDate, icecreamFields.flavour, icecreamFields.isDairyFree);
 
         logger.log(Level.INFO, "Created ice cream item command for category: " + commonFields.categoryName);

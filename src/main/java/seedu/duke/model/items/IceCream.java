@@ -3,11 +3,11 @@ package seedu.duke.model.items;
 import seedu.duke.model.Item;
 
 
-public class Icecream extends Item {
+public class IceCream extends Item {
     private String flavour;
     private boolean isDairyFree;
 
-    public Icecream(String name, int quantity, String binLocation,
+    public IceCream(String name, int quantity, String binLocation,
                     String expiryDate, String flavour, boolean isDairyFree) {
         super(name, quantity, binLocation, expiryDate);
         this.flavour = flavour;

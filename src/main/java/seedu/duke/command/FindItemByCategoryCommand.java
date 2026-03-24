@@ -1,26 +1,27 @@
 package seedu.duke.command;
 
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import seedu.duke.exception.DukeException;
 import seedu.duke.model.Category;
 import seedu.duke.model.Inventory;
 import seedu.duke.model.Item;
 import seedu.duke.ui.UI;
 
-public class FindItemByCategoryCommand extends Command {
+import java.util.List;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+public class FindItemByCategoryCommand extends Command {
     private static final Logger logger = Logger.getLogger(FindItemByCategoryCommand.class.getName());
     private final String categoryInput;
+
 
     public FindItemByCategoryCommand(String categoryInput) {
         this.categoryInput = categoryInput;
     }
 
     @Override
-    public void execute(Inventory inventory, UI ui) throws DukeException {
+    public void execute(Inventory inventory, UI ui) throws DukeException{
         assert inventory != null : "FindItemByCategoryCommand received null inventory.";
         assert ui != null : "FindItemByCategoryCommand received null UI.";
         assert categoryInput != null : "FindItemByCategoryCommand received null category input.";

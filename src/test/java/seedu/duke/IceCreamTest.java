@@ -1,15 +1,15 @@
 package seedu.duke;
 
 import org.junit.jupiter.api.Test;
-import seedu.duke.model.items.Icecream;
+import seedu.duke.model.items.IceCream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class IcecreamTest {
+public class IceCreamTest {
     @Test
     public void constructor_validInput_success() {
-        Icecream icecream = new Icecream("Vanilla Cup", 3, "B1",
+        IceCream icecream = new IceCream("Vanilla Cup", 3, "B1",
                 "2026-03-28", "Vanilla", false);
 
         assertEquals("Vanilla Cup", icecream.getName());

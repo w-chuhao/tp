@@ -6,20 +6,20 @@ import seedu.duke.parser.FieldParser;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class IcecreamParser {
-    private static Logger logger = Logger.getLogger(IcecreamParser.class.getName());
+public class IceCreamParser {
+    private static Logger logger = Logger.getLogger(IceCreamParser.class.getName());
 
     public final String expiryDate;
     public final String flavour;
     public final boolean isDairyFree;
 
-    public IcecreamParser(String expiryDate, String flavour, boolean isDairyFree) {
+    public IceCreamParser(String expiryDate, String flavour, boolean isDairyFree) {
         this.expiryDate = expiryDate;
         this.flavour = flavour;
         this.isDairyFree = isDairyFree;
     }
 
-    public static IcecreamParser parse(String input) throws DukeException {
+    public static IceCreamParser parse(String input) throws DukeException {
         assert input != null : "IceCreamParser received null input.";
         logger.log(Level.INFO, "Processing IceCream special fields.");
 
@@ -49,6 +49,6 @@ public class IcecreamParser {
         boolean isDairyFree = Boolean.parseBoolean(dairyFreeString);
 
         logger.log(Level.INFO, "End of processing ice cream.");
-        return new IcecreamParser(expiryDate, flavour, isDairyFree);
+        return new IceCreamParser(expiryDate, flavour, isDairyFree);
     }
 }
