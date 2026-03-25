@@ -14,7 +14,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class FindItemByExpiryDateCommand extends Command {
-    private static Logger logger = Logger.getLogger(
+    private static final Logger logger = Logger.getLogger(
             FindItemByExpiryDateCommand.class.getName());
 
     private final String expiryDateInput;
@@ -25,9 +25,9 @@ public class FindItemByExpiryDateCommand extends Command {
 
     @Override
     public void execute(Inventory inventory, UI ui) throws DukeException {
-        assert inventory != null : "FindItemCommand received null inventory.";
-        assert ui != null : "FindItemCommand received null UI.";
-        assert expiryDateInput != null : "FindItemCommand received null expiry date.";
+        assert inventory != null : "FindItemByExpiryDateCommand received null inventory.";
+        assert ui != null : "FindItemByExpiryDateCommand received null UI.";
+        assert expiryDateInput != null : "FindItemByExpiryDateCommand received null expiry date.";
         LocalDate cutoffDate = DateParser.parseDate(expiryDateInput);
         List<String> matches = new ArrayList<>();
 
