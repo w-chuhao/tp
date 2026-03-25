@@ -6,7 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class FruitParser {
-    private static Logger logger = Logger.getLogger(FruitParser.class.getName());
+    private static final Logger logger = Logger.getLogger(FruitParser.class.getName());
 
     public final String size;
     public final boolean isRipe;

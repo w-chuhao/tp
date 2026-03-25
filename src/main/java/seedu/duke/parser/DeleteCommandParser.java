@@ -9,7 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class DeleteCommandParser {
-    private static Logger logger = Logger.getLogger(DeleteCommandParser.class.getName());
+    private static final Logger logger = Logger.getLogger(DeleteCommandParser.class.getName());
 
     private final UI ui;
 

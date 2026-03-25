@@ -8,7 +8,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class DeleteCategoryCommand extends Command {
-    private static Logger logger = Logger.getLogger(DeleteCategoryCommand.class.getName());
+    private static final Logger logger = Logger.getLogger(DeleteCategoryCommand.class.getName());
 
     private final String categoryName;
 
