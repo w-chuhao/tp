@@ -6,7 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class VegetableParser {
-    private static Logger logger = Logger.getLogger(VegetableParser.class.getName());
+    private static final Logger logger = Logger.getLogger(VegetableParser.class.getName());
 
     public final boolean isLeafy;
 

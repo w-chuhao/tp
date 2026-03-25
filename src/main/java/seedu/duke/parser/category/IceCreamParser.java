@@ -6,7 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class IceCreamParser {
-    private static Logger logger = Logger.getLogger(IceCreamParser.class.getName());
+    private static final Logger logger = Logger.getLogger(IceCreamParser.class.getName());
 
     public final String flavour;
     public final boolean isDairyFree;
