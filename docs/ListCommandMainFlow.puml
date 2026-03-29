@@ -19,7 +19,9 @@ activate Duke
 Duke -> Parser: parse(input)
 activate Parser
 
-Parser -> ListCommand ++ : ListCommand()
+create ListCommand
+Parser -> ListCommand: ListCommand()
+activate ListCommand
 ListCommand --> Parser: command
 Parser --> Duke: command
 deactivate Parser

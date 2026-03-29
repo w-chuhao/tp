@@ -202,6 +202,320 @@ If this feature is extended in future versions, the following improvements could
 - Add category filters so users can combine expiry search with category search.
 - Introduce an internal index if inventory size grows enough to justify optimisation.
 
+### Add Item Feature
+
+Another core feature of the product is the ability to add an item into an existing category using
+the `add` command.
+
+This feature is necessary because the application is fundamentally an inventory manager. Users need
+to record newly stocked products together with shared fields such as name, quantity, bin location,
+and expiry date, while also capturing category-specific attributes such as fruit size or drink
+volume. The add-item flow solves this by routing the same high-level command through specialised
+parsers based on the category provided by the user.
+
+For example, if the user enters
+`add category/fruits item/apple bin/A1 qty/10 expiryDate/2026-4-01 size/medium isRipe/true`,
+the system validates the common and category-specific fields, constructs the correct `Item`
+subclass, and adds it into the matching category.
+
+#### High-level design
+
+At a high level, this enhancement also fits into the existing command-based architecture of the
+application. The feature follows this flow:
+
+1. The user enters an `add` command.
+2. `Parser` recognises the `add` command word and delegates the remaining input to `AddCommandParser`.
+3. `AddCommandParser` validates the required shared fields and determines the target category.
+4. `AddItemCommandParser` dispatches to the category-specific parsing method such as `FruitParser` and constructs the
+   correct `Item` subtype.
+5. An `AddItemCommand` is created and executed with access to the current `Inventory` and `UI`.
+6. The command finds the target category, inserts the item, and shows a confirmation message.
+
+The main interaction for this flow is illustrated in [AddItemCommandMainFlow.puml](AddItemCommandMainFlow.puml).
+
+This design was chosen because it preserves the same separation of responsibilities used elsewhere
+in the codebase:
+
+- `Parser` and parser helpers interpret user input.
+- `AddItemCommand` performs the inventory mutation.
+- Model classes such as `Inventory`, `Category`, and `Item` hold the application state.
+- `UI` presents confirmation messages to the user.
+
+As a result, adding a new item subtype does not require redesigning the command pipeline. The parser
+layer can be extended category by category while the execution model remains unchanged.
+
+#### Component-level implementation
+
+The feature is mainly implemented using the following classes:
+
+- `Parser`
+- `AddCommandParser`
+- `AddItemCommandParser`
+- Category-specific parsers such as `FruitParser`
+- `AddItemCommand`
+- `Inventory`
+- `Category`
+- `Item`
+
+The responsibilities of these classes are as follows:
+
+- `Parser` identifies that the user wants to perform an add operation.
+- `AddCommandParser` validates shared required fields and chooses the correct parsing branch based on
+  `category/`.
+- `AddItemCommandParser` coordinates common-field parsing and category-specific parsing.
+- Category-specific parsers construct the extra fields required by each concrete `Item` subtype.
+- `AddItemCommand` performs the actual insertion into the inventory.
+- `Inventory` finds the matching category by name.
+- `Category` stores the added item.
+- `Item` and its subclasses represent the domain object being created.
+
+This design intentionally separates shared parsing from category-specific parsing. Common fields such
+as `item/`, `bin/`, `qty/`, and `expiryDate/` can be handled consistently, while subtype-specific
+fields remain encapsulated in the relevant parser and model class.
+
+#### Command execution flow
+
+When the user enters an add command, the implementation performs the following sequence:
+
+1. `Parser.parse()` splits the command word from the arguments.
+2. `Parser` calls `AddCommandParser.parse(arguments)`.
+3. `AddCommandParser` checks that mandatory fields such as `item/` and `category/` are present.
+4. `AddCommandParser` extracts the category and dispatches to the corresponding method in
+   `AddItemCommandParser`.
+5. `AddItemCommandParser` validates the input, parses common fields, and invokes the category-specific
+   parser.
+6. `AddItemCommandParser` creates an `Item` subtype and wraps it in an `AddItemCommand`.
+7. `Duke` executes `AddItemCommand.execute(inventory, ui)`.
+8. `AddItemCommand` calls `inventory.findCategoryByName(categoryName)`.
+9. If the category exists, `AddItemCommand` calls `category.addItem(item)`.
+10. `UI.showItemAdded(...)` displays the confirmation to the user.
+
+The execution logic in `AddItemCommand` is intentionally small:
+
+```java
+Category category = inventory.findCategoryByName(categoryName);
+category.addItem(item);
+ui.showItemAdded(item.getName(), item.getQuantity(),
+        category.getName(), item.getBinLocation());
+```
+
+This keeps construction concerns in the parser layer and mutation concerns in the command layer.
+
+#### Why the feature is implemented this way
+
+The main design choice is the use of category-based dispatch in `AddCommandParser` and
+`AddItemCommandParser` instead of one very large parser or category-agnostic item builder.
+
+This was chosen for three reasons.
+
+First, different item types do not share the same attributes. Separating parsers by category keeps
+validation rules close to the subtype that needs them.
+
+Second, it improves maintainability. Adding support for a new category mostly requires introducing a
+new parser branch and item subtype rather than modifying one monolithic parsing method with many
+special cases.
+
+Third, it keeps command execution simple. By the time `AddItemCommand` runs, all parsing and object
+construction work has already been completed. The command only needs to find the category and append
+the item.
+
+Another deliberate design choice is that the command adds only into an existing category rather than
+creating a missing category automatically. This keeps category creation rules explicit and avoids
+silently introducing unintended categories due to typing errors.
+
+#### Error handling and validation
+
+Validation is split across the parser layer.
+
+`AddCommandParser` rejects missing shared fields such as `item/` and `category/` before dispatching
+to a category-specific parser.
+
+`AddItemCommandParser` and the specialised parsers validate category-specific input. If required
+fields are missing or malformed, they throw `DukeException` before an `AddItemCommand` is created.
+
+`AddItemCommand` also performs execution-time checks. If `inventory.findCategoryByName(categoryName)`
+returns `null`, the command throws a `DukeException` with the message
+`Category not found: <categoryName>`. If the parsed item is unexpectedly `null`, it throws
+`Item cannot be null.`
+
+This layered approach ensures invalid input is rejected as early as possible, while still protecting
+the command layer from invalid state.
+
+#### Alternatives considered
+
+Several alternatives were considered when implementing this feature.
+
+Alternative 1: Use a single generic item parser for every category.
+
+This would reduce the number of parser classes, but it was rejected because different categories have
+different required fields. A single parser would become difficult to understand and maintain.
+
+Alternative 2: Let `AddItemCommand` parse the raw command string itself.
+
+This was rejected because it mixes input interpretation with business logic. The current design keeps
+commands focused on behaviour and leaves parsing to the parser layer.
+
+Alternative 3: Create missing categories automatically during item addition.
+
+This was rejected because it can hide user mistakes. Requiring the target category to exist makes the
+inventory structure more predictable and prevents accidental category creation due to typos.
+
+#### Current limitations
+
+The current implementation has some limitations.
+
+- Category dispatch in `AddCommandParser` is hard-coded using a `switch` statement.
+- Supporting a new category requires updates in multiple places, including parser dispatch and the
+  corresponding model subtype.
+- Error messages depend on the specific parser branch and are not fully standardised across all item
+  types.
+
+These limitations are acceptable for the current project scope, but they may become more noticeable if
+the number of item categories continues to grow.
+
+#### Possible future improvements
+
+If this feature is extended in future versions, the following improvements could be considered:
+
+- Replace hard-coded category dispatch with a registry-based parser lookup.
+- Standardise validation error messages across all category-specific parsers.
+- Support optional default values for selected fields where domain rules permit them.
+- Separate category definitions from parser code so new item types can be added with less wiring.
+
+### List Feature
+
+The product also supports displaying the current inventory using the `list` command.
+
+This feature is important because users need a quick way to inspect the complete inventory after
+adding, updating, deleting, or loading items from storage. Unlike targeted search commands, the list
+operation provides a full snapshot of the current inventory state grouped by category.
+
+For example, after a sequence of inventory changes, the user can enter `list` to review all categories
+and their stored items in one output.
+
+#### High-level design
+
+At a high level, the feature is intentionally minimal and fits directly into the existing command
+architecture:
+
+1. The user enters a `list` command.
+2. `Parser` recognises the command word and constructs a `ListCommand`.
+3. `Duke` executes the command with the current `Inventory` and `UI`.
+4. `ListCommand` delegates rendering to `UI.showInventory(inventory)`.
+5. `UI` iterates through the inventory and prints the formatted listing to the user.
+
+The main interaction for this flow is illustrated in [ListCommandMainFlow.puml](ListCommandMainFlow.puml).
+
+This design was chosen because listing inventory does not require separate parsing logic beyond
+recognising the command word. The command object acts mainly as a bridge between the parser and the UI.
+
+#### Component-level implementation
+
+The feature is mainly implemented using the following classes:
+
+- `Parser`
+- `ListCommand`
+- `Inventory`
+- `Category`
+- `UI`
+
+The responsibilities of these classes are as follows:
+
+- `Parser` detects the `list` command and returns a new `ListCommand`.
+- `ListCommand` represents the list operation and triggers the display behaviour.
+- `Inventory` provides access to the stored categories.
+- `Category` provides the items and summary information for each category.
+- `UI` formats and prints the inventory contents.
+
+This design keeps the command itself lightweight. Since listing is a read-only operation, most of the
+formatting logic appropriately lives in the UI layer instead of the command layer.
+
+#### Command execution flow
+
+When `ListCommand.execute()` is called, the implementation performs the following sequence:
+
+1. Assert that `inventory` and `ui` are not `null`.
+2. Log that the inventory listing is being requested.
+3. Call `ui.showInventory(inventory)`.
+4. Inside the UI layer, retrieve all categories from the `Inventory`.
+5. Iterate through each `Category`.
+6. For each category, display its name, item count, and items.
+7. Print the combined inventory listing to the user.
+
+The command logic is intentionally short:
+
+```java
+logger.log(Level.INFO, "Listing inventory.");
+ui.showInventory(inventory);
+```
+
+This reflects the design decision that `ListCommand` should trigger the operation, while formatting and
+presentation remain the responsibility of the UI.
+
+#### Why the feature is implemented this way
+
+The most important design choice here is that `ListCommand` delegates almost all work to the UI layer
+instead of assembling formatted output by itself.
+
+This was chosen for two reasons.
+
+First, it preserves separation of concerns. The command layer decides what action should happen, while
+the UI layer decides how the result should be shown.
+
+Second, it keeps the read-only command easy to maintain. Since `list` does not modify state, there is
+no need for extra model logic or intermediate data transformation in the command itself.
+
+This also makes the command consistent with other parts of the application where `UI` is responsible
+for user-facing output.
+
+#### Error handling and validation
+
+The `list` command has minimal input validation because it takes no arguments.
+
+`Parser` handles recognition of the command word. Once a `ListCommand` is created, the main runtime
+checks are the assertions in `ListCommand.execute()` that ensure `inventory` and `ui` are not `null`.
+
+Because the command is read-only and does not parse additional user arguments, there are fewer failure
+modes compared with commands such as `add` or `find`.
+
+#### Alternatives considered
+
+Several alternatives were considered when implementing this feature.
+
+Alternative 1: Let `Parser` call `UI.showInventory(inventory)` directly without creating a command
+object.
+
+This was rejected because it breaks the existing command architecture. Keeping `ListCommand` preserves
+a consistent parse-then-execute pipeline across user actions.
+
+Alternative 2: Let `ListCommand` build a formatted string instead of delegating to `UI`.
+
+This was rejected because presentation logic belongs more naturally in the UI layer. Mixing display
+formatting into the command would weaken separation of concerns.
+
+Alternative 3: Add filtering arguments directly to `list`.
+
+This was rejected for now because filtered retrieval is already covered by specialised `find`
+commands. Keeping `list` simple makes its behaviour predictable.
+
+#### Current limitations
+
+The current implementation has some limitations.
+
+- The command always lists the full inventory and does not support optional filters or sorting.
+- Output ordering depends on the current order of categories and items stored in memory.
+- Formatting is tied to the current console UI implementation.
+
+These limitations are acceptable for the current scope because the command is intended to provide a
+simple full-inventory view.
+
+#### Possible future improvements
+
+If this feature is extended in future versions, the following improvements could be considered:
+
+- Support optional sorted views such as by category name or expiry date.
+- Add pagination or condensed summaries for larger inventories.
+- Reuse the same command object for alternate UI front ends if the presentation layer expands.
 ### Storage feature
 
 This product includes a storage component that is responsible for persisting inventory data
@@ -381,6 +695,27 @@ provide more detailed diagnostics to the user. This would reduce potential data 
 
 {Give instructions on how to do a manual product testing e.g., how to load sample data to be used for testing}
 
+### Testing add item
+
+1. Ensure the target category already exists in the inventory, for example `fruits`.
+2. Run `add category/fruits item/apple bin/A1 qty/10 expiryDate/2026-4-01 size/medium isRipe/true`.
+3. Verify that the application shows a confirmation message for the added item.
+4. Run `list`.
+5. Verify that `apple` appears under the `fruits` category with the entered values.
+6. Run `add category/unknown item/apple bin/A1 qty/10 expiryDate/2026-4-01 size/medium isRipe/true`.
+7. Verify that the application shows `Category not found: unknown` or the corresponding category error.
+8. Run an add command with a missing required field, for example `add category/fruits bin/A1 qty/10 expiryDate/2026-4-01 size/medium isRipe/true`.
+9. Verify that the application shows the appropriate validation error for the missing field.
+
+### Testing list command
+
+1. Start the application with at least one category containing items.
+2. Run `list`.
+3. Verify that the application displays the full inventory grouped by category.
+4. Start the application with an empty inventory.
+5. Run `list`.
+6. Verify that the application still handles the command successfully and shows the inventory view for the empty state.
+
 ### Testing find by expiry date
 
 1. Add items with different expiry dates.
@@ -409,3 +744,6 @@ provide more detailed diagnostics to the user. This would reduce potential data 
 12. Exit the application using the `bye` command.
 13. Delete the storage file before launching the application.
 14. Verify that the application recreates the file automatically and starts without crashing.
+
+
+
