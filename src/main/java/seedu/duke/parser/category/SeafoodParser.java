@@ -6,6 +6,9 @@ import seedu.duke.parser.FieldParser;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Parses seafood-specific fields from user input.
+ */
 public class SeafoodParser {
     private static final Logger logger = Logger.getLogger(SeafoodParser.class.getName());
 
@@ -13,12 +16,25 @@ public class SeafoodParser {
     public final String origin;
     public final boolean isFrozen;
 
+    /**
+     * Creates a {@code SeafoodParser} object with the parsed seafood details.
+     *
+     * @param seafoodType Type of seafood.
+     * @param origin Origin of the seafood.
+     */
     public SeafoodParser(String seafoodType, String origin, boolean isFrozen) {
         this.seafoodType = seafoodType;
         this.origin = origin;
         this.isFrozen = isFrozen;
     }
 
+    /**
+     * Parses the seafood-related fields from the given input string.
+     *
+     * @param input User input containing seafood fields.
+     * @return A {@code SeafoodParser} containing the parsed values.
+     * @throws DukeException If any required field is missing or invalid.
+     */
     public static SeafoodParser parse(String input) throws DukeException {
         assert input != null : "SeafoodParser received null input.";
         logger.log(Level.INFO, "Processing Seafood special fields.");

@@ -6,6 +6,9 @@ import seedu.duke.parser.FieldParser;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Parses meat-specific fields from user input.
+ */
 public class MeatParser {
     private static final Logger logger = Logger.getLogger(MeatParser.class.getName());
 
@@ -13,6 +16,12 @@ public class MeatParser {
     public final String origin;
     public final boolean isFrozen;
 
+    /**
+     * Creates a {@code MeatParser} object with the parsed meat details.
+     *
+     * @param meatType Type of meat.
+     * @param origin Origin of the meat.
+     */
     public MeatParser(String meatType, String origin, boolean isFrozen) {
         this.meatType = meatType;
         this.origin = origin;
