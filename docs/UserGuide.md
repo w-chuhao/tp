@@ -27,6 +27,14 @@ Notes about command syntax:
 * Bin searches accept `LETTER-NUMBER`, `LETTER`, or `NUMBER`, such as `A-10`, `A`, or `10`.
 * `update` only supports changing common item fields. Category-specific fields cannot be updated.
 
+## Data Storage
+
+InventoryDock stores data in `data/inventory.txt`.
+
+* Data is saved automatically after every successfully executed command.
+* Data is also saved when you exit the app with `bye`.
+* If the storage file contains corrupted lines, the app skips those lines and continues loading the rest of the inventory.
+
 ## Features 
 
 Notes about the command format:
@@ -184,6 +192,21 @@ Expected result:
 * The app updates the selected item.
 * The app confirms which item was updated.
 * If the item name changed, the new item name is shown as well.
+
+## Error Handling
+
+Common reasons a command may fail:
+
+* missing required fields
+* fields entered in the wrong order for `add`
+* invalid quantity values
+* invalid dates
+* invalid bin search format
+* invalid item index
+* unsupported update fields
+* unknown categories or commands
+
+When an error occurs, the app prints an error message and waits for the next command.
 
 ## FAQ
 
