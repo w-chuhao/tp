@@ -227,7 +227,7 @@ follows:
 5. The command attempts to locate the matching category and displays either the items or an
    appropriate message.
 
-The main interaction for this flow is illustrated in [FindItemByCategoryCommandMainFlow.puml](diagram/FindItemByCategoryCommandMainFlow.puml).
+The main interaction for this flow is illustrated in [FindItemByCategoryCommandMainFlow.puml](diagrams/FindItemByCategoryCommandMainFlow.puml).
 
 This design was chosen because it follows the same separation of concerns already used throughout the
 project:
@@ -390,7 +390,7 @@ is as follows:
 4. The command is executed with access to the current `Inventory` and `UI`.
 5. The command scans the inventory, identifies matching bin locations, and displays the result.
 
-The main interaction for this flow is illustrated in [FindItemByBinCommandMainFlow.puml](diagram/FindItemByBinCommandMainFlow.puml).
+The main interaction for this flow is illustrated in [FindItemByBinCommandMainFlow.puml](diagrams/FindItemByBinCommandMainFlow.puml).
 
 This design was chosen because it allows bin-specific input normalisation to remain in the parser
 layer, while the matching and display behaviour stays in the command layer.
@@ -554,7 +554,7 @@ application. The feature follows this flow:
 5. An `AddItemCommand` is created and executed with access to the current `Inventory` and `UI`.
 6. The command finds the target category, inserts the item, and shows a confirmation message.
 
-The main interaction for this flow is illustrated in [AddItemCommandMainFlow.puml](diagram/AddItemCommandMainFlow.puml).
+The main interaction for this flow is illustrated in [AddItemCommandMainFlow.puml](diagrams/AddItemCommandMainFlow.puml).
 
 This design was chosen because it preserves the same separation of responsibilities used elsewhere
 in the codebase:
@@ -727,7 +727,7 @@ architecture:
 4. `ListCommand` delegates rendering to `UI.showInventory(inventory)`.
 5. `UI` iterates through the inventory and prints the formatted listing to the user.
 
-The main interaction for this flow is illustrated in [ListCommandMainFlow.puml](diagram/ListCommandMainFlow.puml).
+The main interaction for this flow is illustrated in [ListCommandMainFlow.puml](diagrams/ListCommandMainFlow.puml).
 
 This design was chosen because listing inventory does not require separate parsing logic beyond
 recognising the command word. The command object acts mainly as a bridge between the parser and the UI.
