@@ -2,11 +2,25 @@ package seedu.duke.model.items;
 
 import seedu.duke.model.Item;
 
+/**
+ * Represents a meat item in the inventory.
+ */
 public class Meat extends Item {
     private String meatType;
     private String origin;
     private boolean isFrozen;
 
+    /**
+     * Creates a meat item with the given details.
+     *
+     * @param name Name of the meat item.
+     * @param quantity Quantity of the item.
+     * @param binLocation Storage bin location.
+     * @param expiryDate Expiry date.
+     * @param meatType Type of meat.
+     * @param origin Origin of the meat.
+     *          
+     */
     public Meat(String name, int quantity, String binLocation,
                 String expiryDate, String meatType,
                 String origin, boolean isFrozen) {

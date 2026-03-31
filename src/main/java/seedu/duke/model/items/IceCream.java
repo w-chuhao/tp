@@ -31,18 +31,27 @@ public class IceCream extends Item {
         return flavour;
     }
 
+    /** @param flavour New ice cream flavour. */
     public void setFlavour(String flavour) {
         this.flavour = flavour;
     }
 
+    /** @return {@code true} if the ice cream is dairy-free. */
     public boolean isDairyFree() {
         return isDairyFree;
     }
 
+    /** @param isDairyFree New dairy-free status. */
     public void setDairyFree(boolean isDairyFree) {
         this.isDairyFree = isDairyFree;
     }
 
+    /**
+     * Converts this ice cream into a storage-friendly string format.
+     *
+     * @param categoryName Name of the category this item belongs to.
+     * @return Storage string representation.
+     */
     @Override
     public String toStorageString(String categoryName) {
         return super.toStorageString(categoryName)
@@ -50,6 +59,11 @@ public class IceCream extends Item {
                 + " isDairyFree/" + isDairyFree;
     }
 
+    /**
+     * Returns a string representation of this ice cream.
+     *
+     * @return Formatted ice cream details.
+     */
     @Override
     public String toString() {
         return "[IceCream] " + super.toString()
