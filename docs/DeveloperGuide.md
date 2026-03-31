@@ -726,6 +726,219 @@ If this feature is extended in future versions, the following improvements could
 - Support optional default values for selected fields where domain rules permit them.
 - Separate category definitions from parser code so new item types can be added with less wiring.
 
+### Update Item Feature
+
+Another core feature of the product is the ability to update an existing item in a category using the
+`update` command.
+
+This feature is necessary because inventory records may change over time. A user may need to correct an
+item name, adjust its quantity, move it to a different bin location, or revise its expiry date. Without
+an update operation, the user would have to delete the item and recreate it manually, which is less
+efficient and more error-prone. The update-item command solves this by allowing selected fields of an
+existing item to be modified directly.
+
+For example, if the user enters  
+`update category/fruits index/1 qty/20 expiryDate/2026-4-15`,  
+the system locates the first item in the fruits category and updates its quantity and expiry date  
+while leaving its other fields unchanged.
+
+#### High-level design
+
+At a high level, this feature fits into the same command-based architecture used throughout the
+application. The flow is as follows:
+
+* The user enters an `update` command.
+* Parser recognises the `update` command word and delegates the remaining input to `UpdateCommandParser`.
+* `UpdateCommandParser` extracts the category, item index, and the fields to be updated.
+* The parser creates an `UpdateItemCommand`.
+* The command is executed with access to the current `Inventory` and `UI`.
+* The command locates the target category and item, applies the requested updates, and shows a
+  confirmation message.
+
+This design was chosen because it preserves the same separation of concerns already used by the rest
+of the application:
+
+* Parsers interpret user input.
+* Command classes implement behaviour.
+* Model classes store inventory data.
+* UI displays the final result.
+
+As a result, the update feature integrates cleanly into the existing command pipeline without requiring
+a separate editing subsystem.
+
+#### Component-level implementation
+
+The feature is mainly implemented using the following classes:
+
+* `Parser`
+* `UpdateCommandParser`
+* `UpdateItemCommand`
+* `Inventory`
+* `Category`
+* `Item`
+* `CommonFieldParser`
+* `UI`
+
+The responsibilities of these classes are as follows:
+
+* `Parser` detects the update command word and delegates to `UpdateCommandParser`.
+* `UpdateCommandParser` tokenises the input, validates `category/` and `index/`, collects the updated
+  fields into a `Map<String, String>`, and constructs an `UpdateItemCommand`.
+* `UpdateItemCommand` locates the item and applies the requested changes.
+* `Inventory` provides category lookup using `findCategoryByName(...)`.
+* `Category` provides indexed item access through `getItem(...)`.
+* `Item` provides setter methods such as `setName(...)`, `setQuantity(...)`, `setBinLocation(...)`,
+  and `setExpiryDate(...)`.
+* `CommonFieldParser` is reused for quantity and expiry-date validation so that update validation stays
+  consistent with add-command validation.
+* `UI` displays the result after the update is completed.
+
+This design intentionally separates parsing from mutation. The parser determines what should be updated,
+while the command is responsible for locating the correct item and applying the changes.
+
+#### Command execution flow
+
+When `UpdateItemCommand.execute()` is called, the implementation performs the following sequence:
+
+* Assert that `inventory` and `ui` are not null.
+* Call `inventory.findCategoryByName(categoryName)` to locate the target category.
+* If the category is not found, throw a `DukeException`.
+* Validate that the provided `itemIndex` is within the valid range for that category.
+* Retrieve the target item using `category.getItem(itemIndex - 1)`.
+* Store the original item name for display purposes.
+* Call `applyUpdates(item)`.
+* Iterate through each entry in the updates map.
+* Match each field name using a switch statement.
+* Apply the corresponding update to the item.
+* After all updates are applied, call `ui.showItemUpdated(...)`.
+
+The central logic is:
+
+```java
+Category category = inventory.findCategoryByName(categoryName);
+if (category == null) {
+   throw new DukeException("Category not found: " + categoryName);
+}
+
+if (itemIndex < 1 || itemIndex > category.getItemCount()) {
+   throw new DukeException("Invalid item index: " + itemIndex);
+}
+
+Item item = category.getItem(itemIndex - 1);
+String originalName = item.getName();
+applyUpdates(item);
+ui.showItemUpdated(originalName, item.getName(), category.getName());
+
+#### Why the feature is implemented this way
+
+The most important design choice in this feature is that the parser stores updates in a  
+`Map<String, String>` rather than creating a different command class for every possible update  
+combination.
+
+This was chosen for three reasons.
+
+* First, it keeps the parsing logic flexible. A user may update one field or several fields in a single  
+  command, and a map allows the parser to capture all requested updates without requiring a separate  
+  representation for every case.
+
+* Second, it keeps the command extensible. New updatable fields can be added by extending the switch  
+  statement inside `applyUpdates(...)` instead of redesigning the overall feature.
+
+* Third, it avoids unnecessary duplication. The same update mechanism can handle name, quantity, bin, and  
+  expiry date changes in one place.
+
+Another deliberate design choice is reusing existing validation helpers such as  
+`CommonFieldParser.parseQuantity(...)` and `CommonFieldParser.validateExpiryDate(...)`. This ensures  
+that update commands follow the same validation rules as add commands, which improves consistency across  
+the application.
+
+#### Error handling and validation
+
+Validation is split across the parser layer and the command layer.
+
+`UpdateCommandParser` handles syntax-level validation. It rejects:
+
+* empty update input  
+* malformed tokens without a valid `/` separator  
+* missing `category/`  
+* missing `index/`  
+* non-integer item indices  
+* non-positive item indices  
+* update commands that do not specify any fields to change  
+
+`UpdateItemCommand` handles execution-time validation. It rejects:
+
+* missing categories  
+* invalid item indices for the chosen category  
+* unsupported update fields  
+* empty updated names or empty bin locations  
+* invalid quantities  
+* invalid expiry-date values  
+
+This layered design ensures invalid input is rejected early, while still protecting the command layer  
+from invalid runtime state.
+
+#### Alternatives considered
+
+Several alternatives were considered when implementing this feature.
+
+* Alternative 1: Delete and re-add the item instead of supporting update.  
+  This was rejected because it is less convenient for the user and makes small corrections unnecessarily  
+  verbose.
+
+* Alternative 2: Create a separate command for each field, such as `UpdateQuantityCommand` or  
+  `UpdateExpiryDateCommand`.  
+  This was rejected because it would significantly increase the number of command classes and make the  
+  design more fragmented.
+
+* Alternative 3: Allow the parser to mutate the item directly.  
+  This was rejected because it breaks the separation between parsing and execution. Parsers should  
+  interpret input, while commands should perform behaviour.
+
+---
+
+#### Current limitations
+
+The current implementation has some limitations.
+
+* Only shared item fields are updatable: `newItem/`, `bin/`, `qty/`, and `expiryDate/`. Category-specific  
+  fields such as `size/`, `brand/`, or `isRipe/` cannot currently be updated.  
+* Unsupported fields cause the command to fail instead of being ignored.  
+* The command depends on item indices, so the user may need to run `list` or `find` beforehand to  
+  determine the correct target item.  
+* Updating one item does not currently show the full updated item record after completion.  
+
+These limitations are acceptable for the current project scope, but they highlight possible areas for  
+future enhancement.
+
+---
+
+#### Possible future improvements
+
+If this feature is extended in future versions, the following improvements could be considered:
+
+* Support updates to category-specific fields such as `size/`, `brand/`, `flavour/`, or `isRipe/`.  
+* Show the full updated item details after a successful edit.  
+* Support updating multiple matched items in batch mode.  
+* Replace index-based targeting with more flexible item matching and disambiguation.  
+
+### Testing update item
+
+* Ensure the inventory contains at least one category with items, for example `fruits`.
+
+* Run  
+  `add category/fruits item/apple bin/A1 qty/10 expiryDate/2026-4-01 size/medium isRipe/true`
+
+* Run  
+  `update category/fruits index/1 qty/20`
+
+* Verify that the application shows a confirmation message indicating the item was updated.
+
+* Run `list`.
+
+* Verify that the quantity of apple is now updated to 20.
+
+
 ### List Feature
 
 The product also supports displaying the current inventory using the `list` command.
@@ -1279,6 +1492,84 @@ After setting up the application, proceed to the individual test cases below.
 7. Verify that the application shows the invalid date format error.
 8. Run `find expiryDate/`.
 9. Verify that the application shows the missing expiry date error.
+
+
+### Testing updating multiple fields
+
+1. Run  
+  `update category/fruits index/1 newItem/green_apple bin/A2 expiryDate/2026-5-01`
+
+2. Verify that:
+  * The item name is updated to green_apple  
+  * The bin location is updated to A2  
+  * The expiry date is updated to 2026-5-01  
+
+3. Run `list`.
+
+4. Verify that all updated fields are reflected correctly.
+
+---
+
+### Testing invalid category
+
+5. Run `update category/unknown index/1 qty/10`
+
+6. Verify that the application shows  `Category not found: unknown` or the corresponding error message.
+
+---
+
+### Testing invalid index
+
+7. Run `update category/fruits index/100 qty/10`
+
+8. Verify that the application shows an error indicating the index is out of range.
+
+9. Run `update category/fruits index/abc qty/10`
+
+10. Verify that the application shows  
+  `Item index must be an integer.`
+
+---
+
+### Testing missing fields
+
+11. Run `update category/fruits index/1`
+
+12. Verify that the application shows `Provide at least one field to update.`
+
+13. Run `update index/1 qty/10`
+
+14. Verify that the application shows `Missing category.`
+
+15. Run `update category/fruits qty/10`
+
+16. Verify that the application shows `Missing item index.`
+
+---
+
+### Testing invalid field values
+
+17. Run `update category/fruits index/1 qty/-5`
+
+18. Verify that the application shows `Quantity must be a positive integer.`
+
+19. Run `update category/fruits index/1 expiryDate/2026/05/01`
+
+20. Verify that the application shows `Invalid date. Please use yyyy-M-d.`
+
+21. Run `update category/fruits index/1 bin/`
+
+22. Verify that the application shows an error for missing bin location.
+
+---
+
+### Testing unsupported fields
+
+23. Run  
+  `update category/fruits index/1 size/large`
+
+24. Verify that the application shows  
+  `Unsupported field: size` (or corresponding error message).
 
 ### Testing storage
 

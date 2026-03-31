@@ -35,12 +35,11 @@ InventoryDock stores data in `data/inventory.txt`.
 * Data is also saved when you exit the app with `bye`.
 * If the storage file contains corrupted lines, the app skips those lines and continues loading the rest of the inventory.
 
-## Features 
+## Features
 
 Notes about the command format:
 
 * Words in `UPPER_CASE` are placeholders you should replace with your own values.
-* Command keywords are case-sensitive and should be typed exactly as shown.
 * Item and category values are matched case-insensitively by the app.
 * For `add`, fields must appear in the correct order.
 
@@ -248,7 +247,6 @@ When an error occurs, the app prints an error message and waits for the next com
 
 **A**: The category is cleared, but the category itself remains in the inventory.
 
-
 ## Command Summary
 
 * Add item:
@@ -257,9 +255,9 @@ When an error occurs, the app prints an error message and waits for the next com
   `list`
 * Find items by category:
   `find category/CATEGORY`
-* Find item by expiryDate:
- `find expiryDate/DATE`
+* Find items by expiry date:
+  `find expiryDate/DATE`
 * Find items by bin:
   `find bin/BIN_INPUT`
-* `update category/CATEGORY index/INDEX [newItem/NEW_NAME] [bin/NEW_BIN] 
-[qty/NEW_QUANTITY] [expiryDate/NEW_DATE]`
+* Update an item:
+  `update category/CATEGORY index/INDEX [newItem/NEW_NAME] [bin/NEW_BIN] [qty/NEW_QUANTITY] [expiryDate/NEW_DATE]`
