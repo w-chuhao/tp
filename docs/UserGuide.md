@@ -8,10 +8,24 @@ This guide covers the commands needed to add items, list all stored items, and s
 ## Quick Start
 
 1. Ensure that you have Java 17 or above installed.
-1. Download the latest version of the application jar.
-1. Open a terminal in the project folder.
-1. Run `java -jar duke.jar`.
-1. Type a command and press Enter.
+2. Download the latest version of the application jar.
+3. Open a terminal in the project folder.
+4. Run `java -jar duke.jar`.
+5. Type a command and press Enter.
+
+## Command Format
+
+Notes about command syntax:
+
+* Command words are not case-sensitive. For example, `LIST` and `list` are treated the same.
+* Category matching is case-insensitive. For example, `fruits` and `FRUITS` refer to the same category.
+* Field names are case-sensitive. Type them exactly as shown, such as `category/`, `item/`, `qty/`, and `expiryDate/`.
+* For `add`, fields must be entered in the correct order for the selected category.
+* Boolean fields only accept `true` or `false`.
+* Quantities must be positive integers.
+* Dates must use `yyyy-M-d`, for example `2026-3-9` or `2026-12-31`.
+* Bin searches accept `LETTER-NUMBER`, `LETTER`, or `NUMBER`, such as `A-10`, `A`, or `10`.
+* `update` only supports changing common item fields. Category-specific fields cannot be updated.
 
 ## Features 
 
@@ -94,6 +108,25 @@ Expected result:
 * If the category exists but has no items, the app shows `No items found in category: CATEGORY.`
 * If the category does not exist, the app shows an error that the category was not found.
 
+### Find items by expiry date: `find expiryDate/...`
+
+Shows all items whose expiry date is on or before the specified date.
+
+Format:
+
+`find expiryDate/DATE`
+
+Examples:
+
+* `find expiryDate/2026-3-21`
+* `find expiryDate/2026-12-31`
+
+Expected result:
+
+* Items expiring on the given date are included.
+* Items expiring before the given date are also included.
+* If nothing matches, the app shows `No items found expiring by DATE.`
+
 ### Finding items by bin: `find bin/...`
 Shows all items that match a bin search.
 
@@ -120,11 +153,64 @@ Expected result:
 * A bin number matches all items in bins with that number.
 * If no items match, the app shows `No items found in bin location: BIN_INPUT.`
 
+### Update an item: `update`
+
+Updates an existing item in a category by its item index.
+
+Format:
+
+`update category/CATEGORY index/INDEX [newItem/NEW_NAME] [bin/NEW_BIN] [qty/NEW_QUANTITY] [expiryDate/NEW_DATE]`
+
+Updatable fields:
+
+* `newItem/` changes the item name
+* `bin/` changes the bin location
+* `qty/` changes the quantity
+* `expiryDate/` changes the expiry date
+
+Notes:
+
+* `INDEX` is the item number within that category, using 1-based indexing.
+* You must provide at least one field to update.
+* Category-specific fields such as `brand/`, `isRipe/`, or `flavour/` cannot be updated with this command.
+
+Examples:
+
+* `update category/fruits index/1 qty/25`
+* `update category/fruits index/1 newItem/green_apple bin/A-2 expiryDate/2026-4-1`
+
+Expected result:
+
+* The app updates the selected item.
+* The app confirms which item was updated.
+* If the item name changed, the new item name is shown as well.
+
 ## FAQ
 
 **Q**: How do I transfer my data to another computer? 
 
 **A**: Copy the application's data file to the same location on the other computer before starting the app there.
+
+**Q:** Where is my inventory data stored?
+
+**A:** In `data/inventory.txt`.
+
+**Q:** Does the app create new categories?
+
+**A:** No. InventoryDock works with a fixed set of built-in categories.
+
+**Q:** Can I update category-specific fields such as `brand/` or `isFrozen/`?
+
+**A:** No. The `update` command only supports `newItem/`, `bin/`, `qty/`, and `expiryDate/`.
+
+**Q:** What date format should I use?
+
+**A:** Use `yyyy-M-d`, for example `2026-3-21`.
+
+**Q:** What happens if I delete a category?
+
+**A**: The category is cleared, but the category itself remains in the inventory.
+
 
 ## Command Summary
 
@@ -134,5 +220,9 @@ Expected result:
   `list`
 * Find items by category:
   `find category/CATEGORY`
+* Find item by expiryDate:
+ `find expiryDate/DATE`
 * Find items by bin:
   `find bin/BIN_INPUT`
+* `update category/CATEGORY index/INDEX [newItem/NEW_NAME] [bin/NEW_BIN] 
+[qty/NEW_QUANTITY] [expiryDate/NEW_DATE]`
