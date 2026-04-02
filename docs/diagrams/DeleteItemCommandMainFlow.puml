@@ -33,6 +33,7 @@ create DeleteItemCommand
 DeleteCommandParser -> DeleteItemCommand: DeleteItemCommand(categoryName, itemIndex)
 activate DeleteItemCommand
 DeleteItemCommand --> DeleteCommandParser: command
+deactivate DeleteItemCommand
 DeleteCommandParser --> Parser: command
 deactivate DeleteCommandParser
 Parser --> Duke: command
@@ -79,6 +80,7 @@ else category found
     end
 end
 
+DeleteItemCommand --> Duke: display information
 deactivate DeleteItemCommand
 deactivate Duke
 deactivate UI

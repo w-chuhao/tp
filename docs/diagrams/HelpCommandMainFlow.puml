@@ -1,0 +1,39 @@
+@startuml
+title Sequence Diagram for HelpCommand (Main Control Flow Only)
+
+autonumber
+hide footbox
+
+actor User
+participant ":UI" as UI
+participant ":Duke" as Duke
+participant ":Parser" as Parser
+participant ":HelpCommand" as HelpCommand
+
+User -> UI: enter help command
+activate UI
+UI -> Duke: input
+activate Duke
+Duke -> Parser: parse(input)
+activate Parser
+
+create HelpCommand
+Parser -> HelpCommand: HelpCommand()
+activate HelpCommand
+HelpCommand --> Parser: command
+deactivate HelpCommand
+Parser --> Duke: command
+deactivate Parser
+
+Duke -> HelpCommand: execute(inventory, ui)
+activate HelpCommand
+HelpCommand -> UI: showHelp()
+activate UI
+UI --> User: display available commands and User Guide link
+deactivate UI
+
+HelpCommand --> Duke: display information
+deactivate HelpCommand
+deactivate Duke
+deactivate UI
+@enduml

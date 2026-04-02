@@ -43,6 +43,13 @@ Notes about the command format:
 * Item and category values are matched case-insensitively by the app.
 * For `add`, fields must appear in the correct order.
 
+### View help: `help`
+Shows the list of available commands and the link to the published user guide.
+
+Format:
+
+`help`
+
 ### Adding an item: `add`
 Adds a new item to an existing category.
 
@@ -113,6 +120,28 @@ Expected result:
 * All categories are shown in numbered order.
 * Items under each category are listed with their details.
 * If the inventory is empty, the app shows `Inventory is empty.`
+
+### Find items by keyword: `find keyword/...`
+Finds items whose names contain the given keyword.
+
+Format:
+
+`find keyword/KEYWORD`
+
+Notes:
+
+* Matching is case-insensitive.
+* Partial matches work. For example, `apple` matches `apple`, `pineapple`, and `apple_juice`.
+
+Examples:
+
+* `find keyword/apple`
+* `find keyword/chip`
+
+Expected result:
+
+* Matching items are listed together with their category names.
+* If nothing matches, the app shows `No items found matching keyword: KEYWORD.`
 
 ### Finding items by category: `find category/...`
 Shows all items stored in a specified category.
@@ -206,6 +235,52 @@ Expected result:
 * The app confirms which item was updated.
 * If the item name changed, the new item name is shown as well.
 
+### Delete an item: `delete category/... index/...`
+
+Deletes one item from a category by its item index.
+
+Format:
+
+`delete category/CATEGORY index/INDEX`
+
+Notes:
+
+* `INDEX` is the item number within that category, using 1-based indexing.
+
+Example:
+
+`delete category/fruits index/2`
+
+Expected result:
+
+* The selected item is removed from the category.
+* The app confirms the deleted item name and category.
+
+### Clear a category: `delete category/...`
+
+Clears all items in a category.
+
+Format:
+
+`delete category/CATEGORY`
+
+Important:
+
+* This command does not remove the category itself from InventoryDock.
+* If the category is not empty, the app asks for confirmation.
+* Type `yes` to continue.
+* Any other reply cancels the operation.
+
+Example:
+
+`delete category/fruits`
+
+Expected result:
+
+* If confirmed, all items in the category are cleared.
+* The category remains available for future items.
+* If cancelled, no items are removed.
+
 ## Error Handling
 
 Common reasons a command may fail:
@@ -248,11 +323,14 @@ When an error occurs, the app prints an error message and waits for the next com
 **A**: The category is cleared, but the category itself remains in the inventory.
 
 ## Command Summary
-
+* View help:
+  `help`
 * Add item:
   `add category/CATEGORY item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE ...`
 * List all items:
   `list`
+* Find items by keyword:
+  `find keyword/KEYWORD`
 * Find items by category:
   `find category/CATEGORY`
 * Find items by expiry date:
@@ -261,3 +339,7 @@ When an error occurs, the app prints an error message and waits for the next com
   `find bin/BIN_INPUT`
 * Update an item:
   `update category/CATEGORY index/INDEX [newItem/NEW_NAME] [bin/NEW_BIN] [qty/NEW_QUANTITY] [expiryDate/NEW_DATE]`
+* Delete an item
+  `delete category/CATEGORY index/INDEX`
+* Clear a category
+  `delete category/CATEGORY`
