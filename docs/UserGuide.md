@@ -27,6 +27,7 @@ Notes about command syntax:
 * Bin searches accept `LETTER-NUMBER`, `LETTER`, or `NUMBER`, such as `A-10`, `A`, or `10`.
 * Quantity searches return items whose quantity is less than or equal to the specified positive integer.
 * `update` only supports changing common item fields. Category-specific fields cannot be updated.
+* `sort` only supports sorting by name, expiry date and quantity.
 
 ## Data Storage
 
@@ -121,6 +122,28 @@ Expected result:
 * All categories are shown in numbered order.
 * Items under each category are listed with their details.
 * If the inventory is empty, the app shows `Inventory is empty.`
+
+### Sorting items: `sort` (Coming soon)
+Lists the full inventory grouped by category, with the items inside each category sorted by the chosen field.
+
+Format: `sort SORT_TYPE`
+
+Valid `SORT_TYPE` values:
+* `name`: Sorts items alphabetically by item name, ignoring letter case
+* `expirydate` : Sort items by expiry date, from earliest to latest
+* `qty` : Sorts items by quantity, from highest to lowest
+
+Examples:
+
+* `sort name`
+* `sort expirydate`
+* `sort qty`
+
+Expected result:
+
+* Items in each category are sorted according to the chosen sort type.
+* Category order remains unchanged.
+* If the inventory is empty, the app shows Inventory is empty.
 
 ### Find items by keyword: `find keyword/...`
 Finds items whose names contain the given keyword.
@@ -351,6 +374,8 @@ When an error occurs, the app prints an error message and waits for the next com
   `add category/CATEGORY item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE ...`
 * List all items:
   `list`
+* Sort items:
+  `sort SORT_TYPE`
 * Find items by keyword:
   `find keyword/KEYWORD`
 * Find items by category:

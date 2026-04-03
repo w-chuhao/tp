@@ -2,8 +2,8 @@
 
 ## Acknowledgements
 
-This project is develop based on the concepts taught in CS2113. The overall architecture were inspired by SE EDU
-AddressBook Level-3 project: https://se-education.org/addressbook-level3/
+This project is developed based on the concepts taught in CS2113. The overall architecture were inspired by
+the [SE EDU AddressBook Level 3 project](https://se-education.org/addressbook-level3/).
 
 ## Design & implementation
 
@@ -1183,6 +1183,169 @@ If this feature is extended in future versions, the following improvements could
 - Add pagination or condensed summaries for larger inventories.
 - Reuse the same command object for alternate UI front ends if the presentation layer expands.
 
+### Sort Feature (Coming Soon)
+
+The product also supports displaying the current inventory with items sorted within each category using 
+the `sort` command.
+
+This feature is useful because users may want to inspect the inventory from a different perspective without changing 
+the actual stored order of items. For example, a user may want to see which items are expiring earliest, which items 
+have the lowest quantity or items in alphabetical order. The sort command solves this by generating a sorted view 
+of the inventory while keeping items group under their original categories.
+
+For example, if the user enters`sort expirydate`, the system displays all categories as usual, but the items inside 
+each category are shown in ascending expiry date order, allowing the user to quickly identify items that are
+expiring soon.
+
+#### High-level design
+
+This feature extends the existing command-based architecture used by the product. The flow is as follows:
+
+1. The user enters a `sort` command followed by a sort type.
+2. `Parser` recognises the sort command word and delegates the argument to `SortCommandParser`.
+3. `SortCommandParser` validates the sort type and creates a `SortCommand`.
+4. `Duke` executes the command with access to the current `Inventory` and `UI`.
+5. `SortCommand` prepares the sorted view of the inventory.
+6. `UI` displays the sorted inventory while preserving the group by category structure.
+
+This design was chosen because it keeps sorting behaviour within the normal parse then execute command pipeline
+used throughout the application. It also allows the feature to reuse the existing inventory display format instead of
+introducing a completely separate output style.
+
+#### Component-level implementation
+
+The feature is mainly implemented using the following classes:
+
+- `Parser`
+- `SortCommandParser`
+- `SortCommand`
+- `Inventory`
+- `Category`
+- `Item`
+- `UI`
+
+The responsibilities these classes are as follows:
+
+- `Parser` detects the `sort` command and delegates argument parsing to `SortCommandParser`.
+- `SortCommandParser` validates the user supplied sort type and constructs the corresponding command.
+- `SortCommand` performs the sorting preparation and triggers the display behaviour.
+- `Inventory` provides access to the currently stored categories.
+- `Category` provides access to the items stored under each category.
+- `Item` provides the fields used for comparison such as name, expiry date and quantity.
+- `UI` formats and prints the sorted inventory view.
+
+This design keeps parsing, sorting and presentation responsibilities separate, The parser only interprets
+the command, the command prepares the sorted result and the UI remains responsible for rendering it.
+
+#### Command execution flow
+
+When `SortCommand.execute()` is called the implementation performs the following sequence:
+
+1. Assert that `inventory`, `ui` and `sortType` are not `null`.
+2. Retrieve all categories from the `Inventory`.
+3. For each category, make a copy of items item list.
+4. Sort the copied list using the comparator that matches the requested sort type.
+5. Store the sorted lists in the same category order as the original inventory.
+6. Call `ui.showSortedInventory(inventory, sortedItemsByCategory, sortLabel)`.
+7. UI displays the categories in their original order and prints each category's sorted item list.
+
+This means the command does not directly modify the order of items stored inside the actual inventory. Instead, it 
+prepares a sorted view for display.
+
+The main interaction for this flow is illustrated in [SortingMainFlow.png](diagrams/SortingMainFlow.png).
+
+#### Sorting logic
+
+The sorting behaviour depends on the user provided sort type.
+
+- `name`: Sorts items alphabetically by item name, ignoring letter case.
+- `expirydate`: Sorts items by expiry date in ascending order, so earlier expiry dates appear first.
+- `qty`: Sorts items by quantity in descending order, so larger quantities appear first.
+
+For expiry-date sorting, the command relies on date parsing rather than raw string comparison. This is important 
+because proper date parsing ensures dates are compared logically rather than lexicographically.
+
+A simplified version of the sorting approach is:
+
+```java
+List<Item> sortedItems = new ArrayList<>(category.getItems());
+sortedItems.sort(getComparator());
+```
+
+The sorted item lists are then passed to the UI for display.
+
+#### Why the feature is implemented this way
+
+The most important design choice in this feature is that sorting is performed on copied item lists instead of 
+changing the order of items inside the actual inventory.
+
+This was chosen for three reasons.
+
+First, the feature is intended to provide an alternative view of the inventory rather than mutate the underlying data. 
+A user who runs `sort name` is usually asking to inspect the data in a different order, not to permanently reorder the 
+stored inventory.
+
+Second, it avoids unintended side effects. If the underlying item order were modified directly, later commands that 
+depend on the original ordering, such as deletion or updating by index, could behave differently in ways the user 
+did not expect.
+
+Third, it keeps the implementation simple and safe. By sorting copies of the item lists, the command can generate the 
+desired output without changing the model state.
+
+Another deliberate design choice is that the category order is preserved. Only the items within each category are 
+sorted. This keeps the output structure familiar and consistent with the normal `list` command.
+
+#### Error handling and validation
+
+Input validation is handled mainly by `SortCommandParser`.
+
+If the user enters `sort` without providing a sort type, the parser throws a `DukeException` indicating that a valid 
+sort type is required.
+
+If the user provides an unsupported sort type, the parser throws a `DukeException` listing the valid options, 
+such as `name`, `expirydate`, and `qty`.
+
+At execution time, the command handles an empty inventory gracefully. The UI displays the appropriate empty inventory 
+message instead of failing.
+
+#### Alternatives considered
+
+Several alternatives were considered when implementing this feature.
+
+Alternative 1: Permanently reorder items inside each category.
+
+This was rejected because the sort command is intended as a display oriented feature rather than a data mutation 
+feature. Permanently changing the stored order could make other index based commands less predictable.
+
+Alternative 2: Extend the `list` command to accept optional sorting arguments.
+
+This was rejected because it would complicate the behaviour of `list`, which is currently simple and predictable. 
+Keeping `sort` as a separate command makes each command’s purpose clearer.
+
+Alternative 3: Sort both categories and items.
+
+This was rejected because the primary user need is to inspect items within each category more easily. Reordering 
+categories as well would make the output less consistent with the rest of the application.
+
+#### Current limitations
+
+The current implementation has some limitations.
+
+- It only supports one sorting criterion at a time.
+- It preserves category order and does not sort categories themselves.
+- It depends on valid item data for correct field comparison, especially for expiry-date sorting.
+- It currently only support fix direction of sorting, user cannot choose ascending or descending.
+
+These limitations are acceptable for the current project scope.
+
+#### Possible future improvements
+
+If this feature is extended in future versions, the following improvements could be considered:
+
+- Support multi-level sorting such as sorting by expiry date and then by name.
+- Allow categories themselves to be sorted optionally.
+- Support ascending and descending variants for each sort type.
+
 ### Storage feature
 
 This product includes a storage component that is responsible for persisting inventory data
@@ -2159,6 +2322,21 @@ After setting up the application, proceed to the individual test cases below.
 
 24. Verify that the application shows  
   `Unsupported field: size` (or corresponding error message).
+
+### Testing Sort Command
+1. Add several items into at least one category with different names, expiry dates, and quantities.
+2. Run `sort name`.
+3. Verify that items within each category are shown in alphabetical order by name.
+4. Run `sort expirydate`.
+5. Verify that items within each category are shown from earliest to latest expiry date.
+6. Run `sort qty`.
+7. Verify that items within each category are shown from highest to lowest quantity.
+8. Run `sort invalidType`.
+9. Verify that the application shows the appropriate invalid sort type error message.
+10. Run `sort` with no argument.
+11. Verify that the application shows the missing sort type error message.
+12. Run the command on an empty inventory.
+13. Verify that the application handles it without crashing and displays the appropriate empty state.
 
 ### Testing storage
 

@@ -38,6 +38,8 @@ public class Parser {
             return new UpdateCommandParser(ui).parse(arguments);
         case "find":
             return new FindItemParser(ui).parse(arguments);
+        case "sort":
+            return new SortCommandParser().parse(arguments);
         case "list":
             return new ListCommand();
         case "help":

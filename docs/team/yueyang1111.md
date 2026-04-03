@@ -73,37 +73,59 @@ Key aspects of the implementation:
 This contribution is significant because the add-item feature is one of the product’s main write operations. It depends 
 heavily on correct parsing and validation to ensure that user input is translated into valid inventory records.
 
+#### 5. Sorting feature
+
+I contributed to the sorting feature by implementing the parsing logic and integrating it into the command pipeline.
+This feature allows users to view the inventory with items sorted within each category based on different criteria. 
+This enhances the usability of the application by enabling users to analyse inventory data more effectively without 
+modifying the stored order.
+
+Key aspects of the implementation:
+
+1. Implemented SortCommandParser to handle user input for the sort command.
+2. Added validation to ensure that only supported sort types (name, expirydate, qty) are accepted.
+3. Provided clear error messages for missing or invalid sort types to improve user experience.
+4. Integrated the parser with the existing command architecture to correctly construct and return a SortCommand.
+5. Ensured consistency with other command parsers in terms of input handling, validation, and logging.
+
+This contribution is important because it enables the sorting feature to be correctly triggered and used by users, 
+ensuring reliable command interpretation and error handling.
+
 ### Contributions to the User Guide
 
 I contributed to the user-facing documentation for features related to my implementation work. In particular, I wrote or 
 updated sections related to:
 
-1. Error handling and expected invalid-input behaviour
-2. Storage and data persistence behaviour
+1. Error handling and expected invalid-input behaviour.
+2. Storage and data persistence behaviour.
+3. Sorting feature, including command usage, supported sort types, and expected behaviour.
 
 These updates helped make the product easier for users to understand without needing to inspect the source code.
 
 ### Contributions to the Developer Guide
 
-I contributed technical documentation for the components I worked on, specifically the storage implementation 
-and loading flow.
+I contributed technical documentation for the components I worked on, specifically the storage implementation, 
+loading flow and the sorting feature.
 
 I was responsible for writing the Developer Guide sections related to storage, including explaining how data is 
 persisted and reconstructed during application startup.
+
+For the sorting feature, I documented the design and control flow of the sort command, including how user input is
+parsed, validated, and passed into the command pipeline, as well as how the sorted view is generated and displayed.
 
 In addition, I contributed to the non-technical sections of the documentation, such as the overall project description, 
 product scope, and user stories, to provide context on the system’s purpose and intended usage.
 
 My contributions included:
 
-1. Implementation details and design rationale
+1. Implementation details and design rationale (Storage and sorting)
 2. Component interaction and control flow
 3. Handling of invalid or malformed input
 4. Limitations and possible future improvements
-5. Manual testing considerations
+5. Manual testing considerations for storage and sorting features
 
 I also contributed to and updated UML sequence diagrams to illustrate the storage loading flow and overall interaction 
-between components.
+between components, as well as the soring command execution flow.
 
 ### Contributions to Team-Based Tasks
 
