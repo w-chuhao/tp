@@ -4,12 +4,16 @@ import seedu.duke.exception.DukeException;
 import seedu.duke.parser.DateParser;
 import seedu.duke.parser.FieldParser;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Parses and validates fields shared by item categories.
  * A <code>CommonFieldParser</code> object stores the parsed values for
  * category name, item name, bin location, quantity, and expiry date.
  */
 public class CommonFieldParser {
+    private static final Logger logger = Logger.getLogger(CommonFieldParser.class.getName());
     public final String itemName;
     public final String categoryName;
     public final String bin;
@@ -42,11 +46,13 @@ public class CommonFieldParser {
         String itemName = FieldParser.extractField(
                 input, "item/", "bin/");
         if (itemName == null || itemName.isEmpty()) {
+            logger.log(Level.WARNING, "Missing item name while parsing common fields.");
             throw new DukeException("Missing item name.");
         }
 
         String bin = FieldParser.extractField(input, "bin/", "qty/");
         if (bin == null || bin.trim().isEmpty()) {
+            logger.log(Level.WARNING, "Missing bin location while parsing common fields.");
             throw new DukeException("Missing bin location.");
         }
 
@@ -58,6 +64,8 @@ public class CommonFieldParser {
                 input, "expiryDate/", fieldAfterExpiry);
         validateExpiryDate(expiryDate);
 
+        logger.log(Level.INFO, "Parsed common fields for item '" + itemName
+                + "' in category '" + categoryName + "'.");
         return new CommonFieldParser(itemName, categoryName, bin, quantity, expiryDate);
     }
 
@@ -71,6 +79,7 @@ public class CommonFieldParser {
     public static int parseQuantity(String quantityString) throws DukeException {
         if (quantityString == null
                 || quantityString.trim().isEmpty()) {
+            logger.log(Level.WARNING, "Missing quantity while parsing common fields.");
             throw new DukeException("Missing quantity.");
         }
 
@@ -78,10 +87,12 @@ public class CommonFieldParser {
         try {
             quantity = Integer.parseInt(quantityString.trim());
         } catch (NumberFormatException e) {
+            logger.log(Level.WARNING, "Invalid quantity format: " + quantityString);
             throw new DukeException("Quantity must be an integer.");
         }
 
         if (quantity <= 0) {
+            logger.log(Level.WARNING, "Non-positive quantity encountered: " + quantity);
             throw new DukeException("Quantity must be a positive integer.");
         }
 
@@ -96,8 +107,10 @@ public class CommonFieldParser {
      */
     public static void validateExpiryDate(String expiryDate) throws DukeException {
         if (expiryDate == null || expiryDate.trim().isEmpty()) {
+            logger.log(Level.WARNING, "Missing expiry date while parsing common fields.");
             throw new DukeException("Missing expiry date.");
         }
+        logger.log(Level.INFO, "Validating expiry date: " + expiryDate);
         DateParser.validateDate(expiryDate);
     }
 }

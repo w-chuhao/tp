@@ -9,12 +9,16 @@ import seedu.duke.parser.Parser;
 import seedu.duke.storage.Storage;
 import seedu.duke.ui.UI;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Represents the main entry point and application loop for Duke.
  * A <code>Duke</code> object initializes the core components, loads stored data,
  * and processes user commands until exit.
  */
 public class Duke {
+    private static final Logger logger = Logger.getLogger(Duke.class.getName());
     private final Inventory inventory;
     private final UI ui;
     private final Parser parser;
@@ -30,6 +34,7 @@ public class Duke {
         inventory = new Inventory();
         parser = new Parser(ui);
         storage = new Storage("./data/inventory.txt");
+        logger.log(Level.INFO, "Initializing Duke application.");
 
         String[] categoryNames = {
             "fruits",
@@ -52,6 +57,7 @@ public class Duke {
         }
 
         storage.load(inventory, ui);
+        logger.log(Level.INFO, "Loaded inventory with " + inventory.getCategoryCount() + " categories.");
     }
 
     /**
@@ -71,6 +77,7 @@ public class Duke {
      * Successful commands are persisted after execution, and exit also triggers a save.
      */
     public void run() {
+        logger.log(Level.INFO, "Starting Duke command loop.");
         ui.showWelcome();
 
         String input;
@@ -83,17 +90,21 @@ public class Duke {
                 }
 
                 if (command.isExit()) {
+                    logger.log(Level.INFO, "Exit command received. Saving inventory and shutting down.");
                     storage.save(inventory);
                     break;
                 }
 
+                logger.log(Level.INFO, "Executing command: " + command.getClass().getSimpleName());
                 command.execute(inventory, ui);
                 storage.save(inventory);
             } catch (DukeException e) {
+                logger.log(Level.WARNING, "Command processing failed: " + e.getMessage());
                 ui.showError(e.getMessage());
             }
         }
 
+        logger.log(Level.INFO, "Closing Duke application.");
         ui.showGoodbye();
         ui.close();
     }

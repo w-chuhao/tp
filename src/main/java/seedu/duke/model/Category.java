@@ -2,12 +2,15 @@ package seedu.duke.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Represents a category containing inventory items.
  * A <code>Category</code> object stores a category name and its associated items.
  */
 public class Category {
+    private static final Logger logger = Logger.getLogger(Category.class.getName());
     private String name;
     private final List<Item> items;
 
@@ -35,6 +38,7 @@ public class Category {
 
     public void addItem(Item item) {
         items.add(item);
+        logger.log(Level.INFO, "Added item '" + item.getName() + "' to category '" + name + "'.");
     }
 
     public Item getItem(int index) {
@@ -57,8 +61,10 @@ public class Category {
      */
     public void removeItem(int index) {
         if (index < 0 || index >= items.size()) {
+            logger.log(Level.WARNING, "Invalid item removal index " + index + " for category '" + name + "'.");
             throw new IndexOutOfBoundsException("Invalid item index");
         }
+        logger.log(Level.INFO, "Removed item '" + items.get(index).getName() + "' from category '" + name + "'.");
         items.remove(index);
     }
 
