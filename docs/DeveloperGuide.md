@@ -2,11 +2,32 @@
 
 ## Acknowledgements
 
-{list here sources of all reused/adapted ideas, code, documentation, and third-party libraries -- include links to the original source as well}
+This project is developed based on the concepts taught in CS2113. The overall architecture were inspired by
+the [SE EDU AddressBook Level 3 project](https://se-education.org/addressbook-level3/).
 
 ## Design & implementation
 
-{Describe the design and implementation of the product. Use UML diagrams and short code snippets where applicable.}
+This section describes the overall design of the application and how its main components interact.
+
+The application follows a command-based architecture, where user input is parsed into commands that operate on the 
+underlying data model. The system is structured into several key components:
+
+- Parser: Interprets user input and constructs the appropriate command objects.
+- Command: Encapsulates the logic to execute specific user operations.
+- Model: Stores the inventory data, including categories and items.
+- Storage: Handles reading from and writing to the storage file.
+- UI: Manages all user's input and output.
+  
+When a user enters a command, the `Parser` interprets the input and returns a corresponding `Command` object. 
+The `Command` is then executed, modifying the `Model` if necessary and delegating output to the `UI`. 
+After execution, the updated state of the `Model` is saved by the `Storage` component.
+
+This design enforces separation of concerns:
+- Parsing logic is separated from execution logic.
+- Data persistence is handled independently by the storage layer.
+
+This modular structure improves maintainability and allows new features to be added with minimal impact on 
+existing components.
 
 ### Find Item By Expiry Date Feature
 
@@ -227,7 +248,7 @@ follows:
 5. The command attempts to locate the matching category and displays either the items or an
    appropriate message.
 
-The main interaction for this flow is illustrated in [FindItemByCategoryCommandMainFlow.puml](diagram/FindItemByCategoryCommandMainFlow.puml).
+The main interaction for this flow is illustrated in [FindItemByCategoryCommandMainFlow.png](diagrams/FindItemByCategoryCommandMainFlow-Sequence_Diagram_for_FindItemByCategoryCommand__Main_Control_Flow_Only_.png).
 
 This design was chosen because it follows the same separation of concerns already used throughout the
 project:
@@ -390,7 +411,7 @@ is as follows:
 4. The command is executed with access to the current `Inventory` and `UI`.
 5. The command scans the inventory, identifies matching bin locations, and displays the result.
 
-The main interaction for this flow is illustrated in [FindItemByBinCommandMainFlow.puml](diagram/FindItemByBinCommandMainFlow.puml).
+The main interaction for this flow is illustrated in [FindItemByBinCommandMainFlow.png](diagrams/FindItemByBinCommandMainFlow-Sequence_Diagram_for_FindItemByBinCommand__Main_Control_Flow_Only_.png).
 
 This design was chosen because it allows bin-specific input normalisation to remain in the parser
 layer, while the matching and display behaviour stays in the command layer.
@@ -554,7 +575,7 @@ application. The feature follows this flow:
 5. An `AddItemCommand` is created and executed with access to the current `Inventory` and `UI`.
 6. The command finds the target category, inserts the item, and shows a confirmation message.
 
-The main interaction for this flow is illustrated in [AddItemCommandMainFlow.puml](diagram/AddItemCommandMainFlow.puml).
+The main interaction for this flow is illustrated in [AddItemCommandMainFlow.png](diagrams/AddItemCommandMainFlow-Sequence_Diagram_for_AddItemCommand__Main_Control_Flow_Only_.png).
 
 This design was chosen because it preserves the same separation of responsibilities used elsewhere
 in the codebase:
@@ -705,6 +726,220 @@ If this feature is extended in future versions, the following improvements could
 - Support optional default values for selected fields where domain rules permit them.
 - Separate category definitions from parser code so new item types can be added with less wiring.
 
+### Update Item Feature
+
+Another core feature of the product is the ability to update an existing item in a category using the
+`update` command.
+
+This feature is necessary because inventory records may change over time. A user may need to correct an
+item name, adjust its quantity, move it to a different bin location, or revise its expiry date. Without
+an update operation, the user would have to delete the item and recreate it manually, which is less
+efficient and more error-prone. The update-item command solves this by allowing selected fields of an
+existing item to be modified directly.
+
+For example, if the user enters  
+`update category/fruits index/1 qty/20 expiryDate/2026-4-15`,  
+the system locates the first item in the fruits category and updates its quantity and expiry date  
+while leaving its other fields unchanged.
+
+#### High-level design
+
+At a high level, this feature fits into the same command-based architecture used throughout the
+application. The flow is as follows:
+
+* The user enters an `update` command.
+* Parser recognises the `update` command word and delegates the remaining input to `UpdateCommandParser`.
+* `UpdateCommandParser` extracts the category, item index, and the fields to be updated.
+* The parser creates an `UpdateItemCommand`.
+* The command is executed with access to the current `Inventory` and `UI`.
+* The command locates the target category and item, applies the requested updates, and shows a
+  confirmation message.
+
+This design was chosen because it preserves the same separation of concerns already used by the rest
+of the application:
+
+* Parsers interpret user input.
+* Command classes implement behaviour.
+* Model classes store inventory data.
+* UI displays the final result.
+
+As a result, the update feature integrates cleanly into the existing command pipeline without requiring
+a separate editing subsystem.
+
+#### Component-level implementation
+
+The feature is mainly implemented using the following classes:
+
+* `Parser`
+* `UpdateCommandParser`
+* `UpdateItemCommand`
+* `Inventory`
+* `Category`
+* `Item`
+* `CommonFieldParser`
+* `UI`
+
+The responsibilities of these classes are as follows:
+
+* `Parser` detects the update command word and delegates to `UpdateCommandParser`.
+* `UpdateCommandParser` tokenises the input, validates `category/` and `index/`, collects the updated
+  fields into a `Map<String, String>`, and constructs an `UpdateItemCommand`.
+* `UpdateItemCommand` locates the item and applies the requested changes.
+* `Inventory` provides category lookup using `findCategoryByName(...)`.
+* `Category` provides indexed item access through `getItem(...)`.
+* `Item` provides setter methods such as `setName(...)`, `setQuantity(...)`, `setBinLocation(...)`,
+  and `setExpiryDate(...)`.
+* `CommonFieldParser` is reused for quantity and expiry-date validation so that update validation stays
+  consistent with add-command validation.
+* `UI` displays the result after the update is completed.
+
+This design intentionally separates parsing from mutation. The parser determines what should be updated,
+while the command is responsible for locating the correct item and applying the changes.
+
+#### Command execution flow
+
+When `UpdateItemCommand.execute()` is called, the implementation performs the following sequence:
+
+* Assert that `inventory` and `ui` are not null.
+* Call `inventory.findCategoryByName(categoryName)` to locate the target category.
+* If the category is not found, throw a `DukeException`.
+* Validate that the provided `itemIndex` is within the valid range for that category.
+* Retrieve the target item using `category.getItem(itemIndex - 1)`.
+* Store the original item name for display purposes.
+* Call `applyUpdates(item)`.
+* Iterate through each entry in the updates map.
+* Match each field name using a switch statement.
+* Apply the corresponding update to the item.
+* After all updates are applied, call `ui.showItemUpdated(...)`.
+
+The central logic is:
+
+```java
+Category category = inventory.findCategoryByName(categoryName);
+if (category == null) {
+   throw new DukeException("Category not found: " + categoryName);
+}
+
+if (itemIndex < 1 || itemIndex > category.getItemCount()) {
+   throw new DukeException("Invalid item index: " + itemIndex);
+}
+
+Item item = category.getItem(itemIndex - 1);
+String originalName = item.getName();
+applyUpdates(item);
+ui.showItemUpdated(originalName, item.getName(), category.getName());
+```
+
+#### Why the feature is implemented this way
+
+The most important design choice in this feature is that the parser stores updates in a  
+`Map<String, String>` rather than creating a different command class for every possible update  
+combination.
+
+This was chosen for three reasons.
+
+* First, it keeps the parsing logic flexible. A user may update one field or several fields in a single  
+  command, and a map allows the parser to capture all requested updates without requiring a separate  
+  representation for every case.
+
+* Second, it keeps the command extensible. New updatable fields can be added by extending the switch  
+  statement inside `applyUpdates(...)` instead of redesigning the overall feature.
+
+* Third, it avoids unnecessary duplication. The same update mechanism can handle name, quantity, bin, and  
+  expiry date changes in one place.
+
+Another deliberate design choice is reusing existing validation helpers such as  
+`CommonFieldParser.parseQuantity(...)` and `CommonFieldParser.validateExpiryDate(...)`. This ensures  
+that update commands follow the same validation rules as add commands, which improves consistency across  
+the application.
+
+#### Error handling and validation
+
+Validation is split across the parser layer and the command layer.
+
+`UpdateCommandParser` handles syntax-level validation. It rejects:
+
+* empty update input  
+* malformed tokens without a valid `/` separator  
+* missing `category/`  
+* missing `index/`  
+* non-integer item indices  
+* non-positive item indices  
+* update commands that do not specify any fields to change  
+
+`UpdateItemCommand` handles execution-time validation. It rejects:
+
+* missing categories  
+* invalid item indices for the chosen category  
+* unsupported update fields  
+* empty updated names or empty bin locations  
+* invalid quantities  
+* invalid expiry-date values  
+
+This layered design ensures invalid input is rejected early, while still protecting the command layer  
+from invalid runtime state.
+
+#### Alternatives considered
+
+Several alternatives were considered when implementing this feature.
+
+* Alternative 1: Delete and re-add the item instead of supporting update.  
+  This was rejected because it is less convenient for the user and makes small corrections unnecessarily  
+  verbose.
+
+* Alternative 2: Create a separate command for each field, such as `UpdateQuantityCommand` or  
+  `UpdateExpiryDateCommand`.  
+  This was rejected because it would significantly increase the number of command classes and make the  
+  design more fragmented.
+
+* Alternative 3: Allow the parser to mutate the item directly.  
+  This was rejected because it breaks the separation between parsing and execution. Parsers should  
+  interpret input, while commands should perform behaviour.
+
+---
+
+#### Current limitations
+
+The current implementation has some limitations.
+
+* Only shared item fields are updatable: `newItem/`, `bin/`, `qty/`, and `expiryDate/`. Category-specific  
+  fields such as `size/`, `brand/`, or `isRipe/` cannot currently be updated.  
+* Unsupported fields cause the command to fail instead of being ignored.  
+* The command depends on item indices, so the user may need to run `list` or `find` beforehand to  
+  determine the correct target item.  
+* Updating one item does not currently show the full updated item record after completion.  
+
+These limitations are acceptable for the current project scope, but they highlight possible areas for  
+future enhancement.
+
+---
+
+#### Possible future improvements
+
+If this feature is extended in future versions, the following improvements could be considered:
+
+* Support updates to category-specific fields such as `size/`, `brand/`, `flavour/`, or `isRipe/`.  
+* Show the full updated item details after a successful edit.  
+* Support updating multiple matched items in batch mode.  
+* Replace index-based targeting with more flexible item matching and disambiguation.  
+
+### Testing update item
+
+* Ensure the inventory contains at least one category with items, for example `fruits`.
+
+* Run  
+  `add category/fruits item/apple bin/A1 qty/10 expiryDate/2026-4-01 size/medium isRipe/true`
+
+* Run  
+  `update category/fruits index/1 qty/20`
+
+* Verify that the application shows a confirmation message indicating the item was updated.
+
+* Run `list`.
+
+* Verify that the quantity of apple is now updated to 20.
+
+
 ### List Feature
 
 The product also supports displaying the current inventory using the `list` command.
@@ -727,7 +962,7 @@ architecture:
 4. `ListCommand` delegates rendering to `UI.showInventory(inventory)`.
 5. `UI` iterates through the inventory and prints the formatted listing to the user.
 
-The main interaction for this flow is illustrated in [ListCommandMainFlow.puml](diagram/ListCommandMainFlow.puml).
+The main interaction for this flow is illustrated in [ListCommandMainFlow.png](diagrams/ListCommandMainFlow-Sequence_Diagram_for_ListCommand__Main_Control_Flow_Only_.png).
 
 This design was chosen because listing inventory does not require separate parsing logic beyond
 recognising the command word. The command object acts mainly as a bridge between the parser and the UI.
@@ -840,6 +1075,169 @@ If this feature is extended in future versions, the following improvements could
 - Add pagination or condensed summaries for larger inventories.
 - Reuse the same command object for alternate UI front ends if the presentation layer expands.
 
+### Sort Feature (Coming Soon)
+
+The product also supports displaying the current inventory with items sorted within each category using 
+the `sort` command.
+
+This feature is useful because users may want to inspect the inventory from a different perspective without changing 
+the actual stored order of items. For example, a user may want to see which items are expiring earliest, which items 
+have the lowest quantity or items in alphabetical order. The sort command solves this by generating a sorted view 
+of the inventory while keeping items group under their original categories.
+
+For example, if the user enters`sort expirydate`, the system displays all categories as usual, but the items inside 
+each category are shown in ascending expiry date order, allowing the user to quickly identify items that are
+expiring soon.
+
+#### High-level design
+
+This feature extends the existing command-based architecture used by the product. The flow is as follows:
+
+1. The user enters a `sort` command followed by a sort type.
+2. `Parser` recognises the sort command word and delegates the argument to `SortCommandParser`.
+3. `SortCommandParser` validates the sort type and creates a `SortCommand`.
+4. `Duke` executes the command with access to the current `Inventory` and `UI`.
+5. `SortCommand` prepares the sorted view of the inventory.
+6. `UI` displays the sorted inventory while preserving the group by category structure.
+
+This design was chosen because it keeps sorting behaviour within the normal parse then execute command pipeline
+used throughout the application. It also allows the feature to reuse the existing inventory display format instead of
+introducing a completely separate output style.
+
+#### Component-level implementation
+
+The feature is mainly implemented using the following classes:
+
+- `Parser`
+- `SortCommandParser`
+- `SortCommand`
+- `Inventory`
+- `Category`
+- `Item`
+- `UI`
+
+The responsibilities these classes are as follows:
+
+- `Parser` detects the `sort` command and delegates argument parsing to `SortCommandParser`.
+- `SortCommandParser` validates the user supplied sort type and constructs the corresponding command.
+- `SortCommand` performs the sorting preparation and triggers the display behaviour.
+- `Inventory` provides access to the currently stored categories.
+- `Category` provides access to the items stored under each category.
+- `Item` provides the fields used for comparison such as name, expiry date and quantity.
+- `UI` formats and prints the sorted inventory view.
+
+This design keeps parsing, sorting and presentation responsibilities separate, The parser only interprets
+the command, the command prepares the sorted result and the UI remains responsible for rendering it.
+
+#### Command execution flow
+
+When `SortCommand.execute()` is called the implementation performs the following sequence:
+
+1. Assert that `inventory`, `ui` and `sortType` are not `null`.
+2. Retrieve all categories from the `Inventory`.
+3. For each category, make a copy of items item list.
+4. Sort the copied list using the comparator that matches the requested sort type.
+5. Store the sorted lists in the same category order as the original inventory.
+6. Call `ui.showSortedInventory(inventory, sortedItemsByCategory, sortLabel)`.
+7. UI displays the categories in their original order and prints each category's sorted item list.
+
+This means the command does not directly modify the order of items stored inside the actual inventory. Instead, it 
+prepares a sorted view for display.
+
+The main interaction for this flow is illustrated in [SortingMainFlow.png](diagrams/SortingMainFlow.png).
+
+#### Sorting logic
+
+The sorting behaviour depends on the user provided sort type.
+
+- `name`: Sorts items alphabetically by item name, ignoring letter case.
+- `expirydate`: Sorts items by expiry date in ascending order, so earlier expiry dates appear first.
+- `qty`: Sorts items by quantity in descending order, so larger quantities appear first.
+
+For expiry-date sorting, the command relies on date parsing rather than raw string comparison. This is important 
+because proper date parsing ensures dates are compared logically rather than lexicographically.
+
+A simplified version of the sorting approach is:
+
+```java
+List<Item> sortedItems = new ArrayList<>(category.getItems());
+sortedItems.sort(getComparator());
+```
+
+The sorted item lists are then passed to the UI for display.
+
+#### Why the feature is implemented this way
+
+The most important design choice in this feature is that sorting is performed on copied item lists instead of 
+changing the order of items inside the actual inventory.
+
+This was chosen for three reasons.
+
+First, the feature is intended to provide an alternative view of the inventory rather than mutate the underlying data. 
+A user who runs `sort name` is usually asking to inspect the data in a different order, not to permanently reorder the 
+stored inventory.
+
+Second, it avoids unintended side effects. If the underlying item order were modified directly, later commands that 
+depend on the original ordering, such as deletion or updating by index, could behave differently in ways the user 
+did not expect.
+
+Third, it keeps the implementation simple and safe. By sorting copies of the item lists, the command can generate the 
+desired output without changing the model state.
+
+Another deliberate design choice is that the category order is preserved. Only the items within each category are 
+sorted. This keeps the output structure familiar and consistent with the normal `list` command.
+
+#### Error handling and validation
+
+Input validation is handled mainly by `SortCommandParser`.
+
+If the user enters `sort` without providing a sort type, the parser throws a `DukeException` indicating that a valid 
+sort type is required.
+
+If the user provides an unsupported sort type, the parser throws a `DukeException` listing the valid options, 
+such as `name`, `expirydate`, and `qty`.
+
+At execution time, the command handles an empty inventory gracefully. The UI displays the appropriate empty inventory 
+message instead of failing.
+
+#### Alternatives considered
+
+Several alternatives were considered when implementing this feature.
+
+Alternative 1: Permanently reorder items inside each category.
+
+This was rejected because the sort command is intended as a display oriented feature rather than a data mutation 
+feature. Permanently changing the stored order could make other index based commands less predictable.
+
+Alternative 2: Extend the `list` command to accept optional sorting arguments.
+
+This was rejected because it would complicate the behaviour of `list`, which is currently simple and predictable. 
+Keeping `sort` as a separate command makes each command’s purpose clearer.
+
+Alternative 3: Sort both categories and items.
+
+This was rejected because the primary user need is to inspect items within each category more easily. Reordering 
+categories as well would make the output less consistent with the rest of the application.
+
+#### Current limitations
+
+The current implementation has some limitations.
+
+- It only supports one sorting criterion at a time.
+- It preserves category order and does not sort categories themselves.
+- It depends on valid item data for correct field comparison, especially for expiry-date sorting.
+- It currently only support fix direction of sorting, user cannot choose ascending or descending.
+
+These limitations are acceptable for the current project scope.
+
+#### Possible future improvements
+
+If this feature is extended in future versions, the following improvements could be considered:
+
+- Support multi-level sorting such as sorting by expiry date and then by name.
+- Allow categories themselves to be sorted optionally.
+- Support ascending and descending variants for each sort type.
+
 ### Storage feature
 
 This product includes a storage component that is responsible for persisting inventory data
@@ -904,6 +1302,8 @@ public String toStorageString(String categoryName) {
 This design ensures that each subclass is responsible for serializing its own data,
 while the `Storage` class remains independent of specific item types.
 
+The main interaction for this flow is illustrated in [StorageSavingMainFlow.png](diagrams/StorageSavingMainFlow.png).
+
 #### Loading execution flow
 
 When the application loads data from file, `Storage` performs the following sequence:
@@ -925,6 +1325,8 @@ written is also the data that can be read back correctly.
 
 This approach reuses existing parsing logic, ensuring consistency between user input handling and 
 stored data reconstruction.
+
+The main interaction for this flow is illustrated in [StorageLoadingMainFlow.png](diagrams/StorageLoadingMainFlow.png).
 
 #### Error handling and validation
 
@@ -991,33 +1393,680 @@ commands. This would reduce coupling and improve clarity of storage logic.
 3. Instead of skipping malformed lines completely, the system could attempt partial recovery and
 provide more detailed diagnostics to the user. This would reduce potential data loss.
 
+### Delete Item Feature
+
+Another core feature of the product is the ability to delete an item from a specific category using
+the command `delete category/CATEGORY index/INDEX`.
+
+This feature is necessary because users need to remove items that are no longer available, have been
+fully consumed, or were added by mistake. Without a targeted delete operation, users would have no way
+to keep the inventory accurate over time. The delete-item command solves this by allowing the user to
+specify the category and the 1-based index of the item to remove.
+
+For example, if the user enters `delete category/fruits index/1`, the system locates the `fruits`
+category, removes the first item in it, and displays a confirmation message showing which item was
+deleted.
+
+#### High-level design
+
+At a high level, this feature fits into the existing command-based architecture of the application.
+The flow is as follows:
+
+1. The user enters a `delete` command with both `category/` and `index/` fields.
+2. `Parser` recognises the `delete` command word and delegates the remaining input to
+   `DeleteCommandParser`.
+3. `DeleteCommandParser` extracts the category name and index string, validates them, and creates a
+   `DeleteItemCommand`.
+4. The command is executed with access to the current `Inventory` and `UI`.
+5. The command looks up the category, validates the index, removes the item, and shows a confirmation
+   message.
+
+The main interaction for this flow is illustrated in
+[DeleteItemCommandMainFlow.png](diagrams/DeleteItemCommandMainFlow-Sequence_Diagram_for_DeleteItemCommand__Main_Control_Flow_Only_.png).
+
+This design was chosen because it follows the same separation of concerns used throughout the project:
+
+- `Parser` and `DeleteCommandParser` interpret user input.
+- `DeleteItemCommand` performs the inventory mutation.
+- Model classes such as `Inventory`, `Category`, and `Item` hold the application state.
+- `UI` presents confirmation or error messages to the user.
+
+As a result, the delete-item feature integrates cleanly into the existing command pipeline without
+requiring changes to the overall architecture.
+
+#### Component-level implementation
+
+The feature is mainly implemented using the following classes:
+
+- `Parser`
+- `DeleteCommandParser`
+- `DeleteItemCommand`
+- `Inventory`
+- `Category`
+- `Item`
+- `UI`
+
+The responsibilities of these classes are as follows:
+
+- `Parser` detects the `delete` command word and delegates to `DeleteCommandParser`.
+- `DeleteCommandParser` tokenises the arguments, extracts `category/` and `index/` fields, validates
+  that the index is a positive integer, and constructs a `DeleteItemCommand`.
+- `DeleteItemCommand` performs the actual removal of the item from the inventory.
+- `Inventory` provides category lookup through `findCategoryByName(...)`.
+- `Category` provides item access through `getItem(...)` and removal through `removeItem(...)`.
+- `Item` provides the name of the deleted item for the confirmation message.
+- `UI` displays the result to the user.
+
+The parser logic deliberately separates field extraction from index validation.
+`DeleteCommandParser.parse(...)` handles tokenisation and field extraction, while the private helper
+`parseDeleteItem(...)` is responsible for converting the index string into a valid integer. This keeps
+each method focused on a single concern.
+
+#### Command execution flow
+
+When `DeleteItemCommand.execute()` is called, the implementation performs the following sequence:
+
+1. Assert that `inventory`, `ui`, and `categoryName` are not `null`.
+2. Call `inventory.findCategoryByName(categoryName)` to locate the target category.
+3. If the category is not found, call `ui.showCategoryNotFound(categoryName)` and return.
+4. Check whether `itemIndex` is within the valid range (1 to `category.getItemCount()`).
+5. If the index is out of range, call `ui.showError(...)` with a message describing the valid range
+   and return.
+6. Retrieve the item at position `itemIndex - 1` using `category.getItem(...)`.
+7. Remove the item at position `itemIndex - 1` using `category.removeItem(...)`.
+8. Log the deletion at `INFO` level.
+9. Call `ui.showItemDeleted(item.getName(), category.getName())` to confirm the deletion to the user.
+
+#### Error handling and validation
+
+Validation is split across the parser layer and the command layer.
+
+`DeleteCommandParser` rejects input that is empty, contains unrecognised fields, or is missing the
+required `category/` field. If `index/` is provided, `parseDeleteItem(...)` rejects non-integer values
+and non-positive integers before a `DeleteItemCommand` is created.
+
+`DeleteItemCommand` performs execution-time checks. If the category does not exist in the inventory,
+the command shows a category-not-found message. If the index is out of bounds for the resolved
+category, the command shows an error message indicating the valid range.
+
+This layered approach ensures that syntactically invalid input is caught at parse time, while
+semantically invalid operations such as referencing a missing category or an out-of-range index are
+caught at execution time.
+
+#### Alternatives considered
+
+Several alternatives were considered when implementing this feature.
+
+Alternative 1: Delete by item name instead of index.
+
+This was rejected because multiple items can share the same name across or within categories. Using an
+index removes ambiguity and ensures the user can target a specific item.
+
+Alternative 2: Require a confirmation prompt before every item deletion.
+
+This was rejected because individual item deletions are low-risk and easily reversible by re-adding the
+item. The confirmation prompt is reserved for the higher-impact `DeleteCategoryCommand`, which clears
+all items in a category at once.
+
+Alternative 3: Let `DeleteCommandParser` also handle the category-not-found check.
+
+This was rejected because category existence is a runtime concern that depends on the current inventory
+state. Keeping this check in the command layer preserves the separation between parsing and execution.
+
+#### Current limitations
+
+The current implementation has some limitations.
+
+- There is no undo mechanism. Once an item is deleted, it must be manually re-added.
+- The command uses a 1-based index, which requires the user to run `list` or `find` beforehand to
+  determine the correct index.
+- Deleting an item shifts the indices of subsequent items, which may confuse users performing multiple
+  consecutive deletions.
+
+These limitations are acceptable for the current project scope.
+
+#### Possible future improvements
+
+If this feature is extended in future versions, the following improvements could be considered:
+
+- Add an undo or soft-delete mechanism that allows recently deleted items to be restored.
+- Support deletion by item name with a disambiguation prompt when multiple matches exist.
+- Display the updated item list after a successful deletion so the user can see the new indices.
+- Support batch deletion by accepting multiple indices in a single command.
+
+### Delete Category Feature
+
+Another core feature of the product is the ability to clear all items within a category using the
+command `delete category/CATEGORY`.
+
+This feature is necessary because users sometimes need to remove an entire category's worth of items
+at once, for example when a product line is discontinued or when restocking requires a full reset of
+a category. Without a bulk-delete operation, users would have to remove each item individually using
+`delete category/CATEGORY index/INDEX`, which is tedious and error-prone for categories with many items.
+
+For example, if the user enters `delete category/fruits`, the system locates the `fruits` category,
+prompts the user for confirmation if items exist, and clears all items upon receiving a `yes` response.
+
+#### High-level design
+
+At a high level, this feature reuses the same command-based architecture and parser pipeline as the
+single-item delete feature. The flow is as follows:
+
+1. The user enters a `delete` command with only the `category/` field and no `index/` field.
+2. `Parser` recognises the `delete` command word and delegates to `DeleteCommandParser`.
+3. `DeleteCommandParser` detects that no `index/` field is present and creates a
+   `DeleteCategoryCommand` instead of a `DeleteItemCommand`.
+4. The command is executed with access to the current `Inventory` and `UI`.
+5. If the category is not empty, the command prompts the user for confirmation via `UI`.
+6. If the user confirms, the command clears all items from the category.
+
+The main interaction for this flow is illustrated in
+[DeleteCategoryCommandMainFlow.png](diagrams/DeleteCategoryCommandMainFlow-Sequence_Diagram_for_DeleteCategoryCommand__Main_Control_Flow_Only_.png).
+
+This design was chosen because it follows the same separation of concerns used throughout the project:
+
+- `DeleteCommandParser` interprets user input and decides which delete command to create.
+- `DeleteCategoryCommand` performs the confirmation and bulk-clear logic.
+- Model classes such as `Inventory` and `Category` hold the application state.
+- `UI` handles the confirmation prompt and result messages.
+
+The key design distinction from `DeleteItemCommand` is the confirmation prompt. Because clearing an
+entire category is a higher-risk operation than removing a single item, the command requires the user
+to type `yes` before proceeding. This prevents accidental data loss.
+
+#### Component-level implementation
+
+The feature is mainly implemented using the following classes:
+
+- `Parser`
+- `DeleteCommandParser`
+- `DeleteCategoryCommand`
+- `Inventory`
+- `Category`
+- `UI`
+
+The responsibilities of these classes are as follows:
+
+- `Parser` detects the `delete` command word and delegates to `DeleteCommandParser`.
+- `DeleteCommandParser` determines that no `index/` field is present and constructs a
+  `DeleteCategoryCommand` with the category name.
+- `DeleteCategoryCommand` performs the category lookup, confirmation prompt, and item clearing.
+- `Inventory` provides category lookup through `findCategoryByName(...)`.
+- `Category` provides `isEmpty()`, `getItemCount()`, and `getItems().clear()` for the clearing logic.
+- `UI` displays the confirmation prompt, cancellation message, or cleared-category message.
+
+#### Command execution flow
+
+When `DeleteCategoryCommand.execute()` is called, the implementation performs the following sequence:
+
+1. Assert that `inventory`, `ui`, and `categoryName` are not `null`.
+2. Call `inventory.findCategoryByName(categoryName)` to locate the target category.
+3. If the category is not found, call `ui.showCategoryNotFound(categoryName)` and return.
+4. If the category is not empty:
+   a. Call `ui.showDeleteCategoryConfirmation(categoryName, category.getItemCount())` to display the
+   prompt.
+   b. Read the user's response via `ui.readCommand()`.
+   c. If the response is not `yes` (case-insensitive), call
+   `ui.showDeleteCategoryCancelled(categoryName)` and return.
+   d. Call `category.getItems().clear()` to remove all items.
+   e. Call `ui.showCategoryItemsCleared(categoryName)`.
+5. Log the deletion at `INFO` level.
+6. Call `ui.showCategoryDeleted(categoryName)`.
+
+The core confirmation logic is:
+
+```java
+if (!category.isEmpty()) {
+    ui.showDeleteCategoryConfirmation(categoryName, category.getItemCount());
+    String response = ui.readCommand();
+
+    if (response == null || !response.trim().equalsIgnoreCase("yes")) {
+        ui.showDeleteCategoryCancelled(categoryName);
+        return;
+    }
+
+    category.getItems().clear();
+    ui.showCategoryItemsCleared(categoryName);
+}
+```
+
+This ensures that the user is always informed of the consequences before a bulk deletion proceeds.
+
+#### Error handling and validation
+
+Validation is split across the parser layer and the command layer.
+
+`DeleteCommandParser` handles syntax-level validation. It rejects empty input, unrecognised fields,
+and missing `category/` fields before any command object is created.
+
+`DeleteCategoryCommand` handles execution-time validation. If the category does not exist in the
+inventory, the command shows a category-not-found message via `UI`. If the user does not confirm the
+deletion (including providing a `null` response), the command cancels gracefully.
+
+The confirmation check uses `equalsIgnoreCase("yes")`, which means responses such as `Yes`, `YES`,
+and `YeS` are all accepted.
+
+#### Alternatives considered
+
+Several alternatives were considered when implementing this feature.
+
+Alternative 1: Remove the category object from the inventory entirely instead of clearing its items.
+
+This was rejected because categories in the application are predefined. Removing the category object
+would prevent users from adding items back into the same category later without recreating it.
+
+Alternative 2: Skip the confirmation prompt and clear immediately.
+
+This was rejected because clearing all items in a category is a high-impact operation. A confirmation
+prompt prevents accidental data loss and gives the user a chance to reconsider.
+
+Alternative 3: Require a different command word such as `clear` instead of reusing `delete`.
+
+This was rejected because reusing the `delete` command word with different argument patterns is more
+consistent with the existing command structure. The parser can distinguish between item deletion and
+category clearing based on the presence or absence of the `index/` field.
+
+#### Current limitations
+
+The current implementation has some limitations.
+
+- There is no undo mechanism. Once items are cleared, they must be re-added manually.
+- The confirmation prompt accepts only `yes` as a positive response. Other affirmative phrases are
+  treated as cancellations.
+- If the category is already empty, the command still calls `showCategoryDeleted` without informing
+  the user that no items were actually removed.
+
+These limitations are acceptable for the current project scope.
+
+#### Possible future improvements
+
+If this feature is extended in future versions, the following improvements could be considered:
+
+- Add an undo or soft-delete mechanism to restore recently cleared categories.
+- Display the list of items that will be removed before the confirmation prompt.
+- Inform the user explicitly when the category was already empty.
+- Support clearing multiple categories in a single command.
+
+### Testing delete category
+
+1. Ensure the inventory contains a non-empty category such as `fruits`.
+2. Run `delete category/fruits`.
+3. Verify that the application shows a confirmation prompt with the item count.
+4. Type `yes` and press enter.
+5. Verify that the application shows a confirmation message indicating the category was cleared.
+6. Run `list`.
+7. Verify that the `fruits` category is now empty.
+8. Run `delete category/unknown`.
+9. Verify that the application shows the category-not-found error.
+10. Add items back to `fruits`, then run `delete category/fruits`.
+11. Type `no` and press enter.
+12. Verify that the category is not cleared.
+
+---
+
+### Find Item By Keyword Feature
+
+Another search feature in the product is the ability to find items by keyword using the command
+`find keyword/KEYWORD`.
+
+This feature is useful because users often remember part of an item name but not its exact name or
+which category it belongs to. A keyword search provides a fast, flexible way to locate items across
+the entire inventory without needing to browse each category individually.
+
+For example, if the user enters `find keyword/apple`, the system returns all items whose names
+contain `apple`, such as `apple`, `pineapple`, and `apple_juice`, regardless of category.
+
+#### High-level design
+
+At a high level, this feature reuses the existing command pipeline of the application. The flow is
+as follows:
+
+1. The user enters a `find` command.
+2. `FindItemParser` inspects the prefix before the `/`.
+3. If the prefix is `keyword`, the parser creates a `FindItemByKeywordCommand`.
+4. The command is executed with access to the current `Inventory` and `UI`.
+5. The command scans all categories and items, collects matches, and displays the result.
+
+The main interaction for this flow is illustrated in
+[FindItemByKeywordCommandMainFlow.png](diagrams/FindItemByKeywordCommandMainFlow-Sequence_Diagram_for_FindItemByKeywordCommand__Main_Control_Flow_Only_.png).
+
+This design was chosen because it follows the same separation of concerns already used throughout
+the project:
+
+- Parsers interpret user input.
+- Command classes implement the application behaviour.
+- Model classes store inventory data.
+- `UI` is responsible for displaying the result to the user.
+
+As a result, the keyword-search feature integrates cleanly into the existing find-command family
+without requiring a separate search subsystem.
+
+#### Component-level implementation
+
+The feature is mainly implemented using the following classes:
+
+- `FindItemParser`
+- `FindItemByKeywordCommand`
+- `Inventory`
+- `Category`
+- `Item`
+
+The responsibilities of these classes are as follows:
+
+- `FindItemParser` recognises that the user wants to search by keyword and creates the command.
+- `FindItemByKeywordCommand` performs the full inventory scan and substring matching.
+- `Inventory` exposes the list of categories currently stored.
+- `Category` exposes the list of items belonging to that category.
+- `Item` provides the item name used during matching.
+
+The parser logic remains intentionally small. It only determines the requested find type and
+constructs the appropriate command object. The actual search is performed inside the command layer.
+
+#### Command execution flow
+
+When `FindItemByKeywordCommand.execute()` is called, the implementation performs the following
+sequence:
+
+1. Assert that `inventory`, `ui`, and `keywordInput` are not `null`.
+2. Create an empty `List<String>` named `matches` to store formatted search results.
+3. Retrieve all categories from the `Inventory`.
+4. Iterate through each `Category`.
+5. Within each category, iterate through each `Item`.
+6. Compare the item's name (lowercased) against the keyword (lowercased) using `contains(...)`.
+7. If the item name contains the keyword, add a formatted string
+   `category.getName() + ": " + item` to `matches`.
+8. After the scan is complete, either:
+    - Display `No items found matching keyword: ...` if `matches` is empty, or
+    - Display dividers, a heading, and the numbered list of matching items.
+
+The key comparison logic is:
+
+```java
+if (item.getName().toLowerCase().contains(keywordInput.toLowerCase())) {
+    matches.add(category.getName() + ": " + item);
+}
+```
+
+This means the search is case-insensitive and supports partial matches. A keyword like `apple`
+matches `apple`, `pineapple`, and `apple_juice`.
+
+#### Why the feature is implemented this way
+
+The most important design choice in this feature is that the command performs a full scan of the
+inventory using case-insensitive substring matching instead of relying on exact-name matching or
+a precomputed index.
+
+This was chosen for three reasons.
+
+First, substring matching is more practical for real-world use. Users often remember only part of an
+item name, and exact matching would miss items like `pineapple` when searching for `apple`.
+
+Second, it keeps the implementation simple. The inventory is already organised by category, and each
+category stores its own list of items. A linear scan through this existing structure avoids adding
+new state that must be maintained whenever items are added or removed.
+
+Third, the expected inventory size is modest. A linear scan is acceptable for the current scale of
+the application.
+
+Another deliberate design choice is that keyword matching operates across all categories rather than
+within a single category. This makes the feature more useful because users searching by keyword
+typically do not know which category the item belongs to.
+
+#### Error handling and validation
+
+Input validation is handled mainly by `FindItemParser`.
+
+If the user enters `find` with no target, the parser throws a `DukeException` explaining the
+supported find formats.
+
+If the user enters `find keyword/` with no value after the slash, the parser throws a `DukeException`
+for the missing keyword before any command object is created.
+
+At execution time, `FindItemByKeywordCommand` handles the no-match case gracefully by displaying
+`No items found matching keyword: ...` instead of failing.
+
+This makes the feature robust without treating common no-result situations as errors.
+
+#### Alternatives considered
+
+Several alternatives were considered when implementing this feature.
+
+Alternative 1: Support only exact-name matching.
+
+This was rejected because it significantly reduces the usefulness of the search. Users who remember
+only part of an item name would not benefit from the feature.
+
+Alternative 2: Restrict keyword search to a single category at a time.
+
+This was rejected because it weakens the feature. If the user already knows the category, they can
+use `find category/CATEGORY` instead. Keyword search is most valuable when the user does not know
+which category an item belongs to.
+
+Alternative 3: Maintain a separate keyword index.
+
+This was rejected because it introduces extra state that must be synchronised whenever items change.
+The linear scan is sufficient for the expected inventory size.
+
+#### Current limitations
+
+The current implementation has some limitations.
+
+- It performs a full scan of the inventory each time the command is run.
+- It matches only against the item name and does not search other fields such as bin location or
+  brand.
+- Results follow the current category and item order and are not sorted by relevance.
+
+These limitations are acceptable for the current project scope.
+
+#### Possible future improvements
+
+If this feature is extended in future versions, the following improvements could be considered:
+
+- Support searching across multiple item fields such as name, bin location, and brand.
+- Highlight the matching keyword in the output.
+- Sort results by relevance or group them by category.
+- Support multiple keywords in a single search.
+
+### Testing find by keyword
+
+1. Add items with overlapping names such as `apple`, `pineapple`, and `apple_juice` across
+   different categories.
+2. Run `find keyword/apple`.
+3. Verify that all items containing `apple` are shown, regardless of category.
+4. Run `find keyword/APPLE`.
+5. Verify that the search is case-insensitive and returns the same results.
+6. Run `find keyword/chip`.
+7. Verify that partial matches such as `chips` are returned.
+8. Run `find keyword/mango`.
+9. Verify that the application shows `No items found matching keyword: mango.` when there are no
+   matches.
+
+---
+
+### Help Feature
+
+The product also supports displaying help information using the `help` command.
+
+This feature is important because new users need a quick reference to discover which commands are
+available without reading external documentation first. The help command provides a summary of
+available commands and directs the user to the full User Guide for detailed usage and examples.
+
+For example, when the user enters `help`, the system displays the list of command words and a URL
+to the User Guide.
+
+#### High-level design
+
+At a high level, the feature is intentionally minimal and fits directly into the existing command
+architecture:
+
+1. The user enters a `help` command.
+2. `Parser` recognises the command word and constructs a `HelpCommand`.
+3. `Duke` executes the command with the current `Inventory` and `UI`.
+4. `HelpCommand` delegates rendering to `UI.showHelp()`.
+5. `UI` prints the available commands and the User Guide link.
+
+The main interaction for this flow is illustrated in
+[HelpCommandMainFlow.png](diagrams/HelpCommandMainFlow-Sequence_Diagram_for_HelpCommand__Main_Control_Flow_Only_.png).
+
+This design was chosen because displaying help does not require separate parsing logic beyond
+recognising the command word. The command object acts as a bridge between the parser and the UI,
+consistent with the architecture used for `ListCommand` and other simple commands.
+
+#### Component-level implementation
+
+The feature is mainly implemented using the following classes:
+
+- `Parser`
+- `HelpCommand`
+- `UI`
+
+The responsibilities of these classes are as follows:
+
+- `Parser` detects the `help` command and returns a new `HelpCommand`.
+- `HelpCommand` represents the help operation and triggers the display behaviour.
+- `UI` formats and prints the help message including the command summary and User Guide link.
+
+This design keeps the command itself lightweight. Since help is a read-only operation that does not
+interact with the inventory, the command simply delegates to `UI.showHelp()`.
+
+#### Command execution flow
+
+When `HelpCommand.execute()` is called, the implementation performs the following sequence:
+
+1. Call `ui.showHelp()`.
+2. Inside `UI.showHelp()`:
+   a. Display a divider.
+   b. Print the list of available command words: `add, delete, update, find, list, help, bye`.
+   c. Print a blank line.
+   d. Print a message directing the user to the User Guide URL.
+   e. Display a closing divider.
+
+The command logic is intentionally short:
+
+```java
+public void execute(Inventory inventory, UI ui) {
+    ui.showHelp();
+}
+```
+
+This reflects the design decision that `HelpCommand` should trigger the operation, while formatting
+and presentation remain the responsibility of the UI.
+
+#### Why the feature is implemented this way
+
+The most important design choice here is that the help command shows a brief summary of command words
+and a User Guide link instead of displaying detailed usage for every command inline.
+
+This was chosen for two reasons.
+
+First, it keeps the help output concise. Displaying full command formats, examples, and notes for
+every command would produce a very long output that is difficult to scan quickly. A short summary
+with a link to external documentation strikes a better balance.
+
+Second, it avoids duplication. If detailed usage were maintained both in the help output and in the
+User Guide, any change to a command format would need to be updated in two places.
+
+#### Alternatives considered
+
+Several alternatives were considered when implementing this feature.
+
+Alternative 1: Display full usage details for every command directly in the help output.
+
+This was rejected because it produces a long wall of text that is hard to read in a CLI environment.
+Users who need detailed guidance are better served by the User Guide.
+
+Alternative 2: Support `help COMMAND` to show usage for a specific command.
+
+This is a reasonable enhancement for the future, but was not implemented in the current version to
+keep the feature simple.
+
+Alternative 3: Remove the help command entirely and rely on the User Guide alone.
+
+This was rejected because users expect a `help` command in a CLI application. Even a brief response
+reassures the user that help is available and points them to the right resource.
+
+#### Current limitations
+
+The current implementation has some limitations.
+
+- The command does not support targeted help for individual commands.
+- The command summary is hard-coded in `UI.showHelp()`, so adding a new command requires updating
+  the help output manually.
+
+These limitations are acceptable for the current project scope.
+
+#### Possible future improvements
+
+If this feature is extended in future versions, the following improvements could be considered:
+
+- Support `help COMMAND` to display detailed usage for a specific command.
+- Auto-generate the command list from a registry instead of hard-coding it.
+
 ## Product scope
 ### Target user profile
 
-{Describe the target user profile}
+- Users who need to manage categorized inventory items
+- Users who are comfortable using a Command Line Interface (CLI)
+- Users who want to track item details such as quantity, location, and expiry date
+- Store managers or individuals managing physical storage systems
 
 ### Value proposition
 
-{Describe the value proposition: what problem does it solve?}
+InventoryDock is a CLI-based inventory management system that allows users to efficiently manage categorized items 
+with attributes such as bin location, quantity, and expiry date. It provides fast command-based operations for adding, 
+updating, deleting, and searching items, enabling users to quickly locate and manage inventory without navigating 
+complex interfaces.
 
 ## User Stories
 
-|Version| As a ... | I want to ... | So that I can ...|
-|--------|----------|---------------|------------------|
-|v1.0|new user|see usage instructions|refer to them when I forget how to use the application|
-|v2.0|user|find a to-do item by name|locate a to-do without having to go through the entire list|
+| Version | As a ... | I want to ...             | So that I can ...                                           |
+|---------|----------|---------------------------|-------------------------------------------------------------|
+| v1.0    | new user | see usage instructions    | refer to them when I forget how to use the application      |
+| v1.0    | user     | add items                 | track inventory                                             |
+| v1.0    | user     | delete items              | remove outdated or incorrect entries                        |
+| v1.0    | user     | list items                | view all inventory at once                                  |
+| v2.0    | user     | find items by keyword     | locate an item without having to go through the entire list |
+| v2.0    | user     | find items by category    | find items in a particular category                         |
+| v2.0    | user     | find items by bin         | find items based on storage location                        |
+| v2.0    | user     | find items by expiry date | identify items expiring soon                                |
+| v2.0    | user     | update items              | correct or modify item details                              |
 
 ## Non-Functional Requirements
 
-{Give non-functional requirements}
+1. The application should run on any system with Java 17 or above installed.
+2. The system should handle small to moderate inventory sizes efficiently using linear scans.
+3. The application should persist data between sessions using file storage.
+4. The system should provide clear error messages for invalid user inputs.
+5. The application should be usable via a Command Line Interface.
+6. The system should not crash when encountering malformed storage data, and should handle such cases.
 
 ## Glossary
 
-* *glossary item* - Definition
+* *Item* - A unit stored in the inventory with attributes such as name, quantity, and expiry date.
+* *Category* - A grouping of items within the inventory.
+* *Bin* - A physical storage location identifier (e.g., A-10).
+* *Inventory* - The overall collection of categories and items managed by the system.
+* *Command* - A user input instruction that triggers an operation in the application.
 
 ## Instructions for manual testing
 
-{Give instructions on how to do a manual product testing e.g., how to load sample data to be used for testing}
+This section provides instructions for manually testing the application.
+
+### Launching the application
+
+1. Ensure that Java 17 or above is installed on your system.
+2. Compile and run the `Duke` class.
+3. Verify that the application starts successfully and displays the welcome message.
+
+### Adding sample data
+
+1. Use the `add` command to insert sample items into different categories.
+2. Example:
+    - `add category/fruits item/apple bin/A1 qty/10 expiryDate/2026-4-01 size/medium isRipe/true`
+    - `add category/drinks item/cola bin/B2 qty/5 expiryDate/2026-6-01 brand/coke flavour/original isCarbonated/true`
+3. Run `list` to verify that the items are correctly added.
+
+After setting up the application, proceed to the individual test cases below.
 
 ### Testing add item
 
@@ -1076,6 +2125,99 @@ provide more detailed diagnostics to the user. This would reduce potential data 
 8. Run `find expiryDate/`.
 9. Verify that the application shows the missing expiry date error.
 
+
+### Testing updating multiple fields
+
+1. Run  
+  `update category/fruits index/1 newItem/green_apple bin/A2 expiryDate/2026-5-01`
+
+2. Verify that:
+  * The item name is updated to green_apple  
+  * The bin location is updated to A2  
+  * The expiry date is updated to 2026-5-01  
+
+3. Run `list`.
+
+4. Verify that all updated fields are reflected correctly.
+
+---
+
+### Testing invalid category
+
+5. Run `update category/unknown index/1 qty/10`
+
+6. Verify that the application shows  `Category not found: unknown` or the corresponding error message.
+
+---
+
+### Testing invalid index
+
+7. Run `update category/fruits index/100 qty/10`
+
+8. Verify that the application shows an error indicating the index is out of range.
+
+9. Run `update category/fruits index/abc qty/10`
+
+10. Verify that the application shows  
+  `Item index must be an integer.`
+
+---
+
+### Testing missing fields
+
+11. Run `update category/fruits index/1`
+
+12. Verify that the application shows `Provide at least one field to update.`
+
+13. Run `update index/1 qty/10`
+
+14. Verify that the application shows `Missing category.`
+
+15. Run `update category/fruits qty/10`
+
+16. Verify that the application shows `Missing item index.`
+
+---
+
+### Testing invalid field values
+
+17. Run `update category/fruits index/1 qty/-5`
+
+18. Verify that the application shows `Quantity must be a positive integer.`
+
+19. Run `update category/fruits index/1 expiryDate/2026/05/01`
+
+20. Verify that the application shows `Invalid date. Please use yyyy-M-d.`
+
+21. Run `update category/fruits index/1 bin/`
+
+22. Verify that the application shows an error for missing bin location.
+
+---
+
+### Testing unsupported fields
+
+23. Run  
+  `update category/fruits index/1 size/large`
+
+24. Verify that the application shows  
+  `Unsupported field: size` (or corresponding error message).
+
+### Testing Sort Command
+1. Add several items into at least one category with different names, expiry dates, and quantities.
+2. Run `sort name`.
+3. Verify that items within each category are shown in alphabetical order by name.
+4. Run `sort expirydate`.
+5. Verify that items within each category are shown from earliest to latest expiry date.
+6. Run `sort qty`.
+7. Verify that items within each category are shown from highest to lowest quantity.
+8. Run `sort invalidType`.
+9. Verify that the application shows the appropriate invalid sort type error message.
+10. Run `sort` with no argument.
+11. Verify that the application shows the missing sort type error message.
+12. Run the command on an empty inventory.
+13. Verify that the application handles it without crashing and displays the appropriate empty state.
+
 ### Testing storage
 
 1. Add several items to the inventory.
@@ -1092,11 +2234,4 @@ provide more detailed diagnostics to the user. This would reduce potential data 
 12. Exit the application using the `bye` command.
 13. Delete the storage file before launching the application.
 14. Verify that the application recreates the file automatically and starts without crashing.
-
-
-
-
-
-
-
 
