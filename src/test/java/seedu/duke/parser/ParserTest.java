@@ -39,7 +39,8 @@ public class ParserTest {
         Parser parser = new Parser(new UI());
 
         assertInstanceOf(AddItemCommand.class,
-                parser.parse("add category/fruits item/apple bin/A-10 qty/3 expiryDate/2026-03-20 size/big isRipe/true"));
+                parser.parse("add category/fruits item/apple bin/A-10 qty/3 expiryDate/2026-03-20 size/big " +
+                        "isRipe/true"));
     }
 
     @Test
