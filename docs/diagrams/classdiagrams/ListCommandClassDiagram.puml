@@ -4,7 +4,7 @@ skinparam classAttributeIconSize 0
 hide circle
 left to right direction
 
-abstract class Command {
+class "{abstract}\nCommand" as Command {
   + execute(...)
 }
 

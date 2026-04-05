@@ -256,6 +256,10 @@ The main structural relationships for this feature are shown below.
 
 ![FindItemByCategoryCommandClassDiagram](diagrams/classdiagrams/FindItemByCategoryCommandClassDiagram.png)
 
+A representative object snapshot for this feature is shown below.
+
+![FindItemByCategoryCommandObjectDiagram](diagrams/objectdiagrams/FindItemByCategoryCommandObjectDiagram.png)
+
 This design was chosen because it follows the same separation of concerns already used throughout the
 project:
 
@@ -424,6 +428,10 @@ The main interaction for this flow is illustrated below.
 The main structural relationships for this feature are shown below.
 
 ![FindItemByBinCommandClassDiagram](diagrams/classdiagrams/FindItemByBinCommandClassDiagram.png)
+
+A representative object snapshot for this feature is shown below.
+
+![FindItemByBinCommandObjectDiagram](diagrams/objectdiagrams/FindItemByBinCommandObjectDiagram.png)
 
 This design was chosen because it allows bin-specific input normalisation to remain in the parser
 layer, while the matching and display behaviour stays in the command layer.
@@ -706,6 +714,10 @@ The main interaction for this flow is illustrated below.
 The main structural relationships for this feature are shown below.
 
 ![AddItemCommandClassDiagram](diagrams/classdiagrams/AddItemCommandClassDiagram.png)
+
+A representative object snapshot for this feature is shown below.
+
+![AddItemCommandObjectDiagram](diagrams/objectdiagrams/AddItemCommandObjectDiagram.png)
 
 This design was chosen because it preserves the same separation of responsibilities used elsewhere
 in the codebase:
@@ -1099,6 +1111,10 @@ The main interaction for this flow is illustrated below.
 The main structural relationships for this feature are shown below.
 
 ![ListCommandClassDiagram](diagrams/classdiagrams/ListCommandClassDiagram.png)
+
+A representative object snapshot for this feature is shown below.
+
+![ListCommandObjectDiagram](diagrams/objectdiagrams/ListCommandObjectDiagram.png)
 
 This design was chosen because listing inventory does not require separate parsing logic beyond
 recognising the command word. The command object acts mainly as a bridge between the parser and the UI.
