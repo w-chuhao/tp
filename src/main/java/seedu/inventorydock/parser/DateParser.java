@@ -1,6 +1,6 @@
 package seedu.inventorydock.parser;
 
-import seedu.inventorydock.exception.InventoryDockException;
+import seedu.inventorydock.exception.InvalidDateException;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -19,15 +19,15 @@ public class DateParser {
      * @param date The date string to validate.
      * @throws InventoryDockException If the date is missing or invalid.
      */
-    public static void validateDate(String date) throws InventoryDockException {
+    public static void validateDate(String date) throws InvalidDateException {
         if (date == null || date.trim().isEmpty()) {
-            throw new InventoryDockException("Missing expiry date");
+            throw new InvalidDateException("Missing expiry date");
         }
 
         try {
             parseDate(date);
         } catch (DateTimeParseException e) {
-            throw new InventoryDockException("Invalid date. Please use yyyy-M-d.");
+            throw new InvalidDateException("Invalid date. Please use yyyy-M-d.");
         }
     }
 
@@ -38,15 +38,15 @@ public class DateParser {
      * @return The corresponding LocalDate object.
      * @throws InventoryDockException If the date is missing or invalid.
      */
-    public static LocalDate parseDate(String date) throws InventoryDockException {
+    public static LocalDate parseDate(String date) throws InvalidDateException {
         if (date == null || date.trim().isEmpty()) {
-            throw new InventoryDockException("Missing expiry date");
+            throw new InvalidDateException("Missing expiry date");
         }
 
         try {
             return LocalDate.parse(date.trim(), FORMATTER);
         } catch (DateTimeParseException e) {
-            throw new InventoryDockException("Invalid date. Please use yyyy-M-d.");
+            throw new InvalidDateException("Invalid date. Please use yyyy-M-d.");
         }
     }
 }
