@@ -7,8 +7,4 @@ public class InvalidFilterException extends InventoryDockException {
     public InvalidFilterException(String message) {
         super(message);
     }
-
-    public InvalidFilterException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

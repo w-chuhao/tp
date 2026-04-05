@@ -13,14 +13,4 @@ public class CategoryNotFoundException extends InventoryDockException {
     public CategoryNotFoundException(String message) {
         super(message);
     }
-
-    /**
-     * Constructs a CategoryNotFoundException with a custom message and cause.
-     *
-     * @param message The error message.
-     * @param cause The underlying cause of the exception.
-     */
-    public CategoryNotFoundException(String message, Throwable cause) {
-        super(message, cause);
-    }
 }

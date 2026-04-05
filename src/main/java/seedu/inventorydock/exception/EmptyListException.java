@@ -3,7 +3,6 @@ package seedu.inventorydock.exception;
 /**
  * Represents an error when an operation requires items but the target list is empty.
  */
-//@@author omcodedthis
 public class EmptyListException extends InventoryDockException {
 
     /**
