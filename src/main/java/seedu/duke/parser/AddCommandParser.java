@@ -5,7 +5,6 @@ import java.util.logging.Logger;
 
 import seedu.duke.command.Command;
 import seedu.duke.exception.DukeException;
-import seedu.duke.ui.UI;
 
 /**
  * Parses top-level {@code add} commands and routes them to the category-specific
@@ -14,17 +13,6 @@ import seedu.duke.ui.UI;
 public class AddCommandParser {
     private static final Logger logger = Logger.getLogger(AddCommandParser.class.getName());
 
-    private final UI ui;
-
-    /**
-     * Creates an add-command parser.
-     *
-     * @param ui user interface instance associated with the parser workflow.
-     */
-    public AddCommandParser(UI ui) {
-        assert ui != null : "AddCommandParser received null UI.";
-        this.ui = ui;
-    }
 
     /**
      * Validates the common add-command fields, extracts the category, and delegates
@@ -134,3 +122,4 @@ public class AddCommandParser {
         }
     }
 }
+

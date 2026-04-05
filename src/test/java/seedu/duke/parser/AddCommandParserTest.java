@@ -3,14 +3,13 @@ package seedu.duke.parser;
 import org.junit.jupiter.api.Test;
 import seedu.duke.command.AddItemCommand;
 import seedu.duke.exception.DukeException;
-import seedu.duke.ui.UI;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class AddCommandParserTest {
-    private final AddCommandParser parser = new AddCommandParser(new UI());
+    private final AddCommandParser parser = new AddCommandParser();
 
     @Test
     public void parse_emptyInput_throwsException() {
@@ -45,3 +44,4 @@ public class AddCommandParserTest {
                 parser.parse("category/FRUITS item/apple bin/A-10 qty/3 expiryDate/2026-03-20 size/big isRipe/true"));
     }
 }
+

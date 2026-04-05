@@ -31,7 +31,7 @@ public class Parser {
 
         switch (commandWord) {
         case "add":
-            return new AddCommandParser(ui).parse(arguments);
+            return new AddCommandParser().parse(arguments);
         case "delete":
             return new DeleteCommandParser(ui).parse(arguments);
         case "update":
@@ -52,3 +52,4 @@ public class Parser {
         }
     }
 }
+
