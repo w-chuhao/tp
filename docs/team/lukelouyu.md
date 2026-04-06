@@ -83,6 +83,8 @@ These methods allow the system to correctly parse category-dependent input and c
 
 ### Add and update the following UML sequence diagrams:
 - `FindItemByQtyCommand_sequence.puml`
+- `FindItemByQtyCommandObjectDiagram.puml`
+- `FindItemByQtyCommandClassDiagram.puml`
 
 ### Improved code quality and maintainability
 
