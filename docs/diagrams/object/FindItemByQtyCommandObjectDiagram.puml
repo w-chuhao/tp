@@ -1,0 +1,67 @@
+@startuml
+skinparam shadowing false
+skinparam packageStyle rectangle
+
+title Object Diagram for one execution of FindItemByQtyCommand
+
+object "cmd : FindItemByQtyCommand" as cmd {
+  qtyInput = 5
+}
+
+object "inventory : Inventory" as inventory
+
+object "fruits : Category" as fruits {
+  name = "fruits"
+}
+
+object "snacks : Category" as snacks {
+  name = "snacks"
+}
+
+object "apple : Item" as apple {
+  name = "Apple"
+  quantity = 3
+  binLocation = "A1"
+  expiryDate = "2026-04-10"
+}
+
+object "banana : Item" as banana {
+  name = "Banana"
+  quantity = 8
+  binLocation = "A2"
+  expiryDate = "2026-04-08"
+}
+
+object "chips : Item" as chips {
+  name = "Chips"
+  quantity = 5
+  binLocation = "B1"
+  expiryDate = "2026-06-01"
+}
+
+object "ui : UI" as ui
+
+object "matches : List<Item>" as matches {
+  size = 2
+}
+
+inventory *-- fruits
+inventory *-- snacks
+fruits *-- apple
+fruits *-- banana
+snacks *-- chips
+
+cmd ..> inventory : execute(inventory, ui)
+cmd ..> ui
+cmd ..> matches : creates / fills
+matches o-- apple
+matches o-- chips
+
+note right of matches
+Items included because:
+- Apple quantity 3 <= 5
+- Chips quantity 5 <= 5
+Banana is excluded because 8 > 5
+end note
+
+@enduml
