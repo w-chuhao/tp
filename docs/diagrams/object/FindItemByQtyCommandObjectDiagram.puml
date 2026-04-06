@@ -57,11 +57,12 @@ cmd ..> matches : creates / fills
 matches o-- apple
 matches o-- chips
 
-note right of matches
-Items included because:
-- Apple quantity 3 <= 5
-- Chips quantity 5 <= 5
-Banana is excluded because 8 > 5
+note as N1
+  Items included because:
+  - Apple quantity 3 <= 5
+  - Chips quantity 5 <= 5
+  Banana is excluded because 8 > 5
 end note
 
 @enduml
+

@@ -5,7 +5,7 @@ hide circle
 left to right direction
 
 class "{abstract}\nCommand" as Command {
-  + execute(...)
+  + execute(inventory: Inventory, ui: UI)
 }
 
 class FindItemParser {
@@ -14,7 +14,7 @@ class FindItemParser {
 
 class FindItemByCategoryCommand {
   - categoryInput: String
-  + execute(...)
+  + execute(inventory: Inventory, ui: UI)
 }
 
 class Inventory {
@@ -32,7 +32,12 @@ class Item {
 
 class UI {
   + showCategoryNotFound(...)
+  + formatNoItemsFoundMessage(...)
+  + formatFoundItemsMessage(...)
+  + formatFindResultsHeader(...)
+  + showMessage(...)
   + showNumberedList(...)
+  + showDivider()
 }
 
 Command <|-- FindItemByCategoryCommand

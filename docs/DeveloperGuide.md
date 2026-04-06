@@ -638,8 +638,19 @@ When `FindItemByQtyCommand.execute()` is called, the implementation performs the
 
 The main interaction for this flow is illustrated below.
 
-![FindItemByQtyCommandMainFlow](diagrams/FindItemByQtyCommand_sequence-Sequence_Diagram_for_FindItemByQtyCommand__Main_Control_Flow_.png)
+![FindItemByQtyCommandMainFlow](diagrams/sequence/FindItemByQtyCommand_sequence-Sequence_Diagram_for_FindItemByQtyCommand__Main_Control_Flow_.png)
 This sequence diagram is drawn by Luke(lukeluoyu)
+
+The main structural relationships for this feature are shown below.
+
+![FindItemByQtyCommandClassDiagram](diagrams/class/FindItemByQtyCommandClassDiagram.png)
+This class diagram is drawn by Luke(lukeluoyu)
+
+A representative object snapshot for this feature is shown below.
+
+![FindItemByQtyCommandObjectDiagram](diagrams/object/FindItemByQtyCommandObjectDiagram.png)
+This object diagram is drawn by Luke(lukeluoyu)
+
 The key comparison is:
 
 ```java

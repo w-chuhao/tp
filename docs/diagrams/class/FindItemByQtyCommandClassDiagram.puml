@@ -5,7 +5,7 @@ hide circle
 left to right direction
 
 class "{abstract}\nCommand" as Command {
-  + execute(...)
+  + execute(inventory: Inventory, ui: UI)
 }
 
 class FindItemParser {
@@ -15,7 +15,7 @@ class FindItemParser {
 class FindItemByQtyCommand {
   - qtyInput: int
   + parseQtyInput(qtyInput: String)
-  + execute(...)
+  + execute(inventory: Inventory, ui: UI)
 }
 
 class Inventory {
@@ -51,3 +51,4 @@ FindItemByQtyCommand ..> DukeException
 Inventory "1" o-- "*" Category
 Category "1" o-- "*" Item
 @enduml
+

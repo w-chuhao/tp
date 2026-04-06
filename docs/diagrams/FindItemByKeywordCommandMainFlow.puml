@@ -79,4 +79,3 @@ deactivate FindItemByKeywordCommand
 deactivate InventoryDock
 deactivate UI
 @enduml
-

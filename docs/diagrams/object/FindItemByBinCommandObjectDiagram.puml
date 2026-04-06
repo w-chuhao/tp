@@ -21,6 +21,14 @@ object "<u>banana:Item</u>" as banana {
 }
 object "<u>:UI</u>" as ui
 
+note as N1
+  This snapshot shows the letter-only
+  search mode using binInput = "a".
+  The feature also supports exact-bin
+  and number-only searches.
+  See the Developer Guide for details.
+end note
+
 parser --> command : creates >
 command --> inventory : scans >
 command --> ui : displays through >
@@ -28,4 +36,3 @@ inventory --> fruits : contains >
 fruits --> apple : contains >
 fruits --> banana : contains >
 @enduml
-

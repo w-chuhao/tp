@@ -5,7 +5,7 @@ hide circle
 left to right direction
 
 class "{abstract}\nCommand" as Command {
-  + execute(...)
+  + execute(inventory: Inventory, ui: UI)
 }
 
 class AddCommandParser {
@@ -14,11 +14,13 @@ class AddCommandParser {
 
 class AddItemCommandParser {
   + handleFruit(input: String)
+  + handleSnack(input: String)
+  + handleDrinks(input: String)
 }
 
 class AddItemCommand {
   - categoryName: String
-  + execute(...)
+  + execute(inventory: Inventory, ui: UI)
 }
 
 class Inventory {
@@ -39,6 +41,13 @@ class Item {
 class UI {
   + showItemAdded(...)
 }
+
+note as N1
+  The diagram shows a few representative
+  category-specific handlers only.
+  See the Developer Guide text for the
+  full list of supported categories.
+end note
 
 Command <|-- AddItemCommand
 AddCommandParser ..> AddItemCommandParser : delegates to

@@ -5,11 +5,11 @@ hide circle
 left to right direction
 
 class "{abstract}\nCommand" as Command {
-  + execute(...)
+  + execute(inventory: Inventory, ui: UI)
 }
 
 class ListCommand {
-  + execute(...)
+  + execute(inventory: Inventory, ui: UI)
 }
 
 class UI {

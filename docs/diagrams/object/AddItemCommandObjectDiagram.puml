@@ -12,18 +12,49 @@ object "<u>inventory:Inventory</u>" as inventory
 object "<u>fruits:Category</u>" as fruits {
   name = "fruits"
 }
+object "<u>snacks:Category</u>" as snacks {
+  name = "snacks"
+}
+object "<u>drinks:Category</u>" as drinks {
+  name = "drinks"
+}
 object "<u>apple:Item</u>" as apple {
   name = "apple"
   quantity = 10
   binLocation = "A1"
 }
+object "<u>chips:Item</u>" as chips {
+  name = "chips"
+  quantity = 8
+  binLocation = "B2"
+}
+object "<u>cola:Item</u>" as cola {
+  name = "cola"
+  quantity = 12
+  binLocation = "C3"
+}
 object "<u>:UI</u>" as ui
+
+note as N1
+  This snapshot uses the fruits workflow
+  as the main example.
+  Snacks and drinks are also shown as
+  representative categories that follow
+  the same add-item pattern.
+  There are more supported categories
+  and item types beyond those shown here.
+  See the Developer Guide for more.
+end note
 
 addParser --> addItemParser : delegates to >
 addItemParser --> addCommand : creates >
 addCommand --> inventory : updates through >
 addCommand --> ui : shows result via >
 inventory --> fruits : contains >
+inventory --> snacks : contains >
+inventory --> drinks : contains >
 fruits --> apple : contains >
+snacks --> chips : contains >
+drinks --> cola : contains >
 @enduml
 
