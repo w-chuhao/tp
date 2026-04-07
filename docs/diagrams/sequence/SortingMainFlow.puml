@@ -24,7 +24,7 @@ SortCommandParser --> SortCommandParser
 deactivate SortCommandParser
 
 alt input is empty
-    SortCommandParser --> Parser: throw DukeException
+    SortCommandParser --> Parser: throw MissingArgumentException
     Parser --> InventoryDock: exception
 else valid sort type
     create SortCommand

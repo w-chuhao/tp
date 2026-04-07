@@ -13,8 +13,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * Represents the main entry point and application loop for Duke.
- * A <code>Duke</code> object initializes the core components, loads stored data,
+ * Represents the main entry point and application loop for InventoryDock.
+ * An <code>InventoryDock</code> object initializes the core components, loads stored data,
  * and processes user commands until exit.
  */
 public class InventoryDock {
@@ -25,7 +25,7 @@ public class InventoryDock {
     private final Storage storage;
 
     /**
-     * Creates a Duke application instance with default categories and storage.
+     * Creates an InventoryDock application instance with default categories and storage.
      *
      * @throws InventoryDockException If stored inventory data cannot be loaded.
      */
@@ -34,7 +34,7 @@ public class InventoryDock {
         inventory = new Inventory();
         parser = new Parser();
         storage = new Storage("./data/inventory.txt");
-        logger.log(Level.INFO, "Initializing Duke application.");
+        logger.log(Level.INFO, "Initializing InventoryDoke application.");
 
         String[] categoryNames = {
             "fruits",
@@ -61,7 +61,7 @@ public class InventoryDock {
     }
 
     /**
-     * Starts the Duke application.
+     * Starts the InventoryDock application.
      *
      * @param args Command-line arguments.
      * @throws InventoryDockException If startup initialization fails.
@@ -77,7 +77,7 @@ public class InventoryDock {
      * Successful commands are persisted after execution, and exit also triggers a save.
      */
     public void run() {
-        logger.log(Level.INFO, "Starting Duke command loop.");
+        logger.log(Level.INFO, "Starting InventoryDock command loop.");
         ui.showWelcome();
 
         String input;
@@ -105,7 +105,7 @@ public class InventoryDock {
             }
         }
 
-        logger.log(Level.INFO, "Closing Duke application.");
+        logger.log(Level.INFO, "Closing InventoryDock application.");
         ui.close();
     }
 }

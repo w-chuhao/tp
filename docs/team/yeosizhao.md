@@ -35,6 +35,13 @@ Given below are my contributions to the project.
 - **Feature completeness:** Contributed the core logic needed to support three meaningful sort modes for realistic inventory workflows.
 - **Implementation challenge:** The command had to generate a sorted view without mutating the real inventory order, since changing stored order could affect index-based commands such as update and delete.
 
+**Exception hierarchy and error handling**
+
+- **Custom exception design:** Created the project's custom exception hierarchy around `InventoryDockException`, including specific exception types such as `MissingArgumentException`, `InvalidCommandException`, `InvalidFilterException`, `InvalidDateException`, `InvalidIndexException`, `CategoryNotFoundException`, `ItemNotFoundException`, and `StorageException`.
+- **Error-handling alignment:** Updated error handling across parsers, commands, and storage-related paths so the code throws the correct specific exception instead of relying on overly generic exceptions.
+- **Design choice:** Kept the shared base exception so `InventoryDock` can handle failures through one catch path, while still making the source of each failure clearer in the implementation and documentation.
+- **Codebase consistency:** Helped clean up stale exception usage and aligned the documented behaviour with the actual exception subtypes used in code.
+
 ### Contributions to the UG
 
 - Documented the `update` feature.
@@ -43,9 +50,7 @@ Given below are my contributions to the project.
 
 ### Contributions to the DG
 
-- Wrote implementation details for the `update item` feature.
-- Wrote implementation details for the `find by expiry date` feature.
-- Wrote implementation details for the `sort` feature.
+- Wrote implementation details and drew the PlantUML sequence, class, and object diagramsfor the `update item`, `find by expiry date` and `sort`feature.
 - Added and updated sequence diagrams for the implemented features.
 - Added manual testing instructions for all three features.
 

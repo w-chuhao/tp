@@ -10,7 +10,7 @@ This guide covers the commands needed to add items, list all stored items, and s
 1. Ensure that you have Java 17 or above installed.
 2. Download the latest version of the application jar.
 3. Open a terminal in the project folder.
-4. Run `java -jar duke.jar`.
+4. Run `java -jar tp.main.jar`.
 5. Type a command and press Enter.
 
 ## Command Format
