@@ -14,7 +14,7 @@ public abstract class Command {
      *
      * @param inventory The inventory data structure to be modified or accessed.
      * @param ui The user interface used to display feedback or errors to the user.
-     * @throws InvetoryDockException If an error occurs during the execution of the command.
+     * @throws InventoryDockException If an error occurs during the execution of the command.
      */
     public abstract void execute(Inventory inventory, UI ui) throws InventoryDockException;
 
