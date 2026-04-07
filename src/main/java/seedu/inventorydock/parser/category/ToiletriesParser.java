@@ -1,6 +1,8 @@
 package seedu.inventorydock.parser.category;
 
 import seedu.inventorydock.exception.InventoryDockException;
+import seedu.inventorydock.exception.InvalidCommandException;
+import seedu.inventorydock.exception.MissingArgumentException;
 import seedu.inventorydock.parser.FieldParser;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,18 +39,18 @@ public class ToiletriesParser {
         String brand = FieldParser.extractField(input, "brand/", "isLiquid/");
         if (brand == null || brand.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing brand for toiletries.");
-            throw new InventoryDockException("Missing brand for toiletries.");
+            throw new MissingArgumentException("Missing brand for toiletries.");
         }
 
         String liquidString = FieldParser.extractField(input, "isLiquid/", null);
         if (liquidString == null || liquidString.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing liquid field for toiletries.");
-            throw new InventoryDockException("Missing liquid field for toiletries.");
+            throw new MissingArgumentException("Missing liquid field for toiletries.");
         }
 
         if (!(liquidString.equalsIgnoreCase("true") || liquidString.equalsIgnoreCase("false"))) {
             logger.log(Level.WARNING, "Liquid field must be true or false.");
-            throw new InventoryDockException("Liquid field must be true or false.");
+            throw new InvalidCommandException("Liquid field must be true or false.");
         }
         boolean isLiquid = Boolean.parseBoolean(liquidString);
 

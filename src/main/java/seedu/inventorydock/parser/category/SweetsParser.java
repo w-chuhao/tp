@@ -1,6 +1,8 @@
 package seedu.inventorydock.parser.category;
 
 import seedu.inventorydock.exception.InventoryDockException;
+import seedu.inventorydock.exception.InvalidCommandException;
+import seedu.inventorydock.exception.MissingArgumentException;
 import seedu.inventorydock.parser.FieldParser;
 
 import java.util.logging.Level;
@@ -42,24 +44,24 @@ public class SweetsParser {
         String brand = FieldParser.extractField(input, "brand/", "sweetnessLevel/");
         if (brand == null || brand.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing brand for sweets.");
-            throw new InventoryDockException("Missing brand for sweets.");
+            throw new MissingArgumentException("Missing brand for sweets.");
         }
 
         String sweetnessLevel = FieldParser.extractField(input, "sweetnessLevel/", "isChewy/");
         if (sweetnessLevel == null || sweetnessLevel.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing sweetness level for sweets.");
-            throw new InventoryDockException("Missing sweetness level for sweets.");
+            throw new MissingArgumentException("Missing sweetness level for sweets.");
         }
 
         String chewyString = FieldParser.extractField(input, "isChewy/", null);
         if (chewyString == null || chewyString.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing chewiness for snack.");
-            throw new InventoryDockException("Missing chewiness for snack.");
+            throw new MissingArgumentException("Missing chewiness for snack.");
         }
 
         if (!(chewyString.equalsIgnoreCase("true") || chewyString.equalsIgnoreCase("false"))) {
             logger.log(Level.WARNING, "Chewiness must be true or false");
-            throw new InventoryDockException("Chewiness must be true or false");
+            throw new InvalidCommandException("Chewiness must be true or false");
         }
         boolean isChewy = Boolean.parseBoolean(chewyString);
 
@@ -67,3 +69,4 @@ public class SweetsParser {
         return new SweetsParser(brand, sweetnessLevel, isChewy);
     }
 }
+

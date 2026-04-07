@@ -1,6 +1,8 @@
 package seedu.inventorydock.parser.category;
 
 import seedu.inventorydock.exception.InventoryDockException;
+import seedu.inventorydock.exception.InvalidCommandException;
+import seedu.inventorydock.exception.MissingArgumentException;
 import seedu.inventorydock.parser.FieldParser;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,19 +41,19 @@ public class BurgerParser {
         String spicyString = FieldParser.extractField(input, "isSpicy/", "pattyType/");
         if (spicyString == null || spicyString.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing isSpicy for burger.");
-            throw new InventoryDockException("Missing isSpicy for burger.");
+            throw new MissingArgumentException("Missing isSpicy for burger.");
         }
 
         if (!(spicyString.equalsIgnoreCase("true") || spicyString.equalsIgnoreCase("false"))) {
             logger.log(Level.WARNING, "isSpicy must be true or false");
-            throw new InventoryDockException("isSpicy must be true or false");
+            throw new InvalidCommandException("isSpicy must be true or false");
         }
         boolean isSpicy = Boolean.parseBoolean(spicyString);
 
         String pattyType = FieldParser.extractField(input, "pattyType/", null);
         if (pattyType == null || pattyType.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing pattyType for burger.");
-            throw new InventoryDockException("Missing pattyType for burger.");
+            throw new MissingArgumentException("Missing pattyType for burger.");
         }
 
         logger.log(Level.INFO, "End of processing burger.");

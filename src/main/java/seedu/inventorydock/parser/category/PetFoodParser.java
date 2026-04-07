@@ -1,6 +1,8 @@
 package seedu.inventorydock.parser.category;
 
 import seedu.inventorydock.exception.InventoryDockException;
+import seedu.inventorydock.exception.InvalidCommandException;
+import seedu.inventorydock.exception.MissingArgumentException;
 import seedu.inventorydock.parser.FieldParser;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,24 +43,24 @@ public class PetFoodParser {
         String petType = FieldParser.extractField(input, "petType/", "brand/");
         if (petType == null || petType.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing petType for pet food.");
-            throw new InventoryDockException("Missing petType for pet food.");
+            throw new MissingArgumentException("Missing petType for pet food.");
         }
 
         String brand = FieldParser.extractField(input, "brand/", "isDryFood/");
         if (brand == null || brand.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing brand for pet food.");
-            throw new InventoryDockException("Missing brand for pet food.");
+            throw new MissingArgumentException("Missing brand for pet food.");
         }
 
         String isDryFoodString = FieldParser.extractField(input, "isDryFood/", null);
         if (isDryFoodString == null || isDryFoodString.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing isDryFood for pet food.");
-            throw new InventoryDockException("Missing isDryFood for pet food.");
+            throw new MissingArgumentException("Missing isDryFood for pet food.");
         }
 
         if (!(isDryFoodString.equalsIgnoreCase("true") || isDryFoodString.equalsIgnoreCase("false"))) {
             logger.log(Level.WARNING, "isDryFood must be true or false");
-            throw new InventoryDockException("isDryFood must be true or false");
+            throw new InvalidCommandException("isDryFood must be true or false");
         }
         boolean isDryFood = Boolean.parseBoolean(isDryFoodString);
 

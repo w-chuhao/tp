@@ -4,6 +4,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import seedu.inventorydock.exception.InventoryDockException;
+import seedu.inventorydock.exception.InvalidCommandException;
+import seedu.inventorydock.exception.MissingArgumentException;
 import seedu.inventorydock.parser.FieldParser;
 
 /**
@@ -42,24 +44,24 @@ public class AccessoriesParser {
         String type = FieldParser.extractField(input, "type/", "material/");
         if (type == null || type.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing type for accessories.");
-            throw new InventoryDockException("Missing type for accessories.");
+            throw new MissingArgumentException("Missing type for accessories.");
         }
 
         String material = FieldParser.extractField(input, "material/", "isFragile/");
         if (material == null || material.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing material for accessories.");
-            throw new InventoryDockException("Missing material for accessories.");
+            throw new MissingArgumentException("Missing material for accessories.");
         }
 
         String isFragileString = FieldParser.extractField(input, "isFragile/", null);
         if (isFragileString == null || isFragileString.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing isFragile for accessories.");
-            throw new InventoryDockException("Missing isFragile for accessories.");
+            throw new MissingArgumentException("Missing isFragile for accessories.");
         }
 
         if (!(isFragileString.equalsIgnoreCase("true") || isFragileString.equalsIgnoreCase("false"))) {
             logger.log(Level.WARNING, "isFragile must be true or false");
-            throw new InventoryDockException("isFragile must be true or false");
+            throw new InvalidCommandException("isFragile must be true or false");
         }
         boolean isFragile = Boolean.parseBoolean(isFragileString);
 

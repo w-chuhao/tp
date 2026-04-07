@@ -1,6 +1,8 @@
 package seedu.inventorydock.parser.category;
 
 import seedu.inventorydock.exception.InventoryDockException;
+import seedu.inventorydock.exception.InvalidCommandException;
+import seedu.inventorydock.exception.MissingArgumentException;
 import seedu.inventorydock.parser.FieldParser;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,12 +37,12 @@ public class VegetableParser {
         String leafyString = FieldParser.extractField(input, "isLeafy/", null);
         if (leafyString == null || leafyString.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing leafy field for vegetable.");
-            throw new InventoryDockException("Missing leafy field for vegetable.");
+            throw new MissingArgumentException("Missing leafy field for vegetable.");
         }
 
         if (!(leafyString.equalsIgnoreCase("true") || leafyString.equalsIgnoreCase("false"))) {
             logger.log(Level.WARNING, "Leafy field must be true or false.");
-            throw new InventoryDockException("Leafy field must be true or false.");
+            throw new InvalidCommandException("Leafy field must be true or false.");
         }
         boolean isLeafy = Boolean.parseBoolean(leafyString);
 
