@@ -4,6 +4,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import seedu.inventorydock.exception.InventoryDockException;
+import seedu.inventorydock.exception.InvalidCommandException;
+import seedu.inventorydock.exception.MissingArgumentException;
 import seedu.inventorydock.parser.FieldParser;
 
 /**
@@ -42,24 +44,24 @@ public class DrinksParser {
         String brand = FieldParser.extractField(input, "brand/", "flavour/");
         if (brand == null || brand.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing brand for drinks.");
-            throw new InventoryDockException("Missing brand for drinks.");
+            throw new MissingArgumentException("Missing brand for drinks.");
         }
 
         String flavour = FieldParser.extractField(input, "flavour/", "isCarbonated/");
         if (flavour == null || flavour.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing flavour for drinks.");
-            throw new InventoryDockException("Missing flavour for drinks.");
+            throw new MissingArgumentException("Missing flavour for drinks.");
         }
 
         String isCarbonatedString = FieldParser.extractField(input, "isCarbonated/", null);
         if (isCarbonatedString == null || isCarbonatedString.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing carbonation for drinks.");
-            throw new InventoryDockException("Missing carbonation for drinks.");
+            throw new MissingArgumentException("Missing carbonation for drinks.");
         }
 
         if (!(isCarbonatedString.equalsIgnoreCase("true") || isCarbonatedString.equalsIgnoreCase("false"))) {
             logger.log(Level.WARNING, "Carbonation must be true or false");
-            throw new InventoryDockException("Carbonation must be true or false");
+            throw new InvalidCommandException("Carbonation must be true or false");
         }
         boolean isCarbonated = Boolean.parseBoolean(isCarbonatedString);
 

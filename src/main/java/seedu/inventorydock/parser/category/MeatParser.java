@@ -1,6 +1,8 @@
 package seedu.inventorydock.parser.category;
 
 import seedu.inventorydock.exception.InventoryDockException;
+import seedu.inventorydock.exception.InvalidCommandException;
+import seedu.inventorydock.exception.MissingArgumentException;
 import seedu.inventorydock.parser.FieldParser;
 
 import java.util.logging.Level;
@@ -35,24 +37,24 @@ public class MeatParser {
         String meatType = FieldParser.extractField(input, "meatType/", "origin/");
         if (meatType == null || meatType.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing meatType for meat.");
-            throw new InventoryDockException("Missing meatType for meat.");
+            throw new MissingArgumentException("Missing meatType for meat.");
         }
 
         String origin = FieldParser.extractField(input, "origin/", "isFrozen/");
         if (origin == null || origin.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing origin for meat.");
-            throw new InventoryDockException("Missing origin for meat.");
+            throw new MissingArgumentException("Missing origin for meat.");
         }
 
         String isFrozenString = FieldParser.extractField(input, "isFrozen/", null);
         if (isFrozenString == null || isFrozenString.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing isFrozen for meat.");
-            throw new InventoryDockException("Missing isFrozen for meat.");
+            throw new MissingArgumentException("Missing isFrozen for meat.");
         }
 
         if (!(isFrozenString.equalsIgnoreCase("true") || isFrozenString.equalsIgnoreCase("false"))) {
             logger.log(Level.WARNING, "isFrozen must be true or false");
-            throw new InventoryDockException("isFrozen must be true or false");
+            throw new InvalidCommandException("isFrozen must be true or false");
         }
         boolean isFrozen = Boolean.parseBoolean(isFrozenString);
 

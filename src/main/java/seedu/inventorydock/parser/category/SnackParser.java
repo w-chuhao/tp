@@ -1,6 +1,8 @@
 package seedu.inventorydock.parser.category;
 
 import seedu.inventorydock.exception.InventoryDockException;
+import seedu.inventorydock.exception.InvalidCommandException;
+import seedu.inventorydock.exception.MissingArgumentException;
 import seedu.inventorydock.parser.FieldParser;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,18 +37,18 @@ public class SnackParser {
         String brand = FieldParser.extractField(input, "brand/", "isCrunchy/");
         if (brand == null || brand.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing brand for snack.");
-            throw new InventoryDockException("Missing brand for snack.");
+            throw new MissingArgumentException("Missing brand for snack.");
         }
 
         String crunchyString = FieldParser.extractField(input, "isCrunchy/", null);
         if (crunchyString == null || crunchyString.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing crunchiness for snack.");
-            throw new InventoryDockException("Missing crunchiness for snack.");
+            throw new MissingArgumentException("Missing crunchiness for snack.");
         }
 
         if (!(crunchyString.equalsIgnoreCase("true") || crunchyString.equalsIgnoreCase("false"))) {
             logger.log(Level.WARNING, "Crunchiness must be true or false");
-            throw new InventoryDockException("Crunchiness must be true or false");
+            throw new InvalidCommandException("Crunchiness must be true or false");
         }
         boolean isCrunchy = Boolean.parseBoolean(crunchyString);
 

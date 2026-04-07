@@ -1,6 +1,8 @@
 package seedu.inventorydock.parser.category;
 
 import seedu.inventorydock.exception.InventoryDockException;
+import seedu.inventorydock.exception.InvalidCommandException;
+import seedu.inventorydock.exception.MissingArgumentException;
 import seedu.inventorydock.parser.FieldParser;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,18 +41,18 @@ public class IceCreamParser {
         String flavour = FieldParser.extractField(input, "flavour/", "isDairyFree/");
         if (flavour == null || flavour.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing flavour for ice cream.");
-            throw new InventoryDockException("Missing flavour for ice cream.");
+            throw new MissingArgumentException("Missing flavour for ice cream.");
         }
 
         String dairyFreeString = FieldParser.extractField(input, "isDairyFree/", null);
         if (dairyFreeString == null || dairyFreeString.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing dairy-free status for ice cream.");
-            throw new InventoryDockException("Missing dairy-free status for ice cream.");
+            throw new MissingArgumentException("Missing dairy-free status for ice cream.");
         }
 
         if (!(dairyFreeString.equalsIgnoreCase("true") || dairyFreeString.equalsIgnoreCase("false"))) {
             logger.log(Level.WARNING, "isDairyFree must be true or false");
-            throw new InventoryDockException("isDairyFree must be true or false");
+            throw new InvalidCommandException("isDairyFree must be true or false");
         }
         boolean isDairyFree = Boolean.parseBoolean(dairyFreeString);
 

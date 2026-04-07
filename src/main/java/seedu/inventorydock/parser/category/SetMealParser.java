@@ -1,6 +1,8 @@
 package seedu.inventorydock.parser.category;
 
 import seedu.inventorydock.exception.InventoryDockException;
+import seedu.inventorydock.exception.InvalidCommandException;
+import seedu.inventorydock.exception.MissingArgumentException;
 import seedu.inventorydock.parser.FieldParser;
 
 import java.util.logging.Level;
@@ -42,24 +44,24 @@ public class SetMealParser {
         String mealType = FieldParser.extractField(input, "mealType/", "foodSize/");
         if (mealType == null || mealType.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing mealType for set meal.");
-            throw new InventoryDockException("Missing mealType for set meal.");
+            throw new MissingArgumentException("Missing mealType for set meal.");
         }
 
         String foodSize = FieldParser.extractField(input, "foodSize/", "hasDrinks/");
         if (foodSize == null || foodSize.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing foodSize for set meal.");
-            throw new InventoryDockException("Missing foodSize for set meal.");
+            throw new MissingArgumentException("Missing foodSize for set meal.");
         }
 
         String hasDrinksString = FieldParser.extractField(input, "hasDrinks/", null);
         if (hasDrinksString == null || hasDrinksString.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing hasDrinks for set meal.");
-            throw new InventoryDockException("Missing hasDrinks for set meal.");
+            throw new MissingArgumentException("Missing hasDrinks for set meal.");
         }
 
         if (!(hasDrinksString.equalsIgnoreCase("true") || hasDrinksString.equalsIgnoreCase("false"))) {
             logger.log(Level.WARNING, "hasDrinks must be true or false");
-            throw new InventoryDockException("hasDrinks must be true or false");
+            throw new InvalidCommandException("hasDrinks must be true or false");
         }
         boolean hasDrinks = Boolean.parseBoolean(hasDrinksString);
 
