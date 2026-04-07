@@ -76,4 +76,83 @@ Supported categories and extra fields:
   `add category/icecream item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE flavour/FLAVOUR isDairyFree/BOOLEAN`
 * Sweets
   `add category/sweets item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE brand/BRAND sweetnessLevel/LEVEL isChewy/BOOLEAN`
+* Burger
+  `add category/burger item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE isSpicy/BOOLEAN pattyType/TYPE`
+* Set meal
+  `add category/setmeal item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE mealType/TYPE foodSize/SIZE hasDrinks/BOOLEAN`
+* Seafood
+  `add category/seafood item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE seafoodType/TYPE origin/ORIGIN isFrozen/BOOLEAN`
+* Meat
+  `add category/meat item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE meatType/TYPE origin/ORIGIN isFrozen/BOOLEAN`
+* Pet food
+  `add category/petfood item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE petType/TYPE brand/BRAND isDryFood/BOOLEAN`
+* Accessories
+  `add category/accessories item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE type/TYPE material/MATERIAL isFragile/BOOLEAN`
 
+Examples:
+
+* `add category/fruits item/apple bin/A-10 qty/40 expiryDate/2026-10-3 size/big isRipe/true`
+* `add category/snacks item/potato chips bin/D-5 qty/50 expiryDate/2026-8-12 brand/Lays isCrunchy/true`
+* `add category/drinks item/apple_juice bin/F-1 qty/24 expiryDate/2026-10-3 brand/Marigold flavour/Apple isCarbonated/false`
+* `add category/setmeal item/chicken_rice_set bin/G-3 qty/12 expiryDate/2026-4-1 mealType/lunch foodSize/large hasDrinks/true`
+
+Expected result:
+
+* The item is added to the specified category.
+* The app confirms the item name, quantity, category, and bin location.
+
+### Find items by keyword: `find keyword/...`
+Finds items whose names contain the given keyword.
+
+Format:
+
+`find keyword/KEYWORD`
+
+Notes:
+
+* Matching is case-insensitive.
+* Partial matches work. For example, `apple` matches `apple`, `pineapple`, and `apple_juice`.
+
+Examples:
+
+* `find keyword/apple`
+* `find keyword/chip`
+
+Expected result:
+
+* Matching items are listed together with their category names.
+* If nothing matches, the app shows `No items found matching keyword: KEYWORD.`
+
+### Finding items by category: `find category/...`
+Shows all items stored in a specified category.
+
+Format: `find category/CATEGORY`
+
+Example:
+
+`find category/fruits`
+
+Expected result:
+
+* If the category exists and contains items, the app lists all items in that category.
+* If the category exists but has no items, the app shows `No items found in category: CATEGORY.`
+* If the category does not exist, the app shows an error that the category was not found.
+
+### Find items by expiry date: `find expiryDate/...`
+
+Shows all items whose expiry date is on or before the specified date.
+
+Format:
+
+`find expiryDate/DATE`
+
+Examples:
+
+* `find expiryDate/2026-3-21`
+* `find expiryDate/2026-12-31`
+
+Expected result:
+
+* Items expiring on the given date are included.
+* Items expiring before the given date are also included.
+* If nothing matches, the app shows `No items found expiring by DATE.`
