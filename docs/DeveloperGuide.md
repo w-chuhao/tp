@@ -117,21 +117,6 @@ application. The feature follows this flow:
 5. An `AddItemCommand` is created and executed with access to the current `Inventory` and `UI`.
 6. The command finds the target category, inserts the item, and shows a confirmation message.
 
-The interaction for this flow is split into focused sequence diagrams below.
-
-1. Parse routing and category dispatch.
-
-![AddItemCommandParseRoutingFlow](diagrams/sequence/AddItemCommandParseRoutingFlow.png)
-
-2. Fruit parsing and command creation.
-
-![AddItemCommandFruitParsingFlow](diagrams/sequence/AddItemCommandFruitParsingFlow.png)
-
-
-3. Execution and result display.
-
-![AddItemCommandExecutionDisplayFlow](diagrams/sequence/AddItemCommandExecutionDisplayFlow.png)
-
 The main structural relationships for this feature are shown below.
 
 ![AddItemCommandClassDiagram](diagrams/class/AddItemCommandClassDiagram.png)
@@ -622,20 +607,8 @@ architecture:
 4. `ListCommand` delegates rendering to `UI.showInventory(inventory)`.
 5. `UI` iterates through the inventory and prints the formatted listing to the user.
 
-The interaction for this flow is split into focused sequence diagrams below.
-
-1. Parse routing and category dispatch.
-
-![AddItemCommandParseRoutingFlow](diagrams/sequence/AddItemCommandParseRoutingFlow.png)
-
-2. Fruit parsing and command creation.
-
-![AddItemCommandFruitParsingFlow](diagrams/sequence/AddItemCommandFruitParsingFlow.png)
-
-
-3. Execution and result display.
-
-![AddItemCommandExecutionDisplayFlow](diagrams/sequence/AddItemCommandExecutionDisplayFlow.png)
+This design was chosen because listing inventory does not require separate parsing logic beyond
+recognising the command word. The command object acts mainly as a bridge between the parser and the UI.
 
 The main structural relationships for this feature are shown below.
 
@@ -645,8 +618,9 @@ A representative object snapshot for this feature is shown below.
 
 ![ListCommandObjectDiagram](diagrams/object/ListCommandObjectDiagram.png)
 
-This design was chosen because listing inventory does not require separate parsing logic beyond
-recognising the command word. The command object acts mainly as a bridge between the parser and the UI.
+The main interaction for this flow is illustrated below.
+
+![ListCommandMainFlow](diagrams/sequence/ListCommandMainFlow-Sequence_Diagram_for_ListCommand__Main_Control_Flow_Only_.png)
 
 #### Component-level implementation
 
