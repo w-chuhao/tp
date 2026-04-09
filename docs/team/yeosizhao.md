@@ -26,7 +26,7 @@ Given below are my contributions to the project.
 - **Date parsing and comparison:** Implemented proper date parsing and comparison logic so results are based on actual dates rather than unsafe string comparison.
 - **Inventory-wide scanning:** Designed the feature to scan the full inventory and evaluate all relevant items against a user-supplied cutoff date.
 - **Feature completeness:** Made the enhancement useful for realistic inventory workflows by accepting a clear cutoff date and rejecting invalid input reliably.
-- **Implementation challenge:** The logic had to work correctly even when inventory data is heterogeneous, including cases where some items may not have expiry dates populated.
+- **Implementation challenge:** The logic had to work correctly across heterogeneous inventory data while still enforcing consistent date validation and comparison rules.
 
 **Sort items within each category**
 
@@ -50,7 +50,7 @@ Given below are my contributions to the project.
 
 ### Contributions to the DG
 
-- Wrote implementation details and drew the PlantUML sequence, class, and object diagramsfor the `update item`, `find by expiry date` and `sort`feature.
+- Wrote implementation details and drew the PlantUML sequence, class, and object diagrams for the `update item`, `find by expiry date` and `sort`feature.
 - Added and updated sequence diagrams for the implemented features.
 - Added manual testing instructions for all three features.
 

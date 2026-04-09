@@ -80,10 +80,9 @@ The application uses a shared custom exception base class, `InventoryDockExcepti
 runtime can catch command, parsing, and storage failures through a single type while still preserving
 more specific subclasses for clearer intent.
 
-The hierarchy is now split into an overview diagram plus focused diagrams for each exception group.
-This keeps the top-level inheritance structure visible without forcing every detail into a single figure.
+The hierarchy is split into focused diagrams for each exception group.
+This keeps the inheritance structure visible without forcing every detail into a single figure.
 
-- Overview: `ExceptionHierarchyClassDiagram.puml`
 - Parser and input exceptions: `ExceptionHierarchyParserClassDiagram.puml`
 - Inventory lookup exceptions: `ExceptionHierarchyInventoryClassDiagram.puml`
 - Storage exceptions: `ExceptionHierarchyStorageClassDiagram.puml`
