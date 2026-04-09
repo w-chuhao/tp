@@ -1,0 +1,33 @@
+@startuml
+title Sequence Diagram for FindItemByExpiryDateCommand (Parse and Command Creation)
+
+autonumber
+hide footbox
+
+actor User
+participant ":UI" as UI
+participant ":InventoryDock" as InventoryDock
+participant ":Parser" as Parser
+participant ":FindItemParser" as FindItemParser
+participant ":FindItemByExpiryDateCommand" as FindItemByExpiryDateCommand
+
+User -> UI: enter find expiryDate command
+activate UI
+UI -> InventoryDock: input
+activate InventoryDock
+InventoryDock -> Parser: parse(input)
+activate Parser
+Parser -> FindItemParser: parse(arguments)
+activate FindItemParser
+create FindItemByExpiryDateCommand
+FindItemParser -> FindItemByExpiryDateCommand: FindItemByExpiryDateCommand(name)
+activate FindItemByExpiryDateCommand
+FindItemByExpiryDateCommand --> FindItemParser: command
+deactivate FindItemByExpiryDateCommand
+FindItemParser --> Parser: command
+deactivate FindItemParser
+Parser --> InventoryDock: command
+deactivate Parser
+deactivate InventoryDock
+deactivate UI
+@enduml

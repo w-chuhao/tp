@@ -1,0 +1,25 @@
+@startuml
+title Sequence Diagram for FindItemByExpiryDateCommand (Result Display)
+
+autonumber
+hide footbox
+
+actor User
+participant ":FindItemByExpiryDateCommand" as FindItemByExpiryDateCommand
+participant ":UI" as UI
+
+alt matches is empty
+    FindItemByExpiryDateCommand -> UI: showMessage("No items found ...")
+    activate UI
+    UI --> User: display no-match message
+    deactivate UI
+else matches found
+    FindItemByExpiryDateCommand -> UI: showDivider()
+    activate UI
+    FindItemByExpiryDateCommand -> UI: showMessage("Items expiring by ...")
+    FindItemByExpiryDateCommand -> UI: showNumberedList(matches)
+    FindItemByExpiryDateCommand -> UI: showDivider()
+    UI --> User: display matching items
+    deactivate UI
+end
+@enduml

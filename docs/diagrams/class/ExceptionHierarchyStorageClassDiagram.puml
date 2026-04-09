@@ -1,0 +1,21 @@
+@startuml
+title Class Diagram for Storage Exceptions
+skinparam classAttributeIconSize 0
+hide circle
+top to bottom direction
+
+class "Exception" as JavaException
+
+class InventoryDockException {
+  + InventoryDockException(message: String)
+  + InventoryDockException(message: String, cause: Throwable)
+}
+
+class StorageException {
+  + StorageException(message: String)
+  + StorageException(message: String, cause: Throwable)
+}
+
+JavaException <|-- InventoryDockException
+InventoryDockException <|-- StorageException
+@enduml

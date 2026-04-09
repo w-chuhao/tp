@@ -80,9 +80,13 @@ The application uses a shared custom exception base class, `InventoryDockExcepti
 runtime can catch command, parsing, and storage failures through a single type while still preserving
 more specific subclasses for clearer intent.
 
-The exception hierarchy is shown below.
+The hierarchy is now split into an overview diagram plus focused diagrams for each exception group.
+This keeps the top-level inheritance structure visible without forcing every detail into a single figure.
 
-![ExceptionHierarchyClassDiagram](diagrams/class/ExceptionHierarchyClassDiagram.png)
+- Overview: `ExceptionHierarchyClassDiagram.puml`
+- Parser and input exceptions: `ExceptionHierarchyParserClassDiagram.puml`
+- Inventory lookup exceptions: `ExceptionHierarchyInventoryClassDiagram.puml`
+- Storage exceptions: `ExceptionHierarchyStorageClassDiagram.puml`
 
 ### Add Item Feature
 
@@ -264,19 +268,6 @@ Alternative 3: Create missing categories automatically during item addition.
 
 This was rejected because it can hide user mistakes. Requiring the target category to exist makes the
 inventory structure more predictable and prevents accidental category creation due to typos.
-
-#### Current limitations
-
-The current implementation has some limitations.
-
-- Category dispatch in `AddCommandParser` is hard-coded using a `switch` statement.
-- Supporting a new category requires updates in multiple places, including parser dispatch and the
-  corresponding model subtype.
-- Error messages depend on the specific parser branch and are not fully standardised across all item
-  types.
-
-These limitations are acceptable for the current project scope, but they may become more noticeable if
-the number of item categories continues to grow.
 
 #### Possible future improvements
 
@@ -619,22 +610,6 @@ Several alternatives were considered when implementing this feature.
 
 ---
 
-#### Current limitations
-
-The current implementation has some limitations.
-
-* Only shared item fields are updatable: `newItem/`, `bin/`, `qty/`, and `expiryDate/`. Category-specific  
-  fields such as `size/`, `brand/`, or `isRipe/` cannot currently be updated.  
-* Unsupported fields cause the command to fail instead of being ignored.  
-* The command depends on item indices, so the user may need to run `list` or `find` beforehand to  
-  determine the correct target item.  
-* Updating one item does not currently show the full updated item record after completion.  
-
-These limitations are acceptable for the current project scope, but they highlight possible areas for  
-future enhancement.
-
----
-
 #### Possible future improvements
 
 If this feature is extended in future versions, the following improvements could be considered:
@@ -781,17 +756,6 @@ Alternative 3: Add filtering arguments directly to `list`.
 
 This was rejected for now because filtered retrieval is already covered by specialised `find`
 commands. Keeping `list` simple makes its behaviour predictable.
-
-#### Current limitations
-
-The current implementation has some limitations.
-
-- The command always lists the full inventory and does not support optional filters or sorting.
-- Output ordering depends on the current order of categories and items stored in memory.
-- Formatting is tied to the current console UI implementation.
-
-These limitations are acceptable for the current scope because the command is intended to provide a
-simple full-inventory view.
 
 #### Possible future improvements
 
@@ -962,17 +926,6 @@ Alternative 3: Sort both categories and items.
 This was rejected because the primary user need is to inspect items within each category more easily. Reordering
 categories as well would make the output less consistent with the rest of the application.
 
-#### Current limitations
-
-The current implementation has some limitations.
-
-- It only supports one sorting criterion at a time.
-- It preserves category order and does not sort categories themselves.
-- It depends on valid item data for correct field comparison, especially for expiry-date sorting.
-- It currently only support fix direction of sorting, user cannot choose ascending or descending.
-
-These limitations are acceptable for the current project scope.
-
 #### Possible future improvements
 
 If this feature is extended in future versions, the following improvements could be considered:
@@ -1115,17 +1068,6 @@ Alternative 2: Use JSON format.
 This would make the file structure more standardized. However, it was rejected because it would
 introduce additional complexity which is unnecessary for our project scope.
 
-#### Current limitations
-
-The current storage implementation has several limitations.
-
-1. The storage system relies on a fixed text format with prefixes such as `category/`, `item/`.
-   If the format is modified or corrupted, the parser will fail to reconstruct the item correctly.
-2. Malformed or corrupted lines are skipped during loading. While this prevents crashes, it may result
-   in data loss and incomplete reconstruction of the inventory.
-
-For the current version of the application, these limitations are still acceptable.
-
 #### Possible future improvements
 
 The following enhancements can be considered to improve the storage component.
@@ -1203,14 +1145,6 @@ Class and object diagrams:
 - **Confirmation prompt** is used only for category clearing (high-risk), not for single-item deletion (low-risk, easily reversible).
 - **Category clearing** removes items but preserves the category object, since categories are predefined.
 - The `delete` command word is reused for both operations; the parser distinguishes them by the presence of `index/`.
-
-#### Current limitations and future improvements
-
-- No undo mechanism; deleted items must be re-added manually.
-- Deleting an item shifts subsequent indices, which may confuse users performing consecutive deletions.
-- The confirmation prompt accepts only `yes`; other affirmative phrases are treated as cancellations.
-
-Possible improvements include an undo/soft-delete mechanism, batch deletion, deletion by item name with disambiguation, and displaying updated indices after deletion.
 
 ### Help Feature
 
@@ -1367,7 +1301,6 @@ After setting up the application, proceed to the individual test cases below.
 8. Run `find expiryDate/`.
 9. Verify that the application shows the missing expiry date error.
 
-
 ### Testing update feature
 
 1. Run `update category/fruits index/1 newItem/green_apple bin/A2 expiryDate/2026-5-01`
@@ -1431,7 +1364,6 @@ After setting up the application, proceed to the individual test cases below.
 13. Delete the storage file before launching the application.
 14. Verify that the application recreates the file automatically and starts without crashing.
 
-
 ### Testing delete category
 
 1. Ensure the inventory contains a non-empty category such as `fruits`.
@@ -1460,21 +1392,3 @@ After setting up the application, proceed to the individual test cases below.
 8. Run `find keyword/mango`.
 9. Verify that the application shows `No items found matching keyword: mango.` when there are no
    matches.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
