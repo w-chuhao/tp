@@ -83,8 +83,11 @@ public class FindItemByBinCommand extends Command {
         String normalizedBinLocation = itemBinLocation.trim().toLowerCase();
         String[] binParts = normalizedBinLocation.split("-", 2);
 
-        assert binParts.length == 2 : "Stored bin location is not in LETTER-NUMBER format: " + itemBinLocation;
-
+        if (binParts.length != 2 || binParts[0].length() != 1 || !Character.isLetter(binParts[0].charAt(0))
+                || binParts[1].isEmpty()) {
+            logger.log(Level.WARNING, "Skipping item with invalid stored bin location: " + itemBinLocation);
+            return false;
+        }
         String binLetter = binParts[0];
         String binNumber = binParts[1];
 
@@ -99,3 +102,4 @@ public class FindItemByBinCommand extends Command {
         return binNumber.equals(binInput);
     }
 }
+
