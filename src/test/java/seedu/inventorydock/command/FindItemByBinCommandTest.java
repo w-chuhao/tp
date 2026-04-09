@@ -86,6 +86,19 @@ public class FindItemByBinCommandTest {
         assertEquals(0, ui.dividerCount);
     }
 
+    @Test
+    public void execute_invalidStoredBin_skipsInvalidItemAndDoesNotCrash() {
+        fruitsCategory.addItem(new Item("brokenItem", 5, "A10", null));
+        FindItemByBinCommand command = new FindItemByBinCommand("a");
+        TestUI ui = new TestUI();
+
+        command.execute(inventory, ui);
+
+        assertEquals("Items in bin location: a", ui.messages.get(0));
+        assertTrue(ui.messages.stream().anyMatch(message -> message.contains("Name: apple")));
+        assertTrue(ui.messages.stream().anyMatch(message -> message.contains("Name: banana")));
+        assertFalse(ui.messages.stream().anyMatch(message -> message.contains("Name: brokenItem")));
+    }
     private static class TestUI extends UI {
         private final List<String> messages = new ArrayList<>();
         private int dividerCount;
@@ -101,3 +114,5 @@ public class FindItemByBinCommandTest {
         }
     }
 }
+
+

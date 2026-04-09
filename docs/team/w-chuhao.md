@@ -4,7 +4,7 @@
 
 InventoryDock is a CLI inventory management application for store managers to track stock by category, quantity, expiry date, and bin location. It supports fast keyboard-driven workflows for adding items, listing the full inventory, and locating stock based on storage-related attributes.
 
-My main contributions focused on inventory creation and retrieval workflows. I implemented the `add` command, the `list` command, and three search features: `find category`, `find bin`, and `find qty`. I also documented these features in the User Guide and Developer Guide, including the diagrams used to explain their control flow and structure.
+My main contributions focused on inventory creation and retrieval workflows. I implemented the `add` command, the `list` command, and three search features: `find category`, `find bin`, and `find qty`. Across these features, I also added exception-based error handling so invalid input and failure cases could be detected and reported more safely. I documented these features in the User Guide and Developer Guide, including the diagrams used to explain their control flow and structure.
 
 ## Summary of Contributions
 
@@ -16,13 +16,14 @@ My main contributions focused on inventory creation and retrieval workflows. I i
 
 #### 1. Add item command and parsing support
 
-I implemented the core `add` command flow so that users can add inventory items into an existing category using a structured command format. This work included both the command execution logic and the parser pipeline needed to validate common fields, dispatch by category, and construct the correct item subtype.
+I implemented the core `add` command flow so that users can add inventory items into an existing category using a structured command format. This work included both the command execution logic and the parser pipeline needed to validate common fields, dispatch by category, construct the correct item subtype, and throw or propagate exceptions when invalid input or category errors were encountered.
 
 Key aspects of the implementation:
 
 - Added `AddItemCommand` to insert parsed items into the target category.
 - Extended `Parser`, `AddCommandParser`, and `AddItemCommandParser` to support command recognition, validation, and category-based parsing.
 - Helped establish the separation between parsing logic and command execution logic, keeping the implementation consistent with the project's command-based architecture.
+- Included exception handling paths so invalid add-command input and category-related errors could be surfaced clearly instead of failing silently.
 - Added JUnit coverage for add-command behaviour and parser handling.
 
 This contribution is significant because `add` is one of the product's core write operations. It required coordinating input validation, item construction, category lookup, and error handling across multiple classes.
@@ -35,19 +36,20 @@ Representative PRs:
 
 #### 2. Full inventory listing
 
-I implemented the `list` command, which shows the complete inventory grouped by category. This gives users a quick snapshot of current stock after adding, updating, deleting, or loading items from storage.
+I implemented the `list` command, which shows the complete inventory grouped by category. This gives users a quick snapshot of current stock after adding, updating, deleting, or loading items from storage, while also handling exceptional conditions safely when listing cannot proceed as expected.
 
 Key aspects of the implementation:
 
 - Added `ListCommand` as a lightweight read-only command.
 - Integrated it into the parser flow so the command can be triggered directly from user input.
 - Added tests to verify expected listing behaviour.
+- Ensured the command cooperates with the application's exception-based error-handling flow.
 
 Although the feature is simple from the user's point of view, it is important because it is a foundational read operation that supports many other workflows, such as checking current inventory state before running update or delete operations.
 
 #### 3. Search by category
 
-I implemented the `find category/CATEGORY` feature, allowing users to retrieve all items stored in a specified category without scanning the full inventory manually.
+I implemented the `find category/CATEGORY` feature, allowing users to retrieve all items stored in a specified category without scanning the full inventory manually. The implementation also handles exceptional cases such as invalid input or missing categories in a controlled way.
 
 Key aspects of the implementation:
 
@@ -55,6 +57,7 @@ Key aspects of the implementation:
 - Extended `FindItemParser` so that it can recognise category-based search input.
 - Designed the feature to distinguish between a missing category and an existing but empty category.
 - Added JUnit tests for valid matches, empty-category cases, and invalid input handling.
+- Included exception-aware validation paths so malformed category searches are rejected cleanly.
 
 This feature is meaningful because it reuses the product's category-based data model directly instead of doing a less precise global scan, which keeps the implementation small and the behaviour clear.
 
@@ -65,7 +68,7 @@ Representative PRs:
 
 #### 4. Search by bin location
 
-I implemented the `find bin/BIN_INPUT` feature, which lets users search by exact bin location, bin letter, or bin number. This is useful for real inventory retrieval because users often remember where an item is stored before they remember its exact name.
+I implemented the `find bin/BIN_INPUT` feature, which lets users search by exact bin location, bin letter, or bin number. This is useful for real inventory retrieval because users often remember where an item is stored before they remember its exact name. The feature also validates malformed bin input and routes such cases through the application's exception-handling flow.
 
 Key aspects of the implementation:
 
@@ -74,6 +77,7 @@ Key aspects of the implementation:
 - Extended `FindItemParser` to dispatch bin searches correctly.
 - Implemented matching logic for three search modes: exact bin, bin letter, and bin number.
 - Added JUnit tests for parser behaviour and matching logic.
+- Included exception-based handling for invalid bin formats so the command fails predictably and with clearer feedback.
 
 This feature required more than a straightforward exact-match search because it had to support flexible matching while still preventing incorrect overmatching such as treating `A-1` as matching `A-10`.
 
@@ -83,7 +87,7 @@ Representative PR:
 
 #### 5. Search by quantity threshold
 
-I implemented the `find qty/QUANTITY` feature, which lets users search for items whose quantity is less than or equal to a specified threshold. This is useful for stock review workflows because users often need to identify low-stock items quickly instead of searching for one exact quantity.
+I implemented the `find qty/QUANTITY` feature, which lets users search for items whose quantity is less than or equal to a specified threshold. This is useful for stock review workflows because users often need to identify low-stock items quickly instead of searching for one exact quantity. The implementation also rejects invalid quantity input through the same exception-based error-handling approach used in the rest of my contributions.
 
 Key aspects of the implementation:
 
@@ -92,6 +96,7 @@ Key aspects of the implementation:
 - Reused existing quantity validation so the command accepts only positive integers.
 - Implemented inclusive threshold matching using `<=`.
 - Added JUnit tests for parser behaviour and threshold-based matching.
+- Ensured invalid quantity values are handled through explicit exceptions rather than ambiguous command behaviour.
 
 This feature is meaningful because it turns quantity search into an operational low-stock check rather than a narrow exact-match lookup.
 
@@ -170,8 +175,3 @@ I also updated the diagram set later to keep the generated documentation consist
 - [#57](https://github.com/AY2526S2-CS2113-W09-2/tp/pull/57) Commented on the logging feature changes during team integration.
 - [#63](https://github.com/AY2526S2-CS2113-W09-2/tp/pull/63) Helped refine the design of newly added item categories by pushing for a more consistent data model across item types.
 - [#86](https://github.com/AY2526S2-CS2113-W09-2/tp/pull/86) Reviewed parsing improvements and suggested ways to keep item-field design more consistent for future iterations.
-
-
-
-
-

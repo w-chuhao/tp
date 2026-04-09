@@ -25,6 +25,15 @@ public class FindItemParserTest {
     }
 
     @Test
+    public void parse_blankInput_throwsSpecifyWhatToFindException() {
+        InventoryDockException exception = assertThrows(InventoryDockException.class,
+                () -> parser.parse("   "));
+        assertEquals("Please specify what to find. Use: find keyword/KEYWORD, "
+                + "find category/CATEGORY, find expiryDate/DATE, find bin/BIN, or find qty/QTY.",
+                exception.getMessage());
+    }
+
+    @Test
     public void parse_missingName_throwsException() {
         InventoryDockException exception = assertThrows(InventoryDockException.class,
                 () -> parser.parse("keyword/   "));
@@ -100,4 +109,6 @@ public class FindItemParserTest {
 
 
 }
+
+
 

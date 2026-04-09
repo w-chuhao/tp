@@ -30,7 +30,7 @@ public class FindItemParser {
      */
     public Command parse(String input) throws InventoryDockException {
         assert input != null : "FindCommandParser received null input.";
-        if (input.isEmpty()) {
+        if (input.trim().isEmpty()) {
             logger.log(Level.WARNING, "Find command missing target.");
             throw new MissingArgumentException("Please specify what to find. Use: find keyword/KEYWORD, "
                     + "find category/CATEGORY, find expiryDate/DATE, find bin/BIN, or find qty/QTY.");
@@ -66,6 +66,7 @@ public class FindItemParser {
         }
     }
 }
+
 
 
 
