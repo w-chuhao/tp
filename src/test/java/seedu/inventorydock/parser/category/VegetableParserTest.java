@@ -10,23 +10,23 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class VegetableParserTest {
     @Test
     public void parse_validInput_success() {
-        String input = "isLeafy/true";
+        String input = "isLeafy/true origin/Malaysia";
         assertDoesNotThrow(() -> VegetableParser.parse(input));
     }
 
     @Test
     public void parse_missingRipeness_throwsException() {
-        String input = "isLeafy/";
+        String input = "isLeafy/ origin/Malaysia";
         InventoryDockException e = assertThrows(InventoryDockException.class,
                 () -> VegetableParser.parse(input));
         assertEquals("Missing leafy field for vegetable.", e.getMessage());
     }
 
     @Test
-    public void parse_invalidRipeness_throwsException() {
-        String input = "isLeafy/hi";
+    public void parse_missingOrigin_throwsException() {
+        String input = "isLeafy/true origin/";
         InventoryDockException e = assertThrows(InventoryDockException.class,
                 () -> VegetableParser.parse(input));
-        assertEquals("Leafy field must be true or false.", e.getMessage());
+        assertEquals("Missing origin for vegetable.", e.getMessage());
     }
 }

@@ -8,13 +8,13 @@ public class VegetableTest {
     @Test
     public void constructor_validInput_success() {
         Vegetable vegetable = new Vegetable("Spinach", 14, "H1",
-                "2026-03-30", true);
+                "2026-03-30", true, "Malaysia");
 
         assertEquals("Spinach", vegetable.getName());
         assertEquals(14, vegetable.getQuantity());
         assertEquals("H1", vegetable.getBinLocation());
         assertEquals("2026-03-30", vegetable.getExpiryDate());
         assertEquals(true, vegetable.isLeafy());
+        assertEquals("Malaysia", vegetable.getOrigin());
     }
 }
-

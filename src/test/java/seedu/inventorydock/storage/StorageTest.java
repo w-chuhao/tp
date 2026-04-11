@@ -58,7 +58,7 @@ public class StorageTest {
         );
         inventory.findCategoryByName("vegetables").addItem(
                 new Vegetable("spinach", 4, "V-01",
-                        "2026-03-18", true)
+                        "2026-03-18", true, "Malaysia")
         );
         inventory.findCategoryByName("snacks").addItem(
                 new Snack("chips", 6, "S-07",
@@ -100,7 +100,7 @@ public class StorageTest {
 
         List<String> lines = List.of(
                 "category/fruits item/apple bin/A-10 qty/3 expiryDate/2026-03-20 size/big isRipe/true",
-                "category/vegetables item/spinach bin/V-01 qty/4 expiryDate/2026-03-18 isLeafy/true",
+                "category/vegetables item/spinach bin/V-01 qty/4 expiryDate/2026-03-18 isLeafy/true origin/Malaysia",
                 "Corrupted line.",
                 "category/snacks item/chips bin/S-07 qty/6 expiryDate/2026-06-01 brand/lays, isCrunchy/true"
         );

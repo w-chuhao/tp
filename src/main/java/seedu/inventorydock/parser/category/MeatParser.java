@@ -1,7 +1,6 @@
 package seedu.inventorydock.parser.category;
 
 import seedu.inventorydock.exception.InventoryDockException;
-import seedu.inventorydock.exception.InvalidCommandException;
 import seedu.inventorydock.exception.MissingArgumentException;
 import seedu.inventorydock.parser.FieldParser;
 
@@ -16,18 +15,10 @@ public class MeatParser {
 
     public final String meatType;
     public final String origin;
-    public final boolean isFrozen;
 
-    /**
-     * Creates a {@code MeatParser} object with the parsed meat details.
-     *
-     * @param meatType Type of meat.
-     * @param origin Origin of the meat.
-     */
-    public MeatParser(String meatType, String origin, boolean isFrozen) {
+    public MeatParser(String meatType, String origin) {
         this.meatType = meatType;
         this.origin = origin;
-        this.isFrozen = isFrozen;
     }
 
     public static MeatParser parse(String input) throws InventoryDockException {
@@ -40,25 +31,13 @@ public class MeatParser {
             throw new MissingArgumentException("Missing meatType for meat.");
         }
 
-        String origin = FieldParser.extractField(input, "origin/", "isFrozen/");
+        String origin = FieldParser.extractField(input, "origin/", null);
         if (origin == null || origin.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing origin for meat.");
             throw new MissingArgumentException("Missing origin for meat.");
         }
 
-        String isFrozenString = FieldParser.extractField(input, "isFrozen/", null);
-        if (isFrozenString == null || isFrozenString.trim().isEmpty()) {
-            logger.log(Level.WARNING, "Missing isFrozen for meat.");
-            throw new MissingArgumentException("Missing isFrozen for meat.");
-        }
-
-        if (!(isFrozenString.equalsIgnoreCase("true") || isFrozenString.equalsIgnoreCase("false"))) {
-            logger.log(Level.WARNING, "isFrozen must be true or false");
-            throw new InvalidCommandException("isFrozen must be true or false");
-        }
-        boolean isFrozen = Boolean.parseBoolean(isFrozenString);
-
         logger.log(Level.INFO, "End of processing meat.");
-        return new MeatParser(meatType, origin, isFrozen);
+        return new MeatParser(meatType, origin);
     }
 }
