@@ -268,25 +268,6 @@ ull`, it throws a
 This layered approach ensures invalid input is rejected as early as possible, while still protecting
 the command layer from invalid state.
 
-#### Alternatives considered
-
-Several alternatives were considered when implementing this feature.
-
-Alternative 1: Use a single generic item parser for every category.
-
-This would reduce the number of parser classes, but it was rejected because different categories have
-different required fields. A single parser would become difficult to understand and maintain.
-
-Alternative 2: Let `AddItemCommand` parse the raw command string itself.
-
-This was rejected because it mixes input interpretation with business logic. The current design keeps
-commands focused on behaviour and leaves parsing to the parser layer.
-
-Alternative 3: Create missing categories automatically during item addition.
-
-This was rejected because it can hide user mistakes. Requiring the target category to exist makes the
-inventory structure more predictable and prevents accidental category creation due to typos.
-
 ### Find Feature
 
 The product provides a family of `find` commands that share a common flow:
@@ -601,23 +582,6 @@ Validation is split across the parser layer and the command layer.
 This layered design ensures invalid input is rejected early, while still protecting the command layer  
 from invalid runtime state.
 
-#### Alternatives considered
-
-Several alternatives were considered when implementing this feature.
-
-* Alternative 1: Delete and re-add the item instead of supporting update.  
-  This was rejected because it is less convenient for the user and makes small corrections unnecessarily  
-  verbose.
-
-* Alternative 2: Create a separate command for each field, such as `UpdateQuantityCommand` or  
-  `UpdateExpiryDateCommand`.  
-  This was rejected because it would significantly increase the number of command classes and make the  
-  design more fragmented.
-
-* Alternative 3: Allow the parser to mutate the item directly.  
-  This was rejected because it breaks the separation between parsing and execution. Parsers should  
-  interpret input, while commands should perform behaviour.
-
 ---
 
 ### List Feature
@@ -727,26 +691,6 @@ ull`.
 
 Because the command is read-only and does not parse additional user arguments, there are fewer failure
 modes compared with commands such as `add` or `find`.
-
-#### Alternatives considered
-
-Several alternatives were considered when implementing this feature.
-
-Alternative 1: Let `Parser` call `UI.showInventory(inventory)` directly without creating a command
-object.
-
-This was rejected because it breaks the existing command architecture. Keeping `ListCommand` preserves
-a consistent parse-then-execute pipeline across user actions.
-
-Alternative 2: Let `ListCommand` build a formatted string instead of delegating to `UI`.
-
-This was rejected because presentation logic belongs more naturally in the UI layer. Mixing display
-formatting into the command would weaken separation of concerns.
-
-Alternative 3: Add filtering arguments directly to `list`.
-
-This was rejected for now because filtered retrieval is already covered by specialised `find`
-commands. Keeping `list` simple makes its behaviour predictable.
 
 ### Sort Feature
 
@@ -893,25 +837,6 @@ ame`, `expirydate`, and `qty`.
 At execution time, the command handles an empty inventory gracefully. The UI displays the appropriate empty inventory
 message instead of failing.
 
-#### Alternatives considered
-
-Several alternatives were considered when implementing this feature.
-
-Alternative 1: Permanently reorder items inside each category.
-
-This was rejected because the sort command is intended as a display oriented feature rather than a data mutation
-feature. Permanently changing the stored order could make other index based commands less predictable.
-
-Alternative 2: Extend the `list` command to accept optional sorting arguments.
-
-This was rejected because it would complicate the behaviour of `list`, which is currently simple and predictable.
-Keeping `sort` as a separate command makes each command’s purpose clearer.
-
-Alternative 3: Sort both categories and items.
-
-This was rejected because the primary user need is to inspect items within each category more easily. Reordering
-categories as well would make the output less consistent with the rest of the application.
-
 ### Storage feature
 
 This product includes a storage component that is responsible for persisting inventory data
@@ -1032,18 +957,6 @@ libraries or database setup, which makes the application easier to develop and t
 
 Second, the saved data is readable which is useful during debugging because we can inspect the
 contents of the file directly and verify whether items are being written correctly.
-
-#### Alternatives considered
-
-Alternative 1: Store each category in a separate file.
-
-This could improve file organization, especially if categories become large. It was rejected because it would 
-make file management more complicated and require coordinating multiple saved files instead of just one.
-
-Alternative 2: Use JSON format.
-
-This would make the file structure more standardized. However, it was rejected because it would
-introduce additional complexity which is unnecessary for our project scope.
 
 ### Delete Feature
 
@@ -1369,6 +1282,7 @@ o` and press enter.
 8. Run `find keyword/mango`.
 9. Verify that the application shows `No items found matching keyword: mango.` when there are no
    matches.
+
 
 
 
