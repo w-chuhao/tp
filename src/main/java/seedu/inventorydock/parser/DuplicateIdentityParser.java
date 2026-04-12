@@ -2,6 +2,10 @@ package seedu.inventorydock.parser;
 
 import seedu.inventorydock.model.Item;
 
+/**
+ * Builds normalized identity keys used for duplicate-item checks.
+ * The key ignores qty and bin fields so only logical batch identity is compared.
+ */
 public class DuplicateIdentityParser {
     /**
      * Builds a normalized identity key for duplicate checks.
