@@ -38,7 +38,7 @@ public class DeleteCommandParser {
         assert input != null : "DeleteCommandParser received null input.";
         if (input.isEmpty()) {
             logger.log(Level.WARNING, "Delete command missing target.");
-            throw new MissingArgumentException("Please specify what to delete. Use: delete category/CATEGORY "
+            throw new MissingArgumentException("specify what to delete. Use: delete category/CATEGORY "
                     + "index/INDEX or delete category/CATEGORY");
         }
 
@@ -50,7 +50,7 @@ public class DeleteCommandParser {
             int sep = token.indexOf('/');
             if (sep <= 0 || sep == token.length() - 1) {
                 logger.log(Level.WARNING, "Invalid delete token: " + token);
-                throw new InvalidCommandException("Invalid token: '" + token + "'. Use: delete "
+                throw new InvalidCommandException("delete token '" + token + "' is invalid. Use: delete "
                         + "category/CATEGORY index/INDEX or delete category/CATEGORY");
             }
             String key = token.substring(0, sep).trim().toLowerCase();
@@ -65,14 +65,14 @@ public class DeleteCommandParser {
                 break;
             default:
                 logger.log(Level.WARNING, "Unknown delete field: " + key);
-                throw new InvalidCommandException("Unknown field: '" + key + "'. Use: delete "
+                throw new InvalidCommandException("field '" + key + "' is not supported. Use: delete "
                         + "category/CATEGORY index/INDEX or delete category/CATEGORY");
             }
         }
 
         if (categoryName == null || categoryName.isEmpty()) {
             logger.log(Level.WARNING, "Delete command missing category.");
-            throw new MissingArgumentException("Missing category. Use: delete category/CATEGORY index/INDEX "
+            throw new MissingArgumentException("category is required. Use: delete category/CATEGORY index/INDEX "
                     + "or delete category/CATEGORY");
         }
 

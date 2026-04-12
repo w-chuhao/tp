@@ -39,7 +39,7 @@ public class FindItemByQtyCommand extends Command {
     public static int parseQtyInput(String qtyInput) throws MissingArgumentException, InvalidCommandException {
         if (qtyInput == null || qtyInput.trim().isEmpty()) {
             logger.log(Level.WARNING, "Empty quantity input received.");
-            throw new MissingArgumentException("Quantity is missing.");
+            throw new MissingArgumentException("quantity is required.");
         }
 
         int parsedQty;
@@ -47,12 +47,12 @@ public class FindItemByQtyCommand extends Command {
             parsedQty = Integer.parseInt(qtyInput.trim());
         } catch (NumberFormatException e) {
             logger.log(Level.WARNING, "Invalid quantity format: " + qtyInput);
-            throw new InvalidCommandException("Quantity must be an integer.");
+            throw new InvalidCommandException("quantity must be an integer.");
         }
 
         if (parsedQty <= 0) {
             logger.log(Level.WARNING, "Non-positive quantity input: " + parsedQty);
-            throw new InvalidCommandException("Quantity must be a positive integer.");
+            throw new InvalidCommandException("quantity must be a positive integer.");
         }
         assert parsedQty >= 0 : "FindItemByQtyCommand parsed negative quantity input.";
 

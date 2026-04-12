@@ -29,7 +29,7 @@ public class UpdateCommandParser {
         assert input != null : "UpdateCommandParser received null input.";
 
         if (input.trim().isEmpty()) {
-            throw new MissingArgumentException("Use: update category/CATEGORY index/INDEX "
+            throw new MissingArgumentException("specify the update details. Use: update category/CATEGORY index/INDEX "
                     + "[newItem/NAME] [bin/BIN] [qty/QTY] [expiryDate/DATE] ...");
         }
 
@@ -39,7 +39,7 @@ public class UpdateCommandParser {
         for (String token : tokens) {
             int separatorIndex = token.indexOf('/');
             if (separatorIndex <= 0 || separatorIndex == token.length() - 1) {
-                throw new InvalidCommandException("Invalid update token: " + token);
+                throw new InvalidCommandException("update token '" + token + "' is invalid.");
             }
 
             String key = token.substring(0, separatorIndex);
@@ -52,12 +52,12 @@ public class UpdateCommandParser {
 
         String categoryName = fields.remove("category");
         if (categoryName == null || categoryName.trim().isEmpty()) {
-            throw new MissingArgumentException("Missing category.");
+            throw new MissingArgumentException("category is required.");
         }
 
         String itemIndexString = fields.remove("index");
         if (itemIndexString == null || itemIndexString.trim().isEmpty()) {
-            throw new MissingArgumentException("Missing item index.");
+            throw new MissingArgumentException("item index is required.");
         }
 
         int itemIndex;
@@ -72,7 +72,11 @@ public class UpdateCommandParser {
         }
 
         if (fields.isEmpty()) {
-            throw new MissingArgumentException("Provide at least one field to update.");
+            throw new MissingArgumentException("at least one field to update is required.");
+        }
+
+        if (fields.containsKey("bin")) {
+            fields.put("bin", BinLocationParser.parseExactInput(fields.get("bin")));
         }
 
         return new UpdateItemCommand(categoryName.trim(),

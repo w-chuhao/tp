@@ -13,10 +13,41 @@ import java.util.logging.Logger;
  */
 public class BinLocationParser {
     private static final Logger logger = Logger.getLogger(BinLocationParser.class.getName());
+    private static final String INVALID_BIN_LOCATION_MESSAGE =
+            "Bin location must be LETTER-NUMBER (e.g. A-10).";
 
     private static final String INVALID_BIN_SEARCH_MESSAGE =
             "Bin search must be either LETTER-NUMBER (e.g. A-10), "
                     + "LETTER only (e.g. A), or NUMBER only (e.g. 10).";
+
+    /**
+     * Validates a concrete bin location in LETTER-NUMBER format.
+     *
+     * @param input raw bin location input.
+     * @return trimmed bin location.
+     * @throws InventoryDockException if the input does not match the required bin format.
+     */
+    public static String parseExactInput(String input) throws InventoryDockException {
+        assert input != null : "BinLocationParser received null input.";
+
+        String trimmedInput = input.trim();
+        int dashIndex = trimmedInput.indexOf('-');
+
+        if (dashIndex == -1 || dashIndex != trimmedInput.lastIndexOf('-')) {
+            logger.log(Level.WARNING, "Invalid bin location format: " + trimmedInput);
+            throw new InvalidCommandException(INVALID_BIN_LOCATION_MESSAGE);
+        }
+
+        String letterPart = trimmedInput.substring(0, dashIndex);
+        String numberPart = trimmedInput.substring(dashIndex + 1);
+
+        if (!isSingleLetter(letterPart) || !isInteger(numberPart)) {
+            logger.log(Level.WARNING, "Invalid bin location value: " + trimmedInput);
+            throw new InvalidCommandException(INVALID_BIN_LOCATION_MESSAGE);
+        }
+
+        return trimmedInput;
+    }
 
     /**
      * Normalizes a bin search term to lower case and verifies that it is either

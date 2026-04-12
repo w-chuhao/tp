@@ -16,7 +16,7 @@ public class Parser {
         String trimmed = input.trim();
 
         if (trimmed.isEmpty()) {
-            throw new MissingArgumentException("Input is empty.");
+            return null;
         }
 
         String[] parts = trimmed.split(" ", 2);
@@ -41,7 +41,7 @@ public class Parser {
         case "bye":
             return new ExitCommand();
         default:
-            throw new InvalidCommandException("Unknown command.");
+            throw new InvalidCommandException("command is not recognized. Type 'help' to see available commands.");
         }
     }
 }

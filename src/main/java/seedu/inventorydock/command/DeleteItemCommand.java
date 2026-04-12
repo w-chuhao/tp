@@ -56,9 +56,8 @@ public class DeleteItemCommand extends Command {
 
         if (itemIndex < 1 || itemIndex > category.getItemCount()) {
             logger.log(Level.WARNING, "Invalid item index: " + itemIndex);
-            ui.showError("Invalid item index: " + itemIndex + ". Category '" + categoryName
-                    + "' has " + category.getItemCount()
-                    + " item(s).");
+            ui.showError("Invalid input", "index/" + itemIndex + " is out of range for category '"
+                    + categoryName + "' (" + category.getItemCount() + " items).");
             return;
         }
 

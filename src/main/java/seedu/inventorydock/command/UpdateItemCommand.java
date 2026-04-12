@@ -69,7 +69,7 @@ public class UpdateItemCommand extends Command {
         Category category = inventory.findCategoryByName(categoryName);
         if (category == null) {
             logger.log(Level.WARNING, "Category not found while updating item: " + categoryName);
-            throw new CategoryNotFoundException("Category not found: " + categoryName);
+            throw new CategoryNotFoundException("Category '" + categoryName + "' does not exist.");
         }
 
         if (itemIndex < 1 || itemIndex > category.getItemCount()) {

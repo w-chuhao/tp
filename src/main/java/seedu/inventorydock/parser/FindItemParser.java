@@ -32,7 +32,7 @@ public class FindItemParser {
         assert input != null : "FindItemParser received null input.";
         if (input.trim().isEmpty()) {
             logger.log(Level.WARNING, "Find command missing target.");
-            throw new MissingArgumentException("Please specify what to find. Use: find keyword/KEYWORD, "
+            throw new MissingArgumentException("specify what to find. Use: find keyword/KEYWORD, "
                     + "find category/CATEGORY, find expiryDate/DATE, find bin/BIN, or find qty/QTY.");
         }
 
@@ -40,7 +40,7 @@ public class FindItemParser {
 
         if (parts.length < 2 || parts[1].trim().isEmpty()) {
             logger.log(Level.WARNING, "Find command missing name.");
-            throw new MissingArgumentException("Missing name. Use: find keyword/KEYWORD, "
+            throw new MissingArgumentException("Use: find keyword/KEYWORD, "
                     + "find category/CATEGORY, find expiryDate/DATE, find bin/BIN, or find qty/QTY.");
         }
 
@@ -60,7 +60,7 @@ public class FindItemParser {
             return new FindItemByQtyCommand(FindItemByQtyCommand.parseQtyInput(name));
         default:
             logger.log(Level.WARNING, "Unknown find type: " + type);
-            throw new InvalidFilterException("Unknown find type: '" + type + "'. "
+            throw new InvalidFilterException("find type '" + type + "' is not supported. "
                     + "Use: find keyword/KEYWORD, find category/CATEGORY, "
                     + "find expiryDate/DATE, find bin/BIN, or find qty/QTY.");
         }

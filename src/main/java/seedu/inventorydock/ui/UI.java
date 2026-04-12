@@ -1,5 +1,6 @@
 package seedu.inventorydock.ui;
 
+import seedu.inventorydock.exception.InventoryDockException;
 import seedu.inventorydock.model.Category;
 import seedu.inventorydock.model.Inventory;
 import seedu.inventorydock.model.Item;
@@ -94,21 +95,16 @@ public class UI {
         showDivider();
     }
 
-    public void showUnknownCommand() {
-        showError("Unknown command. " + "Type 'help' to see available commands.");
+    public void showError(String category, String message) {
+        showError(category + ": " + message);
+    }
+
+    public void showError(InventoryDockException exception) {
+        showError(exception.getErrorCategory(), exception.getMessage());
     }
 
     public void showCategoryNotFound(String categoryName) {
-        showError("Category not found: " + categoryName);
-    }
-
-
-    public void showInvalidInput(String details) {
-        showError("Invalid input. " + details);
-    }
-
-    public void showEmptyInput() {
-        showError("Input cannot be empty. " + "Type 'help' to see available commands.");
+        showError("Not found", "Category '" + categoryName + "' does not exist.");
     }
 
     public void showItemAdded(String itemName, int quantity,
@@ -141,10 +137,6 @@ public class UI {
         showDivider();
         System.out.println("Deleted category: " + categoryName);
         showDivider();
-    }
-
-    public void showItemNotFound(String itemName) {
-        showError("Item not found: " + itemName);
     }
 
     public void showDeleteCategoryConfirmation(

@@ -43,7 +43,7 @@ public class DateParser {
         try {
             return LocalDate.parse(date.trim(), FORMATTER);
         } catch (DateTimeParseException e) {
-            throw new InvalidDateException("Invalid date. Please enter a valid calendar date in yyyy-M-d format.");
+            throw new InvalidDateException("Please enter a valid calendar date in yyyy-M-d format.");
         }
     }
 }

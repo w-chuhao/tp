@@ -45,7 +45,7 @@ public class FindItemByKeywordCommand extends Command {
         assert keywordInput != null : "FindItemByKeywordCommand received null keyword input.";
 
         if (keywordInput.contains(" ")) {
-            ui.showError("Multiple keywords are not supported. Please provide a single keyword.");
+            ui.showError("Invalid input", "keyword/ accepts only a single keyword.");
             return;
         }
 

@@ -23,7 +23,7 @@ public class BooleanFieldParser {
 
         String booleanString = FieldParser.extractField(input, fieldPrefix, null);
         if (booleanString == null || booleanString.trim().isEmpty()) {
-            throw new MissingArgumentException("Missing value for " + fieldPrefix);
+            throw new MissingArgumentException("value for " + fieldPrefix + " is required.");
         }
 
         if (!(booleanString.equalsIgnoreCase("true") || booleanString.equalsIgnoreCase("false"))) {

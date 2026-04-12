@@ -78,7 +78,7 @@ public class InventoryDock {
                 storage.save(inventory);
             } catch (InventoryDockException e) {
                 logger.log(Level.WARNING, "Command processing failed: " + e.getMessage());
-                ui.showError(e.getMessage());
+                ui.showError(e);
             }
         }
 

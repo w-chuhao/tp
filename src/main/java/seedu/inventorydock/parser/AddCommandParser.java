@@ -19,7 +19,7 @@ public class AddCommandParser {
         assert input != null : "AddCommandParser received null input.";
         if (input.isEmpty()) {
             logger.log(Level.WARNING, "Add command input is empty.");
-            throw new MissingArgumentException("Input is empty.");
+            throw new MissingArgumentException("input cannot be empty.");
         }
 
         String trimmedInput = input.trim();
@@ -34,7 +34,7 @@ public class AddCommandParser {
         String category = extractFieldValue(input, "category/");
         if (category == null || category.isEmpty()) {
             logger.log(Level.WARNING, "Missing category in add command.");
-            throw new MissingArgumentException("Missing category.");
+            throw new MissingArgumentException("category is required.");
         }
     }
 
@@ -72,7 +72,7 @@ public class AddCommandParser {
             return parser.handleAccessories(input);
         default:
             logger.log(Level.WARNING, "Unknown add command category: " + category);
-            throw new InvalidCommandException("Unknown category: " + category);
+            throw new InvalidCommandException("category '" + category + "' is not supported.");
         }
     }
 }

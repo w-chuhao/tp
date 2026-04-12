@@ -1,7 +1,9 @@
 package seedu.inventorydock.parser.category;
 
-import seedu.inventorydock.exception.InventoryDockException;
 import seedu.inventorydock.exception.InvalidCommandException;
+import seedu.inventorydock.exception.InventoryDockException;
+import seedu.inventorydock.exception.MissingArgumentException;
+import seedu.inventorydock.parser.BinLocationParser;
 import seedu.inventorydock.parser.DateParser;
 import seedu.inventorydock.parser.FieldParser;
 
@@ -15,8 +17,6 @@ import java.util.logging.Logger;
  */
 public class CommonFieldParser {
     private static final Logger logger = Logger.getLogger(CommonFieldParser.class.getName());
-    private static final String INVALID_BIN_LOCATION_MESSAGE =
-            "Bin location must be LETTER-NUMBER (e.g. A-10).";
     public final String itemName;
     public final String categoryName;
     public final String bin;
@@ -50,13 +50,13 @@ public class CommonFieldParser {
                 input, "item/", "bin/");
         if (itemName == null || itemName.isEmpty()) {
             logger.log(Level.WARNING, "Missing item name while parsing common fields.");
-            throw new InventoryDockException("Missing item name.");
+            throw new MissingArgumentException("item name is required.");
         }
 
         String bin = FieldParser.extractField(input, "bin/", "qty/");
         if (bin == null || bin.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing bin location while parsing common fields.");
-            throw new InventoryDockException("Missing bin location.");
+            throw new MissingArgumentException("bin location is required.");
         }
         bin = parseBinLocation(bin);
 
@@ -81,22 +81,7 @@ public class CommonFieldParser {
      * @throws InventoryDockException if the bin location format is invalid.
      */
     private static String parseBinLocation(String bin) throws InventoryDockException {
-        String trimmedBin = bin.trim();
-        int dashIndex = trimmedBin.indexOf('-');
-
-        if (dashIndex == -1 || dashIndex != trimmedBin.lastIndexOf('-')) {
-            logger.log(Level.WARNING, "Invalid bin location format: " + trimmedBin);
-            throw new InvalidCommandException(INVALID_BIN_LOCATION_MESSAGE);
-        }
-
-        String letterPart = trimmedBin.substring(0, dashIndex);
-        String numberPart = trimmedBin.substring(dashIndex + 1);
-        if (!isSingleLetter(letterPart) || !isInteger(numberPart)) {
-            logger.log(Level.WARNING, "Invalid bin location value: " + trimmedBin);
-            throw new InvalidCommandException(INVALID_BIN_LOCATION_MESSAGE);
-        }
-
-        return trimmedBin;
+        return BinLocationParser.parseExactInput(bin);
     }
 
     /**
@@ -110,7 +95,7 @@ public class CommonFieldParser {
         if (quantityString == null
                 || quantityString.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing quantity while parsing common fields.");
-            throw new InventoryDockException("Missing quantity.");
+            throw new MissingArgumentException("quantity is required.");
         }
 
         try {
@@ -118,18 +103,18 @@ public class CommonFieldParser {
 
             if (parsedQuantity > Integer.MAX_VALUE) {
                 logger.log(Level.WARNING, "Quantity exceeded maximum value: " + parsedQuantity);
-                throw new InventoryDockException("Quantity exceeded the max value.");
+                throw new InvalidCommandException("quantity exceeded the maximum supported value.");
             }
 
             if (parsedQuantity <= 0) {
                 logger.log(Level.WARNING, "Non-positive quantity encountered: " + parsedQuantity);
-                throw new InventoryDockException("Quantity must be a positive integer.");
+                throw new InvalidCommandException("quantity must be a positive integer.");
             }
 
             return (int) parsedQuantity;
         } catch (NumberFormatException e) {
             logger.log(Level.WARNING, "Invalid quantity format: " + quantityString);
-            throw new InventoryDockException("Quantity must be an integer.");
+            throw new InvalidCommandException("quantity must be an integer.");
         }
     }
 
@@ -142,29 +127,9 @@ public class CommonFieldParser {
     public static void validateExpiryDate(String expiryDate) throws InventoryDockException {
         if (expiryDate == null || expiryDate.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing expiry date while parsing common fields.");
-            throw new InventoryDockException("Missing expiry date.");
+            throw new MissingArgumentException("expiry date is required.");
         }
         logger.log(Level.INFO, "Validating expiry date: " + expiryDate);
         DateParser.validateDate(expiryDate);
-    }
-
-    private static boolean isSingleLetter(String input) {
-        assert input != null : "isSingleLetter received null input.";
-        return input.length() == 1 && Character.isLetter(input.charAt(0));
-    }
-
-    private static boolean isInteger(String input) {
-        assert input != null : "isInteger received null input.";
-
-        if (input.isEmpty()) {
-            return false;
-        }
-
-        for (int i = 0; i < input.length(); i++) {
-            if (!Character.isDigit(input.charAt(i))) {
-                return false;
-            }
-        }
-        return true;
     }
 }
