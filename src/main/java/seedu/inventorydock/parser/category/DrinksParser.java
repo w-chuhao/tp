@@ -18,25 +18,12 @@ public class DrinksParser {
     public final String flavour;
     public final boolean isCarbonated;
 
-    /**
-     * Creates a {@code DrinksParser} object with the parsed drink details.
-     *
-     * @param brand Brand of the drink.
-     * @param flavour Flavour of the drink.
-     */
     public DrinksParser(String brand, String flavour, boolean isCarbonated) {
         this.brand = brand;
         this.flavour = flavour;
         this.isCarbonated = isCarbonated;
     }
 
-    /**
-     * Parses the drink-related fields from the given input string.
-     *
-     * @param input User input containing drink fields.
-     * @return A {@code DrinksParser} containing the parsed values.
-     * @throws InventoryDockException If any required field is missing or invalid.
-     */
     public static DrinksParser parse(String input) throws InventoryDockException {
         assert input != null : "DrinksParser received null input.";
         logger.log(Level.INFO, "Processing Drinks special fields.");
@@ -53,17 +40,17 @@ public class DrinksParser {
             throw new MissingArgumentException("Missing flavour for drinks.");
         }
 
-        String isCarbonatedString = FieldParser.extractField(input, "isCarbonated/", null);
-        if (isCarbonatedString == null || isCarbonatedString.trim().isEmpty()) {
-            logger.log(Level.WARNING, "Missing carbonation for drinks.");
-            throw new MissingArgumentException("Missing carbonation for drinks.");
+        String carbonatedString = FieldParser.extractField(input, "isCarbonated/", null);
+        if (carbonatedString == null || carbonatedString.trim().isEmpty()) {
+            logger.log(Level.WARNING, "Missing carbonation field for drinks.");
+            throw new MissingArgumentException("Missing carbonation field for drinks.");
         }
 
-        if (!(isCarbonatedString.equalsIgnoreCase("true") || isCarbonatedString.equalsIgnoreCase("false"))) {
-            logger.log(Level.WARNING, "Carbonation must be true or false");
-            throw new InvalidCommandException("Carbonation must be true or false");
+        if (!(carbonatedString.equalsIgnoreCase("true") || carbonatedString.equalsIgnoreCase("false"))) {
+            logger.log(Level.WARNING, "Carbonation field must be true or false.");
+            throw new InvalidCommandException("Carbonation field must be true or false.");
         }
-        boolean isCarbonated = Boolean.parseBoolean(isCarbonatedString);
+        boolean isCarbonated = Boolean.parseBoolean(carbonatedString);
 
         logger.log(Level.INFO, "End of processing drinks.");
         return new DrinksParser(brand, flavour, isCarbonated);

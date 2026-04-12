@@ -8,7 +8,7 @@ public class ToiletriesTest {
     @Test
     public void constructor_validInput_success() {
         Toiletries toiletries = new Toiletries("Shampoo", 9, "G2",
-                "Pantene", true, "2026-07-01");
+                "2026-07-01", "Pantene", true);
 
         assertEquals("Shampoo", toiletries.getName());
         assertEquals(9, toiletries.getQuantity());

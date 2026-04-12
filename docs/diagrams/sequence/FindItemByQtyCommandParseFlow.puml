@@ -10,7 +10,6 @@ participant ":InventoryDock" as InventoryDock
 participant ":Parser" as Parser
 participant ":FindItemParser" as FindItemParser
 participant ":CommonFieldParser" as CommonFieldParser
-participant ":FindItemByQtyCommand" as FindItemByQtyCommand
 
 User -> UI: enter find qty command
 activate UI
@@ -26,7 +25,7 @@ activate CommonFieldParser
 CommonFieldParser --> FindItemParser: qtyInput
 deactivate CommonFieldParser
 
-create FindItemByQtyCommand
+create ":FindItemByQtyCommand" as FindItemByQtyCommand
 FindItemParser -> FindItemByQtyCommand: FindItemByQtyCommand(qtyInput)
 activate FindItemByQtyCommand
 FindItemByQtyCommand --> FindItemParser: command
@@ -38,3 +37,5 @@ deactivate Parser
 deactivate InventoryDock
 deactivate UI
 @enduml
+
+

@@ -30,3 +30,4 @@ public class AccessoriesParserTest {
         assertEquals("Missing material for accessories.", e.getMessage());
     }
 }
+

@@ -9,7 +9,6 @@ participant ":UI" as UI
 participant ":InventoryDock" as InventoryDock
 participant ":Parser" as Parser
 participant ":SortCommandParser" as SortCommandParser
-participant ":SortCommand" as SortCommand
 
 User -> UI: enter sort command
 activate UI
@@ -27,10 +26,10 @@ deactivate SortCommandParser
 
 alt input is empty
     SortCommandParser --> Parser: throw MissingArgumentException
-else sort type is invalid
+else else
     SortCommandParser --> Parser: throw InvalidCommandException
-else valid sort type
-    create SortCommand
+else else
+    create ":SortCommand" as SortCommand
     SortCommandParser -> SortCommand: SortCommand(sortType)
     activate SortCommand
     SortCommand --> SortCommandParser: command
@@ -45,3 +44,5 @@ deactivate Parser
 deactivate InventoryDock
 deactivate UI
 @enduml
+
+

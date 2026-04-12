@@ -30,3 +30,4 @@ public class MeatParserTest {
         assertEquals("Missing origin for meat.", e.getMessage());
     }
 }
+

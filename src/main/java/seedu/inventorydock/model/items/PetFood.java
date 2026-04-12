@@ -8,7 +8,7 @@ import seedu.inventorydock.model.Item;
 public class PetFood extends Item {
     private String petType;
     private String brand;
-    private boolean isDryFood;
+    private boolean isDry;
 
     /**
      * Creates a pet food item with the given details.
@@ -17,20 +17,19 @@ public class PetFood extends Item {
      * @param quantity Quantity of the item.
      * @param binLocation Storage bin location.
      * @param expiryDate Expiry date.
-     * @param petType Type of pet this food is for.
+     * @param petType Type of pet the food is for.
      * @param brand Brand of the pet food.
-     * @param isDryFood Check whether food is considered dry food
+     * @param isDry Whether the pet food is dry.
      */
     public PetFood(String name, int quantity, String binLocation,
-                   String expiryDate, String petType,
-                   String brand, boolean isDryFood) {
+                   String expiryDate, String petType, String brand, boolean isDry) {
         super(name, quantity, binLocation, expiryDate);
         this.petType = petType;
         this.brand = brand;
-        this.isDryFood = isDryFood;
+        this.isDry = isDry;
     }
 
-    /** @return Type of pet this food is for. */
+    /** @return Type of pet the food is for. */
     public String getPetType() {
         return petType;
     }
@@ -50,13 +49,14 @@ public class PetFood extends Item {
         this.brand = brand;
     }
 
-    /**
-     * Returns whether this item is dry food.
-     *
-     * @return {@code true} if the item is dry food, {@code false} otherwise.
-     */
-    public boolean isDryFood() {
-        return isDryFood;
+    /** @return {@code true} if the pet food is dry. */
+    public boolean isDry() {
+        return isDry;
+    }
+
+    /** @param isDry New pet food dryness status. */
+    public void setDry(boolean isDry) {
+        this.isDry = isDry;
     }
 
     /**
@@ -70,7 +70,7 @@ public class PetFood extends Item {
         return super.toStorageString(categoryName)
                 + " petType/" + petType
                 + " brand/" + brand
-                + " isDryFood/" + isDryFood;
+                + " isDry/" + isDry;
     }
 
     /**
@@ -83,6 +83,6 @@ public class PetFood extends Item {
         return "[PetFood] " + super.toString()
                 + ", Pet Type: " + petType
                 + ", Brand: " + brand
-                + ", Dry Food: " + isDryFood;
+                + ", Dry: " + isDry;
     }
 }

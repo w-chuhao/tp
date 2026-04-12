@@ -60,32 +60,24 @@ Common required fields:
 * `qty/` specifies the quantity as a positive integer.
 * `expiryDate/` specifies the expiry date.
 
-Supported categories and extra fields:
+Supported categories and category-specific fields(i.e. last 2 fields):
 
 * Fruits
   `add category/fruits item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE size/SIZE isRipe/BOOLEAN`
 * Vegetables
-  `add category/vegetables item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE isLeafy/BOOLEAN`
+  `add category/vegetables item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE origin/ORIGIN isLeafy/BOOLEAN`
 * Toiletries
   `add category/toiletries item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE brand/BRAND isLiquid/BOOLEAN`
 * Snacks
   `add category/snacks item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE brand/BRAND isCrunchy/BOOLEAN`
 * Drinks
   `add category/drinks item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE brand/BRAND flavour/FLAVOUR isCarbonated/BOOLEAN`
-* Ice cream
-  `add category/icecream item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE flavour/FLAVOUR isDairyFree/BOOLEAN`
-* Sweets
-  `add category/sweets item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE brand/BRAND sweetnessLevel/LEVEL isChewy/BOOLEAN`
-* Burger
-  `add category/burger item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE isSpicy/BOOLEAN pattyType/TYPE`
-* Set meal
-  `add category/setmeal item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE mealType/TYPE foodSize/SIZE hasDrinks/BOOLEAN`
 * Seafood
-  `add category/seafood item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE seafoodType/TYPE origin/ORIGIN isFrozen/BOOLEAN`
+  `add category/seafood item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE seafoodType/TYPE origin/ORIGIN isFresh/BOOLEAN`
 * Meat
   `add category/meat item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE meatType/TYPE origin/ORIGIN isFrozen/BOOLEAN`
 * Pet food
-  `add category/petfood item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE petType/TYPE brand/BRAND isDryFood/BOOLEAN`
+  `add category/petfood item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE petType/TYPE brand/BRAND isDry/BOOLEAN`
 * Accessories
   `add category/accessories item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE type/TYPE material/MATERIAL isFragile/BOOLEAN`
 
@@ -93,13 +85,28 @@ Examples:
 
 * `add category/fruits item/apple bin/A-10 qty/40 expiryDate/2026-10-3 size/big isRipe/true`
 * `add category/snacks item/potato chips bin/D-5 qty/50 expiryDate/2026-8-12 brand/Lays isCrunchy/true`
-* `add category/drinks item/apple_juice bin/F-1 qty/24 expiryDate/2026-10-3 brand/Marigold flavour/Apple isCarbonated/false`
-* `add category/setmeal item/chicken_rice_set bin/G-3 qty/12 expiryDate/2026-4-1 mealType/lunch foodSize/large hasDrinks/true`
+* `add category/drinks item/apple_juice bin/F-1 qty/24 expiryDate/2026-10-3 brand/Marigold flavour/Apple isCarbonated/true`
+* `add category/vegetables item/spinach bin/B-2 qty/30 expiryDate/2026-6-1 origin/Malaysia isLeafy/true`
 
 Expected result:
 
 * The item is added to the specified category.
 * The app confirms the item name, quantity, category, and bin location.
+* Duplicate check rule for `add` (if-else style):
+  * If `category/` and `item/` are the same, compare only batch fields (`expiryDate/` and category-specific fields)
+  * If any batch field is different, the item is treated as a new batch and is added.
+  * Else, if `category/` and `item/` are the same but only `qty/` and/or `bin/` are different, it is treated as a duplicate.
+  * If a duplicate is detected, the command is rejected with:
+    `Duplicate item found for category/CATEGORY item/ITEM.`
+
+Example (`fruits`: `size/` + `isRipe/`):
+* Existing add command:
+  * `add category/fruits item/apple bin/A-10 qty/10 expiryDate/2026-6-5 size/medium isRipe/true`
+* This command causes the duplicate exception (only `bin/` and `qty/` changed):
+  * `add category/fruits item/apple bin/B-20 qty/99 expiryDate/2026-6-5 size/medium isRipe/true`
+  Result: `Duplicate item found for category/fruits item/apple.`
+* This command is allowed as a new batch of items (`expiryDate/` changed):
+  * `add category/fruits item/apple bin/B-20 qty/99 expiryDate/2026-6-6 size/medium isRipe/true`
 
 ### Find items by keyword: `find keyword/...`
 Finds items whose names contain the given keyword.
@@ -224,7 +231,7 @@ Expected result:
 
 * All categories are shown in numbered order.
 * Items under each category are listed with their details.
-* If the inventory is empty, the app shows `Inventory is empty.`
+* If the inventory is empty, the app will show the empty inventory.
 
 ### Sorting items: `sort`
 Lists the full inventory grouped by category, with the items inside each category sorted by the chosen field.
@@ -246,7 +253,7 @@ Expected result:
 
 * Items in each category are sorted according to the chosen sort type.
 * Category order remains unchanged.
-* If the inventory is empty, the app shows Inventory is empty.
+* If the inventory is empty, the app shows the empty inventory.
 
 ### Update an item: `update`
 
@@ -268,7 +275,7 @@ Notes:
 * `INDEX` is the item number within that category, using 1-based indexing.
 * You must provide at least one field to update.
 * Category-specific fields such as `brand/`, `isRipe/`, or `flavour/` cannot be updated with this command.
-
+* `update` also enforces duplicate-batch checks that is same as add command.
 Examples:
 
 * `update category/fruits index/1 qty/25`
@@ -337,6 +344,7 @@ Common reasons a command may fail:
 * invalid bin search format
 * invalid item index
 * unsupported update fields
+* duplicate logical batch during add or update
 * unknown categories or commands
 
 When an error occurs, the app prints an error message and waits for the next command.
@@ -355,7 +363,7 @@ When an error occurs, the app prints an error message and waits for the next com
 
 **A:** No. InventoryDock works with a fixed set of built-in categories.
 
-**Q:** Can I update category-specific fields such as `brand/` or `isFrozen/`?
+**Q:** Can I update category-specific fields such as `brand/` or `origin/`?
 
 **A:** No. The `update` command only supports `newItem/`, `bin/`, `qty/`, and `expiryDate/`.
 
@@ -392,3 +400,16 @@ When an error occurs, the app prints an error message and waits for the next com
   `delete category/CATEGORY index/INDEX`
 * Clear a category
   `delete category/CATEGORY`
+
+
+
+
+
+
+
+
+
+
+
+
+

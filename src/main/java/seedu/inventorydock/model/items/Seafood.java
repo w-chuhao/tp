@@ -8,7 +8,7 @@ import seedu.inventorydock.model.Item;
 public class Seafood extends Item {
     private String seafoodType;
     private String origin;
-    private boolean isFrozen;
+    private boolean isFresh;
 
     /**
      * Creates a seafood item with the given details.
@@ -19,15 +19,14 @@ public class Seafood extends Item {
      * @param expiryDate Expiry date.
      * @param seafoodType Type of seafood.
      * @param origin Origin of the seafood.
-     * @param isFrozen Check whether the food is frozen
+     * @param isFresh Whether the seafood is fresh.
      */
     public Seafood(String name, int quantity, String binLocation,
-                   String expiryDate, String seafoodType,
-                   String origin, boolean isFrozen) {
+                   String expiryDate, String seafoodType, String origin, boolean isFresh) {
         super(name, quantity, binLocation, expiryDate);
         this.seafoodType = seafoodType;
         this.origin = origin;
-        this.isFrozen = isFrozen;
+        this.isFresh = isFresh;
     }
 
     /** @return Origin of the seafood. */
@@ -50,13 +49,14 @@ public class Seafood extends Item {
         this.seafoodType = seafoodType;
     }
 
-    /**
-     * Returns whether this item is frozen.
-     *
-     * @return {@code true} if the item is frozen, {@code false} otherwise.
-     */
-    public boolean isFrozen() {
-        return isFrozen;
+    /** @return {@code true} if the seafood is fresh. */
+    public boolean isFresh() {
+        return isFresh;
+    }
+
+    /** @param isFresh New seafood freshness status. */
+    public void setFresh(boolean isFresh) {
+        this.isFresh = isFresh;
     }
 
     /**
@@ -70,7 +70,7 @@ public class Seafood extends Item {
         return super.toStorageString(categoryName)
                 + " seafoodType/" + seafoodType
                 + " origin/" + origin
-                + " isFrozen/" + isFrozen;
+                + " isFresh/" + isFresh;
     }
 
     /**
@@ -83,6 +83,6 @@ public class Seafood extends Item {
         return "[Seafood] " + super.toString()
                 + ", Seafood Type: " + seafoodType
                 + ", Origin: " + origin
-                + ", Frozen: " + isFrozen;
+                + ", Fresh: " + isFresh;
     }
 }

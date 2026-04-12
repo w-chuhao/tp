@@ -2,7 +2,9 @@ package seedu.inventorydock.command;
 
 import org.junit.jupiter.api.Test;
 import seedu.inventorydock.exception.CategoryNotFoundException;
-import seedu.inventorydock.exception.InvalidDateException;
+
+import seedu.inventorydock.exception.DuplicateItemException;
+import seedu.inventorydock.exception.InventoryDockException;
 import seedu.inventorydock.exception.MissingArgumentException;
 import seedu.inventorydock.model.Category;
 import seedu.inventorydock.model.Inventory;
@@ -17,7 +19,9 @@ public class AddItemCommandTest {
 
     @Test
     public void execute_validCategoryAndItem_itemAddedAndUiUpdated()
-            throws CategoryNotFoundException, MissingArgumentException, InvalidDateException {
+
+            throws InventoryDockException {
+
         Inventory inventory = new Inventory();
         Category fruits = new Category("fruits");
         inventory.addCategory(fruits);
@@ -59,6 +63,33 @@ public class AddItemCommandTest {
         assertEquals("Item cannot be null.", e.getMessage());
     }
 
+    @Test
+    public void execute_duplicateBatchInSameCategory_throwsException() {
+        Inventory inventory = new Inventory();
+        Category fruits = new Category("fruits");
+        inventory.addCategory(fruits);
+        fruits.addItem(new Item("apple", 2, "A-01", "2026-01-01"));
+
+        AddItemCommand command = new AddItemCommand("fruits", new Item("Apple", 5, "B-02", "2026-01-01"));
+
+        DuplicateItemException e = assertThrows(DuplicateItemException.class,
+                () -> command.execute(inventory, new TestUI()));
+        assertEquals("Duplicate item found for category/fruits item/Apple.", e.getMessage());
+    }
+
+    @Test
+    public void execute_sameNameDifferentBatch_allowed() throws InventoryDockException {
+        Inventory inventory = new Inventory();
+        Category fruits = new Category("fruits");
+        inventory.addCategory(fruits);
+        fruits.addItem(new Item("apple", 2, "A-01", "2026-01-01"));
+
+        AddItemCommand command = new AddItemCommand("fruits", new Item("Apple", 5, "B-02", "2026-02-01"));
+        command.execute(inventory, new TestUI());
+
+        assertEquals(2, fruits.getItemCount());
+    }
+
     private static class TestUI extends UI {
         private String itemName;
         private int quantity;
@@ -75,3 +106,6 @@ public class AddItemCommandTest {
         }
     }
 }
+
+
+

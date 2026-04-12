@@ -19,11 +19,10 @@ public class Meat extends Item {
      * @param expiryDate Expiry date.
      * @param meatType Type of meat.
      * @param origin Origin of the meat.
-     * @param isFrozen Check the frozen state of meat
+     * @param isFrozen Whether the meat is frozen.
      */
     public Meat(String name, int quantity, String binLocation,
-                String expiryDate, String meatType,
-                String origin, boolean isFrozen) {
+                String expiryDate, String meatType, String origin, boolean isFrozen) {
         super(name, quantity, binLocation, expiryDate);
         this.meatType = meatType;
         this.origin = origin;
@@ -35,12 +34,12 @@ public class Meat extends Item {
         return origin;
     }
 
-    /** @param origin New origin value. */
+    /** @param origin New meat origin. */
     public void setOrigin(String origin) {
         this.origin = origin;
     }
 
-    /** @return Type of meat. */
+    /** @return Type of the meat. */
     public String getMeatType() {
         return meatType;
     }
@@ -50,13 +49,14 @@ public class Meat extends Item {
         this.meatType = meatType;
     }
 
-    /**
-     * Returns whether this item is frozen.
-     *
-     * @return {@code true} if the item is frozen, {@code false} otherwise.
-     */
+    /** @return {@code true} if the meat is frozen. */
     public boolean isFrozen() {
         return isFrozen;
+    }
+
+    /** @param isFrozen New frozen status. */
+    public void setFrozen(boolean isFrozen) {
+        this.isFrozen = isFrozen;
     }
 
     /**

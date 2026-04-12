@@ -32,9 +32,9 @@ loop for each category
     activate SortCommand
     alt sortType is "name"
         SortCommand --> SortCommand: Comparator<Item> by name
-    else sortType is "qty"
+    else else
         SortCommand --> SortCommand: Comparator<Item> by quantity (descending)
-    else sortType is "expirydate"
+    else else
         SortCommand --> SortCommand: Comparator<Item> by expiry date
     end
     deactivate SortCommand
@@ -50,7 +50,7 @@ loop for each category
             activate DateParser
             alt date is valid
                 DateParser --> SortCommand: LocalDate
-            else date is invalid
+            else else
                 DateParser --> SortCommand: InvalidDateException
                 SortCommand -> SortCommand: return LocalDate.MAX
             end
@@ -71,3 +71,4 @@ end
 SortCommand --> SortCommand: sortedItemsByCategory
 deactivate SortCommand
 @enduml
+

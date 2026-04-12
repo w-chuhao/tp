@@ -8,7 +8,6 @@ actor User
 participant ":UI" as UI
 participant ":InventoryDock" as InventoryDock
 participant ":Parser" as Parser
-participant ":ListCommand" as ListCommand
 participant ":Inventory" as Inventory
 participant ":Category" as Category
 
@@ -19,7 +18,7 @@ activate InventoryDock
 InventoryDock -> Parser: parse(input)
 activate Parser
 
-create ListCommand
+create ":ListCommand" as ListCommand
 Parser -> ListCommand: ListCommand()
 activate ListCommand
 ListCommand --> Parser: command
@@ -52,4 +51,5 @@ deactivate ListCommand
 deactivate InventoryDock
 deactivate UI
 @enduml
+
 

@@ -1,5 +1,4 @@
-@startuml Sequence Diagram for DeleteCategoryCommand
-actor User
+@startuml`r`ntitle Sequence Diagram for DeleteCategoryCommand`r`nactor User
 participant ":UI" as UI
 participant ":InventoryDock" as InventoryDock
 participant ":Parser" as Parser
@@ -9,6 +8,7 @@ participant ":Category" as Category
 
 User -> UI : 1 enter delete category command
 UI -> InventoryDock : 2 input
+activate InventoryDock
 InventoryDock -> Parser : 3 parse(input)
 Parser -> DeleteCommandParser : 4 parse(arguments)
 create ":DeleteCategoryCommand" as DeleteCategoryCommand
@@ -24,7 +24,7 @@ alt [category is null]
     DeleteCategoryCommand -> UI : 12 showCategoryNotFound(categoryName)
     UI --> User : 13 display error
 
-else [category found]
+else else
     alt [category is not empty]
         DeleteCategoryCommand -> Category : 14 getItemCount()
         DeleteCategoryCommand <-- Category : 15 itemCount
@@ -37,7 +37,7 @@ else [category found]
             DeleteCategoryCommand -> UI : 20 showDeleteCategoryCancelled(categoryName)
             UI --> User : 21 display cancellation
 
-        else [response is "yes"]
+        else else
             DeleteCategoryCommand -> Category : 22 getItems().clear()
             DeleteCategoryCommand <-- Category : 23
             DeleteCategoryCommand -> UI : 24 showCategoryItemsCleared(categoryName)
@@ -46,12 +46,15 @@ else [category found]
             UI --> User : 27 display confirmation
         end
 
-    else [category is empty]
+    else else
         DeleteCategoryCommand -> UI : 28 showCategoryDeleted(categoryName)
         UI --> User : 29 display confirmation
     end
 end
 
 InventoryDock -> UI : 30 display information
+deactivate InventoryDock
 
 @enduml
+
+

@@ -13,12 +13,12 @@ alt category not found
     activate UI
     UI --> User: display error
     deactivate UI
-else category found and items is empty
+else else
     FindItemByCategoryCommand -> UI: showMessage("No items found ...")
     activate UI
     UI --> User: display no-match message
     deactivate UI
-else items found
+else else
     FindItemByCategoryCommand -> UI: showDivider()
     activate UI
     FindItemByCategoryCommand -> UI: showMessage("Items in category ...")
@@ -28,3 +28,4 @@ else items found
     deactivate UI
 end
 @enduml
+

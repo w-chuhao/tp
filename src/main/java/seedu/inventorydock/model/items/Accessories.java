@@ -11,15 +11,15 @@ public class Accessories extends Item {
     private boolean isFragile;
 
     /**
-     * Creates an accessory item with the given details.
+     * Creates an accessories item with the given details.
      *
-     * @param name Name of the item.
+     * @param name Name of the accessory item.
      * @param quantity Quantity of the item.
      * @param binLocation Storage bin location.
-     * @param expiryDate Expiry date of the item.
+     * @param expiryDate Expiry date.
      * @param type Type of accessory.
      * @param material Material of the accessory.
-     * @param isFragile Check the fragility of the accessories
+     * @param isFragile Whether the accessory is fragile.
      */
     public Accessories(String name, int quantity, String binLocation,
                        String expiryDate, String type, String material, boolean isFragile) {
@@ -49,17 +49,18 @@ public class Accessories extends Item {
         this.material = material;
     }
 
-    /**
-     * Returns whether this item is fragile.
-     *
-     * @return {@code true} if the item is fragile, {@code false} otherwise.
-     */
+    /** @return {@code true} if the accessory is fragile. */
     public boolean isFragile() {
         return isFragile;
     }
 
+    /** @param isFragile New accessory fragility status. */
+    public void setFragile(boolean isFragile) {
+        this.isFragile = isFragile;
+    }
+
     /**
-     * Converts this accessory into a storage-friendly string format.
+     * Converts this accessory item into a storage-friendly string format.
      *
      * @param categoryName Name of the category this item belongs to.
      * @return Storage string representation.
@@ -73,7 +74,7 @@ public class Accessories extends Item {
     }
 
     /**
-     * Returns a string representation of this accessory.
+     * Returns a string representation of this accessory item.
      *
      * @return Formatted accessory details.
      */
@@ -82,6 +83,6 @@ public class Accessories extends Item {
         return "[Accessories] " + super.toString()
                 + ", Type: " + type
                 + ", Material: " + material
-                + ", Fragile: " +isFragile;
+                + ", Fragile: " + isFragile;
     }
 }

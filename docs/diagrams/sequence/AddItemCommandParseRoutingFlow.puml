@@ -12,10 +12,10 @@ participant ":AddCommandParser" as AddCommandParser
 participant ":AddItemCommandParser" as AddItemCommandParser
 
 note right of AddCommandParser
-This diagram uses the fruits workflow
-as a representative example.
-The same routing pattern applies
-to other supported categories.
+Supported add categories:
+fruits, vegetables, toiletries,
+snacks, drinks, seafood,
+meat, petfood, accessories.
 end note
 
 User -> UI: enter add command
@@ -28,27 +28,20 @@ activate Parser
 Parser -> AddCommandParser: parse(arguments)
 activate AddCommandParser
 AddCommandParser -> AddCommandParser: validateRequiredFields(trimmedInput)
-activate AddCommandParser
-AddCommandParser --> AddCommandParser
-deactivate AddCommandParser
-
 AddCommandParser -> AddCommandParser: extractCategory(trimmedInput)
-activate AddCommandParser
-AddCommandParser --> AddCommandParser: category
-deactivate AddCommandParser
 
 alt category == fruits
     AddCommandParser -> AddItemCommandParser: handleFruit(trimmedInput)
     activate AddItemCommandParser
     AddItemCommandParser --> AddCommandParser: command
     deactivate AddItemCommandParser
-else other supported category
-    AddCommandParser -> AddItemCommandParser: handleCategory(input)
+else else
+    AddCommandParser -> AddItemCommandParser: handleCategory(trimmedInput)
     activate AddItemCommandParser
     AddItemCommandParser --> AddCommandParser: command
     deactivate AddItemCommandParser
 else else
-    AddCommandParser --> Parser: throw InvalidCommandException("Unknown category: " + category)
+    AddCommandParser --> Parser: throw InvalidCommandException("Unknown category: ...")
 end
 
 AddCommandParser --> Parser: command
@@ -58,5 +51,4 @@ deactivate Parser
 deactivate InventoryDock
 deactivate UI
 @enduml
-
 

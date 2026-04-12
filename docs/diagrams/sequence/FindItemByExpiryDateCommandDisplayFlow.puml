@@ -13,7 +13,7 @@ alt matches is empty
     activate UI
     UI --> User: display no-match message
     deactivate UI
-else matches found
+else else
     FindItemByExpiryDateCommand -> UI: showDivider()
     activate UI
     FindItemByExpiryDateCommand -> UI: showMessage("Items expiring by ...")
@@ -23,3 +23,4 @@ else matches found
     deactivate UI
 end
 @enduml
+

@@ -12,28 +12,31 @@ object "<u>inventory:Inventory</u>" as inventory
 object "<u>fruits:Category</u>" as fruits {
   name = "fruits"
 }
-object "<u>apple:Item</u>" as apple {
+object "<u>existingApple:Item</u>" as existingApple {
   name = "apple"
   quantity = 10
   binLocation = "A1"
 }
+object "<u>incomingApple:Item</u>" as incomingApple {
+  name = "apple"
+  quantity = 20
+  binLocation = "B2"
+}
 object "<u>:UI</u>" as ui
 
 note as N1
-  This snapshot uses the fruits workflow
-  as the main example.
-  Snacks and drinks are also shown as
-  representative categories that follow
-  the same add-item pattern.
-  There are more supported categories
-  and item types beyond those shown here.
-  See the Developer Guide for more.
+  Snapshot before command execution.
+  existingApple is already in fruits.
+  incomingApple has the same item name.
+  AddItemCommand will treat this as duplicate
+  and reject the add command.
 end note
 
 addParser --> addItemParser : delegates to >
 addItemParser --> addCommand : creates >
-addCommand --> inventory : updates through >
-addCommand --> ui : shows result via >
+addCommand --> incomingApple : holds >
+addCommand --> inventory : queries >
+addCommand --> ui : reports via >
 inventory --> fruits : contains >
-fruits --> apple : contains >
+fruits --> existingApple : contains >
 @enduml

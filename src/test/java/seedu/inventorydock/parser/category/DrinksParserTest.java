@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class DrinksParserTest {
     @Test
     public void parse_validInput_success() {
-        String input = "brand/CocaCola flavour/Cola, isCarbonated/true";
+        String input = "brand/CocaCola flavour/Cola isCarbonated/true";
         assertDoesNotThrow(() -> DrinksParser.parse(input));
     }
 
@@ -29,5 +29,5 @@ public class DrinksParserTest {
                 () -> DrinksParser.parse(input));
         assertEquals("Missing flavour for drinks.", e.getMessage());
     }
-
 }
+

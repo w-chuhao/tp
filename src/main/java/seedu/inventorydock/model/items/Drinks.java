@@ -14,12 +14,12 @@ public class Drinks extends Item {
      * Creates a drink item with the given details.
      *
      * @param name Name of the drink.
-     * @param quantity Quantity of the drink.
+     * @param quantity Quantity of the item.
      * @param binLocation Storage bin location.
      * @param expiryDate Expiry date.
      * @param brand Brand of the drink.
      * @param flavour Flavour of the drink.
-     * @param isCarbonated Check if the drink is carbonated
+     * @param isCarbonated Whether the drink is carbonated.
      */
     public Drinks(String name, int quantity, String binLocation, String expiryDate,
                   String brand, String flavour, boolean isCarbonated) {
@@ -49,13 +49,14 @@ public class Drinks extends Item {
         this.flavour = flavour;
     }
 
-    /**
-     * Returns whether this item is carbonated.
-     *
-     * @return {@code true} if the item is carbonated, {@code false} otherwise.
-     */
+    /** @return {@code true} if the drink is carbonated. */
     public boolean isCarbonated() {
         return isCarbonated;
+    }
+
+    /** @param isCarbonated New carbonation status. */
+    public void setCarbonated(boolean isCarbonated) {
+        this.isCarbonated = isCarbonated;
     }
 
     /**

@@ -9,7 +9,6 @@ participant ":AddItemCommandParser" as AddItemCommandParser
 participant ":InputValidator" as InputValidator
 participant ":CommonFieldParser" as CommonFieldParser
 participant ":FruitParser" as FruitParser
-participant ":AddItemCommand" as AddItemCommand
 
 AddCommandParser -> AddItemCommandParser: handleFruit(trimmedInput)
 activate AddItemCommandParser
@@ -29,12 +28,14 @@ activate FruitParser
 FruitParser --> AddItemCommandParser: fruitFields
 deactivate FruitParser
 
-create AddItemCommand
-AddItemCommandParser -> AddItemCommand: AddItemCommand(categoryName, item)
+create ":AddItemCommand" as AddItemCommand
+AddItemCommandParser -> AddItemCommand: 5 AddItemCommand(categoryName, item)
 activate AddItemCommand
-AddItemCommand --> AddItemCommandParser: command
+AddItemCommand --> AddItemCommandParser: 6 command
 deactivate AddItemCommand
 
 AddItemCommandParser --> AddCommandParser: command
 deactivate AddItemCommandParser
 @enduml
+
+

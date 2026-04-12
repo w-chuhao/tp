@@ -9,7 +9,6 @@ participant ":UI" as UI
 participant ":InventoryDock" as InventoryDock
 participant ":Parser" as Parser
 participant ":UpdateCommandParser" as UpdateCommandParser
-participant ":UpdateItemCommand" as UpdateItemCommand
 participant ":Inventory" as Inventory
 participant ":Category" as Category
 participant ":Item" as Item
@@ -24,7 +23,7 @@ activate Parser
 
 Parser -> UpdateCommandParser: parse(arguments)
 activate UpdateCommandParser
-create UpdateItemCommand
+create ":UpdateItemCommand" as UpdateItemCommand
 UpdateCommandParser -> UpdateItemCommand: UpdateItemCommand(categoryName, itemIndex, fields)
 activate UpdateItemCommand
 UpdateItemCommand --> UpdateCommandParser: command
@@ -64,7 +63,7 @@ loop for each update entry
         activate Item
         Item --> UpdateItemCommand
         deactivate Item
-    else field == qty
+    else else
         UpdateItemCommand -> CommonFieldParser: parseQuantity(value)
         activate CommonFieldParser
         CommonFieldParser --> UpdateItemCommand: quantity
@@ -73,7 +72,7 @@ loop for each update entry
         activate Item
         Item --> UpdateItemCommand
         deactivate Item
-    else field == expiryDate
+    else else
         UpdateItemCommand -> CommonFieldParser: validateExpiryDate(value)
         activate CommonFieldParser
         CommonFieldParser --> UpdateItemCommand
@@ -101,4 +100,5 @@ deactivate UpdateItemCommand
 deactivate InventoryDock
 deactivate UI
 @enduml
+
 

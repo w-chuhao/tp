@@ -13,26 +13,28 @@ import java.util.logging.Logger;
 public class VegetableParser {
     private static final Logger logger = Logger.getLogger(VegetableParser.class.getName());
 
+    public final String origin;
     public final boolean isLeafy;
 
     /**
      * Creates a {@code VegetableParser} object with the parsed vegetable details.
      *
+     * @param origin Origin of the vegetable.
      * @param isLeafy Whether the vegetable is leafy.
      */
-    public VegetableParser(boolean isLeafy) {
+    public VegetableParser(String origin, boolean isLeafy) {
+        this.origin = origin;
         this.isLeafy = isLeafy;
     }
 
-    /**
-     * Parses the vegetable-related fields from the given input string.
-     *
-     * @param input User input containing vegetable fields.
-     * @return A {@code VegetableParser} containing the parsed values.
-     * @throws InventoryDockException If the required field is missing or invalid.
-     */
     public static VegetableParser parse(String input) throws InventoryDockException {
         assert input != null : "VegetableParser received null inputs.";
+
+        String origin = FieldParser.extractField(input, "origin/", "isLeafy/");
+        if (origin == null || origin.trim().isEmpty()) {
+            logger.log(Level.WARNING, "Missing origin for vegetable.");
+            throw new MissingArgumentException("Missing origin for vegetable.");
+        }
 
         String leafyString = FieldParser.extractField(input, "isLeafy/", null);
         if (leafyString == null || leafyString.trim().isEmpty()) {
@@ -46,6 +48,6 @@ public class VegetableParser {
         }
         boolean isLeafy = Boolean.parseBoolean(leafyString);
 
-        return new VegetableParser(isLeafy);
+        return new VegetableParser(origin, isLeafy);
     }
 }

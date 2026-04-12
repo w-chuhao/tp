@@ -19,29 +19,17 @@ import java.util.logging.Logger;
 
 /**
  * Handles reading from and writing to the storage file.
- * <p>
- * The storage file persists inventory data between application runs.
  */
 public class Storage {
     private static final Logger logger = Logger.getLogger(Storage.class.getName());
     private final File dataFile;
 
-    /**
-     * Construct Storage object with the specified file path.
-     *
-     * @param filePath Path to the storage file.
-     */
     public Storage(String filePath) {
         assert filePath != null : "Storage received null file path.";
         this.dataFile = new File(filePath);
         logger.log(Level.INFO, "Storage initialized with file path: " + filePath);
     }
 
-    /**
-     * Create the storage file if it does not exist.
-     *
-     * @throws IOException If the file cannot be created.
-     */
     private void createFile() throws IOException {
         if (dataFile.exists()) {
             return;
@@ -54,13 +42,6 @@ public class Storage {
         logger.log(Level.INFO, "Created storage file: " + dataFile.getPath());
     }
 
-    /**
-     * Load data from storage file.
-     *
-     * @param inventory Inventory to populate with loaded data.
-     * @param ui UI used to display skipped lines.
-     * @throws InventoryDockException If storage file cannot be read.
-     */
     public void load(Inventory inventory, UI ui) throws InventoryDockException {
         assert inventory != null : "Storage.load received null inventory.";
         assert ui != null : "Storage.load received null ui.";
@@ -88,14 +69,6 @@ public class Storage {
         }
     }
 
-    /**
-     * Parse a line from the storage file into a corresponding command.
-     *
-     * @param line The storage line from file representing an item.
-     * @param parser Parser to interpret the line.
-     * @return The command corresponding to the stored item.
-     * @throws InventoryDockException If the line cannot be parsed.
-     */
     private Command parseStoredLine(String line, AddItemCommandParser parser) throws InventoryDockException {
         assert line != null : "Storage.parseStoredLine received null line.";
         assert parser != null : "Storage.parseStoredLine received null parser.";
@@ -112,14 +85,6 @@ public class Storage {
             return parser.handleVegetables(line);
         case "drinks":
             return parser.handleDrinks(line);
-        case "icecream":
-            return parser.handleIceCream(line);
-        case "sweets":
-            return parser.handleSweets(line);
-        case "burger":
-            return parser.handleBurger(line);
-        case "setmeal":
-            return parser.handleSetMeal(line);
         case "seafood":
             return parser.handleSeafood(line);
         case "meat":
@@ -134,13 +99,6 @@ public class Storage {
         }
     }
 
-    /**
-     * Extract the category name from the storage line.
-     *
-     * @param line The storage line.
-     * @return The category name in lowercase.
-     * @throws InventoryDockException If the category field is missing.
-     */
     private String extractCategory(String line) throws InventoryDockException {
         assert line != null : "Storage.extractCategory received null line.";
         String[] tokens = line.trim().split(" ");
@@ -154,12 +112,6 @@ public class Storage {
         throw new StorageException("Missing category in storage line: " + line);
     }
 
-    /**
-     * Save the current inventory into storage file.
-     *
-     * @param inventory Inventory containing all the items to be saved.
-     * @throws InventoryDockException If data cannot be written into the storage file.
-     */
     public void save(Inventory inventory) throws InventoryDockException {
         assert inventory != null : "Storage.save received null inventory.";
         List<String> lines = new ArrayList<>();
@@ -181,13 +133,6 @@ public class Storage {
         }
     }
 
-    /**
-     * Formats the item into its storage string representation.
-     *
-     * @param item The item to format.
-     * @param categoryName The category that the item belongs to.
-     * @return A string representation of the item to be stored in the storage file.
-     */
     private String formatItem(Item item, String categoryName) {
         assert item != null : "Storage.formatItem received null item.";
         assert categoryName != null : "Storage.formatItem received null categoryName.";

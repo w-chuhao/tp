@@ -15,27 +15,14 @@ public class PetFoodParser {
 
     public final String petType;
     public final String brand;
-    public final boolean isDryFood;
+    public final boolean isDry;
 
-    /**
-     * Creates a {@code PetFoodParser} object with the parsed pet food details.
-     *
-     * @param petType Type of pet the food is for.
-     * @param brand Brand of the pet food.
-     */
-    public PetFoodParser(String petType, String brand, boolean isDryFood) {
+    public PetFoodParser(String petType, String brand, boolean isDry) {
         this.petType = petType;
         this.brand = brand;
-        this.isDryFood = isDryFood;
+        this.isDry = isDry;
     }
 
-    /**
-     * Parses the pet food-related fields from the given input string.
-     *
-     * @param input User input containing pet food fields.
-     * @return A {@code PetFoodParser} containing the parsed values.
-     * @throws InventoryDockException If any required field is missing or invalid.
-     */
     public static PetFoodParser parse(String input) throws InventoryDockException {
         assert input != null : "PetFoodParser received null input.";
         logger.log(Level.INFO, "Processing PetFood special fields.");
@@ -46,25 +33,25 @@ public class PetFoodParser {
             throw new MissingArgumentException("Missing petType for pet food.");
         }
 
-        String brand = FieldParser.extractField(input, "brand/", "isDryFood/");
+        String brand = FieldParser.extractField(input, "brand/", "isDry/");
         if (brand == null || brand.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing brand for pet food.");
             throw new MissingArgumentException("Missing brand for pet food.");
         }
 
-        String isDryFoodString = FieldParser.extractField(input, "isDryFood/", null);
-        if (isDryFoodString == null || isDryFoodString.trim().isEmpty()) {
-            logger.log(Level.WARNING, "Missing isDryFood for pet food.");
-            throw new MissingArgumentException("Missing isDryFood for pet food.");
+        String dryString = FieldParser.extractField(input, "isDry/", null);
+        if (dryString == null || dryString.trim().isEmpty()) {
+            logger.log(Level.WARNING, "Missing dry field for pet food.");
+            throw new MissingArgumentException("Missing dry field for pet food.");
         }
 
-        if (!(isDryFoodString.equalsIgnoreCase("true") || isDryFoodString.equalsIgnoreCase("false"))) {
-            logger.log(Level.WARNING, "isDryFood must be true or false");
-            throw new InvalidCommandException("isDryFood must be true or false");
+        if (!(dryString.equalsIgnoreCase("true") || dryString.equalsIgnoreCase("false"))) {
+            logger.log(Level.WARNING, "Dry field must be true or false.");
+            throw new InvalidCommandException("Dry field must be true or false.");
         }
-        boolean isDryFood = Boolean.parseBoolean(isDryFoodString);
+        boolean isDry = Boolean.parseBoolean(dryString);
 
         logger.log(Level.INFO, "End of processing pet food.");
-        return new PetFoodParser(petType, brand, isDryFood);
+        return new PetFoodParser(petType, brand, isDry);
     }
 }

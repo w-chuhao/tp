@@ -8,7 +8,6 @@ actor User
 participant ":UI" as UI
 participant ":InventoryDock" as InventoryDock
 participant ":Parser" as Parser
-participant ":HelpCommand" as HelpCommand
 
 User -> UI: enter help command
 activate UI
@@ -17,7 +16,7 @@ activate InventoryDock
 InventoryDock -> Parser: parse(input)
 activate Parser
 
-create HelpCommand
+create ":HelpCommand" as HelpCommand
 Parser -> HelpCommand: HelpCommand()
 activate HelpCommand
 HelpCommand --> Parser: command
@@ -37,4 +36,5 @@ deactivate HelpCommand
 deactivate InventoryDock
 deactivate UI
 @enduml
+
 

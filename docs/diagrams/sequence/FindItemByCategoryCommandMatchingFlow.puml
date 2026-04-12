@@ -24,3 +24,4 @@ activate Category
 Category --> FindItemByCategoryCommand: items, categoryName
 deactivate Category
 @enduml
+

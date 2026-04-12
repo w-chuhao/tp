@@ -2,6 +2,7 @@ package seedu.inventorydock.command;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import seedu.inventorydock.exception.DuplicateItemException;
 import seedu.inventorydock.exception.InventoryDockException;
 import seedu.inventorydock.exception.InvalidCommandException;
 import seedu.inventorydock.model.Category;
@@ -52,6 +53,24 @@ public class UpdateItemCommandTest {
     }
 
     @Test
+    public void execute_updateCreatesDuplicateBatch_throwsExceptionAndRollsBack() {
+        fruitsCategory.addItem(new Fruit("apple", 8, "A-08",
+                "2026-05-01", "small", true));
+
+        Map<String, String> updates = new LinkedHashMap<>();
+        updates.put("expiryDate", "2026-03-20");
+
+        UpdateItemCommand command = new UpdateItemCommand("fruits", 2, updates);
+
+        DuplicateItemException exception = assertThrows(DuplicateItemException.class,
+                () -> command.execute(inventory, new UI()));
+        assertEquals("Duplicate item found for category/fruits item/apple.", exception.getMessage());
+
+        Fruit secondItem = (Fruit) fruitsCategory.getItem(1);
+        assertEquals("2026-05-01", secondItem.getExpiryDate());
+    }
+
+    @Test
     public void execute_invalidNonCommonField_throwsException() {
         Map<String, String> updates = new LinkedHashMap<>();
         updates.put("isRipe", "false");
@@ -77,3 +96,6 @@ public class UpdateItemCommandTest {
         assertEquals("Quantity must be a positive integer.", exception.getMessage());
     }
 }
+
+
+

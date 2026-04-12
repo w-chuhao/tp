@@ -19,8 +19,8 @@ public class Toiletries extends Item {
      * @param isLiquid Whether the item is liquid.
      * @param expiryDate Expiry date.
      */
-    public Toiletries(String name, int quantity, String binLocation, String brand,
-                      boolean isLiquid, String expiryDate) {
+    public Toiletries(String name, int quantity, String binLocation, String expiryDate,
+                      String brand, boolean isLiquid) {
         super(name,quantity,binLocation,expiryDate);
         this.brand = brand;
         this.isLiquid = isLiquid;

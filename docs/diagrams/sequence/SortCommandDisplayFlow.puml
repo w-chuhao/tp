@@ -28,7 +28,7 @@ deactivate Inventory
 
 alt inventory is empty
     UI -> User: display "Inventory is empty."
-else categories exist
+else else
     UI -> User: display sorted inventory header
 
     loop for each category
@@ -53,3 +53,4 @@ deactivate UI
 SortCommand --> User
 deactivate SortCommand
 @enduml
+

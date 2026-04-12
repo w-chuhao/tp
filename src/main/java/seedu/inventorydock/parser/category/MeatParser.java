@@ -18,12 +18,6 @@ public class MeatParser {
     public final String origin;
     public final boolean isFrozen;
 
-    /**
-     * Creates a {@code MeatParser} object with the parsed meat details.
-     *
-     * @param meatType Type of meat.
-     * @param origin Origin of the meat.
-     */
     public MeatParser(String meatType, String origin, boolean isFrozen) {
         this.meatType = meatType;
         this.origin = origin;
@@ -46,17 +40,17 @@ public class MeatParser {
             throw new MissingArgumentException("Missing origin for meat.");
         }
 
-        String isFrozenString = FieldParser.extractField(input, "isFrozen/", null);
-        if (isFrozenString == null || isFrozenString.trim().isEmpty()) {
-            logger.log(Level.WARNING, "Missing isFrozen for meat.");
-            throw new MissingArgumentException("Missing isFrozen for meat.");
+        String frozenString = FieldParser.extractField(input, "isFrozen/", null);
+        if (frozenString == null || frozenString.trim().isEmpty()) {
+            logger.log(Level.WARNING, "Missing frozen field for meat.");
+            throw new MissingArgumentException("Missing frozen field for meat.");
         }
 
-        if (!(isFrozenString.equalsIgnoreCase("true") || isFrozenString.equalsIgnoreCase("false"))) {
-            logger.log(Level.WARNING, "isFrozen must be true or false");
-            throw new InvalidCommandException("isFrozen must be true or false");
+        if (!(frozenString.equalsIgnoreCase("true") || frozenString.equalsIgnoreCase("false"))) {
+            logger.log(Level.WARNING, "Frozen field must be true or false.");
+            throw new InvalidCommandException("Frozen field must be true or false.");
         }
-        boolean isFrozen = Boolean.parseBoolean(isFrozenString);
+        boolean isFrozen = Boolean.parseBoolean(frozenString);
 
         logger.log(Level.INFO, "End of processing meat.");
         return new MeatParser(meatType, origin, isFrozen);

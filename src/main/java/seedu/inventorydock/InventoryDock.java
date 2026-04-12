@@ -14,8 +14,6 @@ import java.util.logging.Logger;
 
 /**
  * Represents the main entry point and application loop for InventoryDock.
- * An <code>InventoryDock</code> object initializes the core components, loads stored data,
- * and processes user commands until exit.
  */
 public class InventoryDock {
     private static final Logger logger = Logger.getLogger(InventoryDock.class.getName());
@@ -24,11 +22,6 @@ public class InventoryDock {
     private final Parser parser;
     private final Storage storage;
 
-    /**
-     * Creates an InventoryDock application instance with default categories and storage.
-     *
-     * @throws InventoryDockException If stored inventory data cannot be loaded.
-     */
     public InventoryDock() throws InventoryDockException {
         ui = new UI();
         inventory = new Inventory();
@@ -42,10 +35,6 @@ public class InventoryDock {
             "toiletries",
             "snacks",
             "drinks",
-            "icecream",
-            "sweets",
-            "burger",
-            "setmeal",
             "seafood",
             "meat",
             "petfood",
@@ -60,22 +49,12 @@ public class InventoryDock {
         logger.log(Level.INFO, "Loaded inventory with " + inventory.getCategoryCount() + " categories.");
     }
 
-    /**
-     * Starts the InventoryDock application.
-     *
-     * @param args Command-line arguments.
-     * @throws InventoryDockException If startup initialization fails.
-     */
     public static void main(String[] args) throws InventoryDockException {
         LoggerConfig logger = new LoggerConfig("./logs/logger.txt");
         logger.setup();
         new InventoryDock().run();
     }
 
-    /**
-     * Runs the main command loop until the user exits the application.
-     * Successful commands are persisted after execution, and exit also triggers a save.
-     */
     public void run() {
         logger.log(Level.INFO, "Starting InventoryDock command loop.");
         ui.showWelcome();

@@ -6,11 +6,11 @@ hide footbox
 
 participant ":InventoryDock" as InventoryDock
 participant ":Storage" as Storage
-participant ":AddItemCommandParser" as AddItemCommandParser
 participant ":Command" as Command
 participant ":Inventory" as Inventory
 participant ":UI" as UI
 
+activate InventoryDock
 InventoryDock -> Storage: load(inventory, ui)
 activate Storage
 
@@ -24,7 +24,7 @@ activate Storage
 Storage --> Storage
 deactivate Storage
 
-create AddItemCommandParser
+create ":AddItemCommandParser" as AddItemCommandParser
 Storage -> AddItemCommandParser: AddItemCommandParser()
 activate AddItemCommandParser
 AddItemCommandParser --> Storage
@@ -54,7 +54,7 @@ loop for each line in storage file
         deactivate Inventory
         Command --> Storage
         deactivate Command
-    else corrupted or invalid line
+    else else
         Storage -> UI: showSkippedLine(line, errorMessage)
         activate UI
         UI --> Storage
@@ -64,5 +64,7 @@ end
 
 Storage --> InventoryDock
 deactivate Storage
+deactivate InventoryDock
 
 @enduml
+

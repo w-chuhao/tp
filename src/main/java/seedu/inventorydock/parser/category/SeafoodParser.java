@@ -16,27 +16,14 @@ public class SeafoodParser {
 
     public final String seafoodType;
     public final String origin;
-    public final boolean isFrozen;
+    public final boolean isFresh;
 
-    /**
-     * Creates a {@code SeafoodParser} object with the parsed seafood details.
-     *
-     * @param seafoodType Type of seafood.
-     * @param origin Origin of the seafood.
-     */
-    public SeafoodParser(String seafoodType, String origin, boolean isFrozen) {
+    public SeafoodParser(String seafoodType, String origin, boolean isFresh) {
         this.seafoodType = seafoodType;
         this.origin = origin;
-        this.isFrozen = isFrozen;
+        this.isFresh = isFresh;
     }
 
-    /**
-     * Parses the seafood-related fields from the given input string.
-     *
-     * @param input User input containing seafood fields.
-     * @return A {@code SeafoodParser} containing the parsed values.
-     * @throws InventoryDockException If any required field is missing or invalid.
-     */
     public static SeafoodParser parse(String input) throws InventoryDockException {
         assert input != null : "SeafoodParser received null input.";
         logger.log(Level.INFO, "Processing Seafood special fields.");
@@ -47,25 +34,25 @@ public class SeafoodParser {
             throw new MissingArgumentException("Missing seafoodType for seafood.");
         }
 
-        String origin = FieldParser.extractField(input, "origin/", "isFrozen/");
+        String origin = FieldParser.extractField(input, "origin/", "isFresh/");
         if (origin == null || origin.trim().isEmpty()) {
             logger.log(Level.WARNING, "Missing origin for seafood.");
             throw new MissingArgumentException("Missing origin for seafood.");
         }
 
-        String isFrozenString = FieldParser.extractField(input, "isFrozen/", null);
-        if (isFrozenString == null || isFrozenString.trim().isEmpty()) {
-            logger.log(Level.WARNING, "Missing isFrozen for seafood.");
-            throw new MissingArgumentException("Missing isFrozen for seafood.");
+        String freshString = FieldParser.extractField(input, "isFresh/", null);
+        if (freshString == null || freshString.trim().isEmpty()) {
+            logger.log(Level.WARNING, "Missing freshness field for seafood.");
+            throw new MissingArgumentException("Missing freshness field for seafood.");
         }
 
-        if (!(isFrozenString.equalsIgnoreCase("true") || isFrozenString.equalsIgnoreCase("false"))) {
-            logger.log(Level.WARNING, "isFrozen must be true or false");
-            throw new InvalidCommandException("isFrozen must be true or false");
+        if (!(freshString.equalsIgnoreCase("true") || freshString.equalsIgnoreCase("false"))) {
+            logger.log(Level.WARNING, "Freshness field must be true or false.");
+            throw new InvalidCommandException("Freshness field must be true or false.");
         }
-        boolean isFrozen = Boolean.parseBoolean(isFrozenString);
+        boolean isFresh = Boolean.parseBoolean(freshString);
 
         logger.log(Level.INFO, "End of processing seafood.");
-        return new SeafoodParser(seafoodType, origin, isFrozen);
+        return new SeafoodParser(seafoodType, origin, isFresh);
     }
 }

@@ -10,7 +10,6 @@ participant ":InventoryDock" as InventoryDock
 participant ":Parser" as Parser
 participant ":FindItemParser" as FindItemParser
 participant ":BinLocationParser" as BinLocationParser
-participant ":FindItemByBinCommand" as FindItemByBinCommand
 
 User -> UI: enter find bin command
 activate UI
@@ -26,7 +25,7 @@ activate BinLocationParser
 BinLocationParser --> FindItemParser: normalizedBinInput
 deactivate BinLocationParser
 
-create FindItemByBinCommand
+create ":FindItemByBinCommand" as FindItemByBinCommand
 FindItemParser -> FindItemByBinCommand: FindItemByBinCommand(normalizedBinInput)
 activate FindItemByBinCommand
 FindItemByBinCommand --> FindItemParser: command
@@ -39,3 +38,5 @@ deactivate Parser
 deactivate InventoryDock
 deactivate UI
 @enduml
+
+

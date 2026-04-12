@@ -9,7 +9,6 @@ participant ":UI" as UI
 participant ":InventoryDock" as InventoryDock
 participant ":Parser" as Parser
 participant ":FindItemParser" as FindItemParser
-participant ":FindItemByExpiryDateCommand" as FindItemByExpiryDateCommand
 participant ":DateParser" as DateParser
 participant ":Inventory" as Inventory
 participant ":Category" as Category
@@ -24,7 +23,7 @@ activate Parser
 
 Parser -> FindItemParser: parse(arguments)
 activate FindItemParser
-create FindItemByExpiryDateCommand
+create ":FindItemByExpiryDateCommand" as FindItemByExpiryDateCommand
 FindItemParser -> FindItemByExpiryDateCommand: FindItemByExpiryDateCommand(name)
 activate FindItemByExpiryDateCommand
 FindItemByExpiryDateCommand --> FindItemParser: command
@@ -76,7 +75,7 @@ alt matches is empty
     activate UI
     UI --> User: display no-match message
     deactivate UI
-else matches found
+else else
     FindItemByExpiryDateCommand -> UI: showDivider()
     activate UI
     FindItemByExpiryDateCommand -> UI: showMessage("Items expiring by ...")
@@ -90,4 +89,5 @@ deactivate FindItemByExpiryDateCommand
 deactivate InventoryDock
 deactivate UI
 @enduml
+
 

@@ -18,25 +18,12 @@ public class AccessoriesParser {
     public final String material;
     public final boolean isFragile;
 
-    /**
-     * Creates an {@code AccessoriesParser} object with the parsed accessory details.
-     *
-     * @param type Type of the accessory.
-     * @param material Material of the accessory.
-     */
     public AccessoriesParser(String type, String material, boolean isFragile) {
         this.type = type;
         this.material = material;
         this.isFragile = isFragile;
     }
 
-    /**
-     * Parses the accessory-related fields from the given input string.
-     *
-     * @param input User input containing accessory fields.
-     * @return An {@code AccessoriesParser} containing the parsed values.
-     * @throws InventoryDockException If any required field is missing or invalid.
-     */
     public static AccessoriesParser parse(String input) throws InventoryDockException {
         assert input != null : "AccessoriesParser received null input.";
         logger.log(Level.INFO, "Processing Accessories special fields.");
@@ -53,17 +40,17 @@ public class AccessoriesParser {
             throw new MissingArgumentException("Missing material for accessories.");
         }
 
-        String isFragileString = FieldParser.extractField(input, "isFragile/", null);
-        if (isFragileString == null || isFragileString.trim().isEmpty()) {
-            logger.log(Level.WARNING, "Missing isFragile for accessories.");
-            throw new MissingArgumentException("Missing isFragile for accessories.");
+        String fragileString = FieldParser.extractField(input, "isFragile/", null);
+        if (fragileString == null || fragileString.trim().isEmpty()) {
+            logger.log(Level.WARNING, "Missing fragility field for accessories.");
+            throw new MissingArgumentException("Missing fragility field for accessories.");
         }
 
-        if (!(isFragileString.equalsIgnoreCase("true") || isFragileString.equalsIgnoreCase("false"))) {
-            logger.log(Level.WARNING, "isFragile must be true or false");
-            throw new InvalidCommandException("isFragile must be true or false");
+        if (!(fragileString.equalsIgnoreCase("true") || fragileString.equalsIgnoreCase("false"))) {
+            logger.log(Level.WARNING, "Fragility field must be true or false.");
+            throw new InvalidCommandException("Fragility field must be true or false.");
         }
-        boolean isFragile = Boolean.parseBoolean(isFragileString);
+        boolean isFragile = Boolean.parseBoolean(fragileString);
 
         logger.log(Level.INFO, "End of processing accessories.");
         return new AccessoriesParser(type, material, isFragile);

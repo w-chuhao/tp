@@ -10,13 +10,13 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class PetFoodParserTest {
     @Test
     public void parse_validInput_success() {
-        String input = "petType/Cat brand/Whiskas isDryFood/true";
+        String input = "petType/Cat brand/Whiskas isDry/true";
         assertDoesNotThrow(() -> PetFoodParser.parse(input));
     }
 
     @Test
     public void parse_missingPetType_throwsException() {
-        String input = "petType/ brand/Whiskas isDryFood/true";
+        String input = "petType/ brand/Whiskas isDry/true";
         InventoryDockException e = assertThrows(InventoryDockException.class,
                 () -> PetFoodParser.parse(input));
         assertEquals("Missing petType for pet food.", e.getMessage());
@@ -24,9 +24,10 @@ public class PetFoodParserTest {
 
     @Test
     public void parse_missingBrand_throwsException() {
-        String input = "petType/Cat brand/ isDryFood/true";
+        String input = "petType/Cat brand/ isDry/true";
         InventoryDockException e = assertThrows(InventoryDockException.class,
                 () -> PetFoodParser.parse(input));
         assertEquals("Missing brand for pet food.", e.getMessage());
     }
 }
+

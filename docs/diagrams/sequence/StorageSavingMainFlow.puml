@@ -10,6 +10,7 @@ participant ":Inventory" as Inventory
 participant ":Category" as Category
 participant ":Item" as Item
 
+activate InventoryDock
 InventoryDock -> Storage: save(inventory)
 activate Storage
 
@@ -53,5 +54,7 @@ deactivate Storage
 
 Storage --> InventoryDock
 deactivate Storage
+deactivate InventoryDock
 
 @enduml
+
