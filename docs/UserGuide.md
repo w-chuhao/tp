@@ -24,9 +24,10 @@ Notes about command syntax:
 * Boolean fields only accept `true` or `false`.
 * Quantities must be positive integers.
 * Dates must use `yyyy-M-d`, for example `2026-3-9` or `2026-12-31`.
+* Bin locations for `add` and `update` must use the exact `LETTER-NUMBER` format, for example `A-10`.
 * Bin searches accept `LETTER-NUMBER`, `LETTER`, or `NUMBER`, such as `A-10`, `A`, or `10`.
 * Quantity searches return items whose quantity is less than or equal to the specified positive integer.
-* `update` only supports changing common item fields. Category-specific fields cannot be updated.
+* `update` supports both common item fields and the category-specific boolean field for the item's category.
 * `sort` only supports sorting by name, expiry date and quantity.
 
 ## Data Storage
@@ -88,12 +89,10 @@ Expected result:
 
 * The item is added to the specified category.
 * The app confirms the item name, quantity, category, and bin location.
-* Duplicate check rule for `add` (if-else style):
-  * If `category/` and `item/` are the same, compare only batch fields (`expiryDate/` and boolean fields)
-  * If any batch field is different, the item is treated as a new batch and is added.
-  * Else, if `category/` and `item/` are the same but only `qty/` and/or `bin/` are different, it is treated as a duplicate.
-  * If a duplicate is detected, the command is rejected with:
-    `Duplicate item found for category/CATEGORY item/ITEM.`
+* Duplicate-batch rule for `add`:
+  * Duplicate checking ignores only `qty/` and `bin/`.
+  * The logical batch identity still includes `category/`, `item/`, `expiryDate/`, and the category-specific boolean field.
+  * If another item in the same category has the same logical batch identity, the command is rejected with `Duplicate item found for category/CATEGORY item/ITEM.`
 
 Example (`fruits`: `isRipe/`):
 * Existing add command:
@@ -139,7 +138,7 @@ Expected result:
 
 * If the category exists and contains items, the app lists all items in that category.
 * If the category exists but has no items, the app shows `No items found in category: CATEGORY.`
-* If the category does not exist, the app shows an error that the category was not found.
+* If the category does not exist, the app shows `[Error] Not found: Category 'CATEGORY' does not exist.`
 
 ### Find items by expiry date: `find expiryDate/...`
 
@@ -265,13 +264,15 @@ Updatable fields:
 * `bin/` changes the bin location
 * `qty/` changes the quantity
 * `expiryDate/` changes the expiry date
+* The category-specific boolean field can also be updated for the matching category, for example `isRipe/false`
 
 Notes:
 
 * `INDEX` is the item number within that category, using 1-based indexing.
 * You must provide at least one field to update.
-* Category-specific boolean fields such as `isRipe/`, `isCarbonated/`, or `isFrozen/` cannot be updated with this command.
-* `update` also enforces duplicate-batch checks that is same as add command.
+* Category-specific boolean fields such as `isRipe/`, `isCarbonated/`, or `isFrozen/` can also be updated, but only for items in the matching category.
+* `bin/` must use the exact `LETTER-NUMBER` format, for example `A-2`.
+* `update` uses the same duplicate-batch rule as `add`: only `qty/` and `bin/` are ignored when checking for duplicates.
 Examples:
 
 * `update category/fruits index/1 qty/25`
@@ -326,7 +327,8 @@ Example:
 Expected result:
 
 * If confirmed, all items in the category are cleared.
-* The category remains available for future items.
+* The predefined category remains available for future items.
+* The app reports the action using its existing delete-category messages, even though the category object itself is preserved.
 * If cancelled, no items are removed.
 
 ## Error Handling
@@ -345,6 +347,9 @@ Common reasons a command may fail:
 
 When an error occurs, the app prints an error message and waits for the next command.
 
+Error messages use a consistent format such as `[Error] Invalid input: ...`, `[Error] Missing input: ...`,
+`[Error] Not found: ...`, `[Error] Conflict: ...`, or `[Error] Storage error: ...`.
+
 ## FAQ
 
 **Q**: How do I transfer my data to another computer?
@@ -355,13 +360,17 @@ When an error occurs, the app prints an error message and waits for the next com
 
 **A:** In `data/inventory.txt`.
 
+**Q:** What happens if `inventory.txt` is corrupted?
+
+**A:** InventoryDock skips corrupted lines, loads the remaining valid items, and shows which lines were skipped.
+
 **Q:** Does the app create new categories?
 
 **A:** No. InventoryDock works with a fixed set of built-in categories.
 
 **Q:** Can I update category-specific boolean fields such as `isRipe/` or `isFrozen/`?
 
-**A:** No. The `update` command only supports `newItem/`, `bin/`, `qty/`, and `expiryDate/`.
+**A:** Yes. You can update the category-specific boolean field that belongs to the item's category, in addition to `newItem/`, `bin/`, `qty/`, and `expiryDate/`.
 
 **Q:** What date format should I use?
 

@@ -103,12 +103,12 @@ the `add` command.
 
 This feature is necessary because the application is fundamentally an inventory manager. Users need
 to record newly stocked products together with shared fields such as name, quantity, bin location,
-and expiry date, while also capturing category-specific attributes such as fruit size or drink
-brand. The add-item flow solves this by routing the same high-level command through specialised
+and expiry date, while also capturing category-specific boolean attributes such as `isRipe/` or
+`isCarbonated/`. The add-item flow solves this by routing the same high-level command through specialised
 parsers based on the category provided by the user.
 
 For example, if the user enters
-`add category/fruits item/apple bin/A1 qty/10 expiryDate/2026-4-01 isRipe/true`,
+`add category/fruits item/apple bin/A-1 qty/10 expiryDate/2026-4-01 isRipe/true`,
 the system validates the common and category-specific fields, constructs the correct `Item`
 subclass, and adds it into the matching category.
 
@@ -193,7 +193,7 @@ When the user enters an add command, the implementation performs the following s
 
 1. `Parser.parse()` splits the command word from the arguments.
 2. `Parser` calls `AddCommandParser.parse(arguments)`.
-3. `AddCommandParser` checks that mandatory fields such as `item/` and `category/` are present.
+3. `AddCommandParser` checks that `category/` is present and dispatches to the correct category branch.
 4. `AddCommandParser` extracts the category and dispatches to the corresponding method in
    `AddItemCommandParser`.
 5. `AddItemCommandParser` validates the input, parses common fields, and invokes the category-specific
@@ -204,7 +204,7 @@ When the user enters an add command, the implementation performs the following s
 9. If the category exists, `AddItemCommand` computes a normalized batch-identity key for the new item.
 10. `AddItemCommand` scans existing items in the same category and compares normalized keys.
 11. The normalized key ignores `qty/` and `bin/`, and compares the remaining stored fields.
-12. If a duplicate batch is found, `AddItemCommand` throws `InventoryDockException` with
+12. If a duplicate batch is found, `AddItemCommand` throws `DuplicateItemException` with
     `Duplicate item found for category/<category> item/<item>.`.
 13. If no duplicate is found, `AddItemCommand` calls `category.addItem(item)`.
 14. `UI.showItemAdded(...)` displays the confirmation to the user.
@@ -215,7 +215,7 @@ The execution logic in `AddItemCommand` keeps validation and mutation together:
 Category category = inventory.findCategoryByName(categoryName);
 Item duplicateItem = findDuplicateItem(category, item);
 if (duplicateItem != null) {
-    throw new InventoryDockException("Duplicate item found for category/"
+    throw new DuplicateItemException("Duplicate item found for category/"
             + category.getName() + " item/" + item.getName() + ".");
 }
 category.addItem(item);
@@ -251,19 +251,22 @@ silently introducing unintended categories due to typing errors.
 
 Validation is split across the parser layer.
 
-`AddCommandParser` rejects missing shared fields such as `item/` and `category/` before dispatching
-to a category-specific parser. These failures are reported using `MissingArgumentException`, while an
-unsupported category is reported using `InvalidCommandException`.
+`AddCommandParser` rejects missing `category/` before dispatching to a category-specific parser.
+The category-specific parser path then uses `InputValidator`, `CommonFieldParser`, and
+`BooleanFieldParser` to validate the remaining required fields. Missing-field failures are reported
+using `MissingArgumentException`, while unsupported categories are reported using
+`InvalidCommandException`.
 
 `AddItemCommandParser` and the specialised parsers validate category-specific input. If required
 fields are missing or malformed, they throw `InventoryDockException` before an `AddItemCommand` is created.
 
 `AddItemCommand` also performs execution-time checks. If `inventory.findCategoryByName(categoryName)`
-returns 
-ull`, the command throws a `CategoryNotFoundException` with the message
+returns `null`, the command throws a `CategoryNotFoundException` with the message
 `Category not found: <categoryName>`. If the parsed item is unexpectedly 
-ull`, it throws a
-`MissingArgumentException` with the message `Item cannot be null.` It also checks for duplicate batches in the same category using normalized identity keys (ignoring `qty/` and `bin/`) and throws `InventoryDockException` with `Duplicate item found for category/<category> item/<item>.` when a duplicate is detected.
+`null`, it throws a `MissingArgumentException` with the message `Item cannot be null.` It also
+checks for duplicate batches in the same category using normalized identity keys (ignoring `qty/`
+and `bin/`) and throws `DuplicateItemException` with
+`Duplicate item found for category/<category> item/<item>.` when a duplicate is detected.
 
 This layered approach ensures invalid input is rejected as early as possible, while still protecting
 the command layer from invalid state.
@@ -483,9 +486,11 @@ The feature is mainly implemented using the following classes:
 The responsibilities of these classes are as follows:
 
 * `Parser` detects the update command word and delegates to `UpdateCommandParser`.
-* `UpdateCommandParser` tokenises the input, validates `category/` and `index/`, collects the updated
-  fields into a `Map<String, String>`, and constructs an `UpdateItemCommand`.
-* `UpdateItemCommand` locates the item, applies the requested changes, and rejects duplicate-batch collisions.
+* `UpdateCommandParser` tokenises the input, validates `category/` and `index/`, validates `bin/`
+  early using the same exact-format rule as `add`, collects the updated fields into a
+  `Map<String, String>`, and constructs an `UpdateItemCommand`.
+* `UpdateItemCommand` locates the item, applies the requested changes, rolls back on validation
+  failure, and rejects duplicate-batch collisions.
 * `Inventory` provides category lookup using `findCategoryByName(...)`.
 * `Category` provides indexed item access through `getItem(...)`.
 * `Item` provides setter methods such as `setName(...)`, `setQuantity(...)`, `setBinLocation(...)`,
@@ -507,18 +512,21 @@ When `UpdateItemCommand.execute()` is called, the implementation performs the fo
 * Validate that the provided `itemIndex` is within the valid range for that category.
 * Retrieve the target item using `category.getItem(itemIndex - 1)`.
 * Store the original item name for display purposes.
+* Capture an item snapshot so the original state can be restored if validation later fails.
 * Call `applyUpdates(item)`.
 * Iterate through each entry in the updates map.
 * Match each field name using a switch statement.
 * Apply the corresponding update to the item.
-* After all updates are applied, call `ui.showItemUpdated(...)`.
+* Compare the updated item against the other items in the same category using the duplicate-batch key.
+* If a duplicate batch is detected, restore the original values and throw `DuplicateItemException`.
+* After all updates are applied successfully, call `ui.showItemUpdated(...)`.
 
 The central logic is:
 
 ```java
 Category category = inventory.findCategoryByName(categoryName);
 if (category == null) {
-   throw new CategoryNotFoundException("Category not found: " + categoryName);
+   throw new CategoryNotFoundException("Category '" + categoryName + "' does not exist.");
 }
 
 if (itemIndex < 1 || itemIndex > category.getItemCount()) {
@@ -528,7 +536,14 @@ if (itemIndex < 1 || itemIndex > category.getItemCount()) {
 
 Item item = category.getItem(itemIndex - 1);
 String originalName = item.getName();
+ItemSnapshot snapshot = ItemSnapshot.from(item);
 applyUpdates(item);
+Item duplicateItem = findDuplicateItem(category, item);
+if (duplicateItem != null && duplicateItem != item) {
+   restoreOriginalValues(item, snapshot);
+   throw new DuplicateItemException("Duplicate item found for category/"
+           + category.getName() + " item/" + item.getName() + ".");
+}
 ui.showItemUpdated(originalName, item.getName(), category.getName());
 ```
 
@@ -555,6 +570,10 @@ Another deliberate design choice is reusing existing validation helpers such as
 that update commands follow the same validation rules as add commands, which improves consistency across  
 the application.
 
+The parser also validates `bin/` eagerly using `BinLocationParser.parseExactInput(...)`. This keeps
+update behaviour aligned with add behaviour, so malformed bin values are rejected before command
+execution begins.
+
 #### Error handling and validation
 
 Validation is split across the parser layer and the command layer.
@@ -567,7 +586,8 @@ Validation is split across the parser layer and the command layer.
 * missing `index/`  
 * non-integer item indices  
 * non-positive item indices  
-* update commands that do not specify any fields to change  
+* update commands that do not specify any fields to change
+* malformed `bin/` values such as `A2`
 
 `UpdateItemCommand` handles execution-time validation. It rejects:
 
@@ -1067,12 +1087,16 @@ complex interfaces.
 | Version | As a ... | I want to ...             | So that I can ...                                           |
 |---------|----------|---------------------------|-------------------------------------------------------------|
 | v1.0    | new user | see usage instructions    | recover quickly when I forget the command format            |
+| v1.0    | user     | view command help         | recover quickly when I am unsure what syntax to use         |
 | v1.0    | user     | add items                 | sync real-world items into the system                       |
 | v1.0    | user     | delete items              | remove entries that no longer reflect physical stock        |
+| v1.0    | user     | clear a category          | remove all items from one category without deleting them one by one |
 | v1.0    | user     | list items                | review the current inventory state in one place             |
+| v1.0    | user     | have my inventory saved automatically | continue from my previous state after restarting the app |
 | v2.0    | user     | find items by keyword     | locate a product quickly when I only remember part of its name |
 | v2.0    | user     | find items by category    | inspect all items belonging to one category                 |
 | v2.0    | user     | find items by bin         | check what is stored at a specific physical location        |
+| v2.0    | user     | find items by quantity    | identify low-stock items that may need replenishment        |
 | v2.0    | user     | find items by expiry date | identify batches that need attention before they expire     |
 | v2.0    | user     | sort items                | review inventory in a meaningful order for faster scanning  |
 | v2.0    | user     | update items              | correct data-entry mistakes without re-adding the whole item |
@@ -1083,6 +1107,8 @@ complex interfaces.
 2. The system should handle small to moderate inventory sizes efficiently using linear scans.
 3. The application should persist data between sessions using file storage.
 4. The system should provide clear error messages for invalid user inputs.
+   Error messages should use a consistent user-facing format with labels such as `Missing input`,
+   `Invalid input`, `Not found`, `Conflict`, or `Storage error`.
 5. The application should be usable via a Command Line Interface.
 6. The system should not crash when encountering malformed storage data, and should handle such cases.
 
@@ -1108,8 +1134,8 @@ This section provides instructions for manually testing the application.
 
 1. Use the `add` command to insert sample items into different categories.
 2. Example:
-    - `add category/fruits item/apple bin/A1 qty/10 expiryDate/2026-4-01 isRipe/true`
-    - `add category/drinks item/cola bin/B2 qty/5 expiryDate/2026-6-01 isCarbonated/true`
+    - `add category/fruits item/apple bin/A-1 qty/10 expiryDate/2026-4-01 isRipe/true`
+    - `add category/drinks item/cola bin/B-2 qty/5 expiryDate/2026-6-01 isCarbonated/true`
 3. Run `list` to verify that the items are correctly added.
 
 After setting up the application, proceed to the individual test cases below.
@@ -1122,11 +1148,11 @@ After setting up the application, proceed to the individual test cases below.
 4. Run `list`.
 5. Verify that `apple` appears under the `fruits` category with the entered values.
 6. Run `add category/unknown item/apple bin/A-1 qty/10 expiryDate/2026-4-01 isRipe/true`.
-7. Verify that the application shows `Category not found: unknown` or the corresponding category error.
+7. Verify that the application shows a `Invalid input` error for the invalid category.
 8. Run an add command with a missing required field, for example `add category/fruits bin/A-1 qty/10 expiryDate/2026-4-01 isRipe/true`.
-9. Verify that the application shows the appropriate validation error for the missing field.
+9. Verify that the application shows a `Missing input` error for the missing field.
 10. Run `add category/fruits item/apple bin/B-9 qty/99 expiryDate/2026-4-01 isRipe/true`.
-11. Verify that the application rejects it with `Duplicate item found for category/fruits item/apple.`
+11. Verify that the application rejects it with a `Conflict` error for a duplicate logical batch.
 12. Verify through `list` that no second identical batch was added to `fruits`.
 13. Run `add category/fruits item/apple bin/C-1 qty/5 expiryDate/2026-4-02 isRipe/true`.
 14. Verify through `list` that this different batch is allowed and appears under `fruits`.
@@ -1160,7 +1186,7 @@ After setting up the application, proceed to the individual test cases below.
 4. Run `find qty/15`.
 5. Verify that items with quantity `15` and lower are shown, and items above `15` are excluded.
 6. Run `find qty/abc`.
-7. Verify that the application shows the invalid quantity error.
+7. Verify that the application shows the invalid input.
 8. Run `find qty/5` when no item has quantity `5` or lower.
 9. Verify that the application shows `No items found with quantity: 5.` or the corresponding no-match message.
 
@@ -1172,8 +1198,8 @@ After setting up the application, proceed to the individual test cases below.
 4. Run `find category/FRUITS`.
 5. Verify that the application still returns the items in `fruits`.
 6. Run `find category/snacks` for an existing but empty category.
-7. Verify that the application shows `No items found in category: snacks.` or the corresponding empty-category message.
-8. Run `find category/toiletries` for a category that does not exist.
+7. Verify that the application shows `No items found in category: snacks.`
+8. Run `find category/car` for a category that does not exist.
 9. Verify that the application shows the category-not-found message.
 
 ### Testing find by expiry date
@@ -1184,42 +1210,39 @@ After setting up the application, proceed to the individual test cases below.
 4. Run `find expiryDate/2026-3-01`.
 5. Verify that the application shows `No items found expiring by 2026-3-01.` when there are no matches.
 6. Run `find expiryDate/2026/3/25`.
-7. Verify that the application shows the invalid date format error.
+7. Verify that the application shows the invalid input error.
 8. Run `find expiryDate/`.
-9. Verify that the application shows the missing expiry date error.
+9. Verify that the application shows the missing input error.
 
 ### Testing update feature
 
-1. Run `update category/fruits index/1 newItem/green_apple bin/A2 expiryDate/2026-5-01`
+1. Run `update category/fruits index/1 newItem/green_apple bin/A-2 expiryDate/2026-5-01`
 2. Verify that:
   * The item name is updated to green_apple  
-  * The bin location is updated to A2  
+  * The bin location is updated to A-2  
   * The expiry date is updated to 2026-5-01  
 3. Run `list`.
 4. Verify that all updated fields are reflected correctly.
 5. Run `update category/unknown index/1 qty/10`
-6. Verify that the application shows  `Category not found: unknown`.
+6. Verify that the application shows a `Not found` error for the missing category.
 7. Run `update category/fruits index/100 qty/10`
-8. Verify that the application shows an error indicating the index is out of range.
+8. Verify that the application shows an `Invalid input` error indicating the index is out of range.
 9. Run `update category/fruits index/abc qty/10`
 10. Verify that the application shows `Item index must be an integer.`
 11. Run `update category/fruits index/1`
-12. Verify that the application shows `Provide at least one field to update.`
+12. Verify that the application shows `at least one field to update is required.`
 13. Run `update index/1 qty/10`
-14. Verify that the application shows `Missing category.`
+14. Verify that the application shows a `Missing input` error for the missing category.
 15. Run `update category/fruits qty/10`
-16. Verify that the application shows `Missing item index.`
+16. Verify that the application shows `item index is required.`
 17. Run `update category/fruits index/1 qty/-5`
-18. Verify that the application shows `Quantity must be a positive integer.`
+18. Verify that the application shows an `Invalid input` error for the invalid quantity.
 19. Run `update category/fruits index/1 expiryDate/2026/05/01`
-20. Verify that the application shows `Invalid date. Please use yyyy-M-d.`
+20. Verify that the application shows `Please enter a valid calendar date in yyyy-M-d format.`
 21. Run `update category/fruits index/1 bin/`
-22. Verify that the application shows `Invalid update token: bin/`.
+22. Verify that the application shows `update token 'bin/' is invalid.`
 23. Run `update category/fruits index/1 isRipe/false`
-24. Verify that the application shows `Only newItem/, bin/, qty/, and expiryDate/ can be updated.`
-25. Add a second fruits batch first, for example `add category/fruits item/green_apple bin/B1 qty/8 expiryDate/2026-6-1 isRipe/true`.
-26. Run `update category/fruits index/2 expiryDate/2026-5-01` if index 1 already has `green_apple` with `2026-5-01` and same category fields.
-27. Verify that the application rejects the update with `Duplicate item found for category/fruits item/green_apple.`
+24. Verify that the application updates the fruit's ripe status successfully.
 
 ### Testing Sort Command
 1. Add several items into at least one category with different names, expiry dates, and quantities.
@@ -1282,19 +1305,3 @@ o` and press enter.
 8. Run `find keyword/mango`.
 9. Verify that the application shows `No items found matching keyword: mango.` when there are no
    matches.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
