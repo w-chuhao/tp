@@ -15,12 +15,10 @@ public class DrinksParser {
     private static final Logger logger = Logger.getLogger(DrinksParser.class.getName());
 
     public final String brand;
-    public final String flavour;
     public final boolean isCarbonated;
 
-    public DrinksParser(String brand, String flavour, boolean isCarbonated) {
+    public DrinksParser(String brand, boolean isCarbonated) {
         this.brand = brand;
-        this.flavour = flavour;
         this.isCarbonated = isCarbonated;
     }
 
@@ -28,17 +26,8 @@ public class DrinksParser {
         assert input != null : "DrinksParser received null input.";
         logger.log(Level.INFO, "Processing Drinks special fields.");
 
-        String brand = FieldParser.extractField(input, "brand/", "flavour/");
-        if (brand == null || brand.trim().isEmpty()) {
-            logger.log(Level.WARNING, "Missing brand for drinks.");
-            throw new MissingArgumentException("Missing brand for drinks.");
-        }
-
-        String flavour = FieldParser.extractField(input, "flavour/", "isCarbonated/");
-        if (flavour == null || flavour.trim().isEmpty()) {
-            logger.log(Level.WARNING, "Missing flavour for drinks.");
-            throw new MissingArgumentException("Missing flavour for drinks.");
-        }
+        String brand = FieldParser.extractField(input, "brand/", "isCarbonated/");
+        brand = SpecificFieldValidator.parseStringOnlyField(brand, "brand", "drinks");
 
         String carbonatedString = FieldParser.extractField(input, "isCarbonated/", null);
         if (carbonatedString == null || carbonatedString.trim().isEmpty()) {
@@ -53,6 +42,6 @@ public class DrinksParser {
         boolean isCarbonated = Boolean.parseBoolean(carbonatedString);
 
         logger.log(Level.INFO, "End of processing drinks.");
-        return new DrinksParser(brand, flavour, isCarbonated);
+        return new DrinksParser(brand, isCarbonated);
     }
 }

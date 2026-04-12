@@ -4,6 +4,7 @@ import seedu.inventorydock.exception.InventoryDockException;
 import seedu.inventorydock.exception.InvalidCommandException;
 import seedu.inventorydock.exception.MissingArgumentException;
 import seedu.inventorydock.parser.FieldParser;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -35,10 +36,7 @@ public class SnackParser {
     public static SnackParser parse(String input) throws InventoryDockException {
         assert input != null : "SnackParser received null inputs.";
         String brand = FieldParser.extractField(input, "brand/", "isCrunchy/");
-        if (brand == null || brand.trim().isEmpty()) {
-            logger.log(Level.WARNING, "Missing brand for snack.");
-            throw new MissingArgumentException("Missing brand for snack.");
-        }
+        brand = SpecificFieldValidator.parseStringOnlyField(brand, "brand", "snack");
 
         String crunchyString = FieldParser.extractField(input, "isCrunchy/", null);
         if (crunchyString == null || crunchyString.trim().isEmpty()) {
@@ -55,4 +53,3 @@ public class SnackParser {
         return new SnackParser(brand, isCrunchy);
     }
 }
-

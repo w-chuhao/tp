@@ -10,24 +10,31 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class DrinksParserTest {
     @Test
     public void parse_validInput_success() {
-        String input = "brand/CocaCola flavour/Cola isCarbonated/true";
+        String input = "brand/CocaCola isCarbonated/true";
         assertDoesNotThrow(() -> DrinksParser.parse(input));
     }
 
     @Test
     public void parse_missingBrand_throwsException() {
-        String input = "brand/ flavour/Cola isCarbonated/true";
+        String input = "brand/ isCarbonated/true";
         InventoryDockException e = assertThrows(InventoryDockException.class,
                 () -> DrinksParser.parse(input));
         assertEquals("Missing brand for drinks.", e.getMessage());
     }
 
     @Test
-    public void parse_missingFlavour_throwsException() {
-        String input = "brand/PepsiCola flavour/ isCarbonated/true";
+    public void parse_missingCarbonation_throwsException() {
+        String input = "brand/PepsiCola isCarbonated/";
         InventoryDockException e = assertThrows(InventoryDockException.class,
                 () -> DrinksParser.parse(input));
-        assertEquals("Missing flavour for drinks.", e.getMessage());
+        assertEquals("Missing carbonation field for drinks.", e.getMessage());
+    }
+
+    @Test
+    public void parse_invalidBrand_throwsException() {
+        String input = "brand/CocaCola123 isCarbonated/true";
+        InventoryDockException e = assertThrows(InventoryDockException.class,
+                () -> DrinksParser.parse(input));
+        assertEquals("brand for drinks must contain letters only.", e.getMessage());
     }
 }
-

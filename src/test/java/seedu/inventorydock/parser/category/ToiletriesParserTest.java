@@ -37,4 +37,12 @@ public class ToiletriesParserTest {
                 () -> ToiletriesParser.parse(input));
         assertEquals("Liquid field must be true or false.", e.getMessage());
     }
+
+    @Test
+    public void parse_invalidBrand_throwsException() {
+        String input = "brand/Dove123 isLiquid/true";
+        InventoryDockException e = assertThrows(InventoryDockException.class,
+                () -> ToiletriesParser.parse(input));
+        assertEquals("brand for toiletries must contain letters only.", e.getMessage());
+    }
 }

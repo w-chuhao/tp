@@ -15,7 +15,7 @@ public class VegetableParserTest {
     }
 
     @Test
-    public void parse_missingRipeness_throwsException() {
+    public void parse_missingLeafy_throwsException() {
         String input = "origin/Malaysia isLeafy/";
         InventoryDockException e = assertThrows(InventoryDockException.class,
                 () -> VegetableParser.parse(input));
@@ -28,5 +28,13 @@ public class VegetableParserTest {
         InventoryDockException e = assertThrows(InventoryDockException.class,
                 () -> VegetableParser.parse(input));
         assertEquals("Missing origin for vegetable.", e.getMessage());
+    }
+
+    @Test
+    public void parse_invalidOrigin_throwsException() {
+        String input = "origin/Malaysia123 isLeafy/true";
+        InventoryDockException e = assertThrows(InventoryDockException.class,
+                () -> VegetableParser.parse(input));
+        assertEquals("origin for vegetable must contain letters only.", e.getMessage());
     }
 }

@@ -46,9 +46,9 @@ public class FindItemByQtyCommandTest {
         assertEquals(2, ui.dividerCount);
         assertEquals("Items with quantity: 10", ui.messages.get(0));
         assertTrue(ui.messages.stream().anyMatch(message ->
-                message.equals("1. Name: apple, Quantity: 10, Bin: A-1, Expiry: null")));
+                message.equals("1. fruits: Name: apple, Quantity: 10, Bin: A-1, Expiry: null")));
         assertTrue(ui.messages.stream().anyMatch(message ->
-                message.equals("2. Name: carrot, Quantity: 10, Bin: B-10, Expiry: null")));
+                message.equals("2. vegetables: Name: carrot, Quantity: 10, Bin: B-10, Expiry: null")));
         assertFalse(ui.messages.stream().anyMatch(message -> message.contains("Name: banana")));
         assertFalse(ui.messages.stream().anyMatch(message -> message.contains("Name: spinach")));
     }
@@ -62,9 +62,9 @@ public class FindItemByQtyCommandTest {
 
         assertEquals(2, ui.dividerCount);
         assertEquals("Items with quantity: 15", ui.messages.get(0));
-        assertTrue(ui.messages.stream().anyMatch(message -> message.contains("Name: apple")));
-        assertTrue(ui.messages.stream().anyMatch(message -> message.contains("Name: carrot")));
-        assertTrue(ui.messages.stream().anyMatch(message -> message.contains("Name: spinach")));
+        assertTrue(ui.messages.stream().anyMatch(message -> message.contains("fruits: Name: apple")));
+        assertTrue(ui.messages.stream().anyMatch(message -> message.contains("vegetables: Name: carrot")));
+        assertTrue(ui.messages.stream().anyMatch(message -> message.contains("vegetables: Name: spinach")));
         assertFalse(ui.messages.stream().anyMatch(message -> message.contains("Name: banana")));
     }
 
@@ -112,6 +112,7 @@ public class FindItemByQtyCommandTest {
         }
     }
 }
+
 
 
 

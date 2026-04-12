@@ -35,9 +35,7 @@ public class InventoryDock {
             "toiletries",
             "snacks",
             "drinks",
-            "seafood",
             "meat",
-            "petfood",
             "accessories"
         };
 

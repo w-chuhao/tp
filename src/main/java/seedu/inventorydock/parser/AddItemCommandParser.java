@@ -11,8 +11,6 @@ import seedu.inventorydock.model.items.Accessories;
 import seedu.inventorydock.model.items.Drinks;
 import seedu.inventorydock.model.items.Fruit;
 import seedu.inventorydock.model.items.Meat;
-import seedu.inventorydock.model.items.PetFood;
-import seedu.inventorydock.model.items.Seafood;
 import seedu.inventorydock.model.items.Snack;
 import seedu.inventorydock.model.items.Toiletries;
 import seedu.inventorydock.model.items.Vegetable;
@@ -22,8 +20,6 @@ import seedu.inventorydock.parser.category.DrinksParser;
 import seedu.inventorydock.parser.category.FruitParser;
 import seedu.inventorydock.parser.category.InputValidator;
 import seedu.inventorydock.parser.category.MeatParser;
-import seedu.inventorydock.parser.category.PetFoodParser;
-import seedu.inventorydock.parser.category.SeafoodParser;
 import seedu.inventorydock.parser.category.SnackParser;
 import seedu.inventorydock.parser.category.ToiletriesParser;
 import seedu.inventorydock.parser.category.VegetableParser;
@@ -91,29 +87,14 @@ public class AddItemCommandParser {
         assert input != null : "AddItemCommandParser received null drinks input.";
         logger.log(Level.INFO, "Parsing add-item command for drinks.");
         InputValidator.validate(input, "category/", "item/", "bin/", "qty/",
-                "expiryDate/", "brand/", "flavour/", "isCarbonated/");
+                "expiryDate/", "brand/", "isCarbonated/");
 
         CommonFieldParser commonFields = CommonFieldParser.parse(input, "brand/");
         DrinksParser drinksFields = DrinksParser.parse(input);
         Item item = new Drinks(commonFields.itemName, commonFields.quantity, commonFields.bin,
-                commonFields.expiryDate, drinksFields.brand, drinksFields.flavour, drinksFields.isCarbonated);
+                commonFields.expiryDate, drinksFields.brand, drinksFields.isCarbonated);
 
         logger.log(Level.INFO, "Created drinks item command for category: " + commonFields.categoryName);
-        return new AddItemCommand(commonFields.categoryName, item);
-    }
-
-    public Command handleSeafood(String input) throws InventoryDockException {
-        assert input != null : "AddItemCommandParser received null seafood input.";
-        logger.log(Level.INFO, "Parsing add-item command for seafood.");
-        InputValidator.validate(input, "category/", "item/", "bin/", "qty/",
-                "expiryDate/", "seafoodType/", "origin/", "isFresh/");
-
-        CommonFieldParser commonFields = CommonFieldParser.parse(input, "seafoodType/");
-        SeafoodParser seafoodFields = SeafoodParser.parse(input);
-        Item item = new Seafood(commonFields.itemName, commonFields.quantity, commonFields.bin,
-                commonFields.expiryDate, seafoodFields.seafoodType, seafoodFields.origin, seafoodFields.isFresh);
-
-        logger.log(Level.INFO, "Created seafood item command for category: " + commonFields.categoryName);
         return new AddItemCommand(commonFields.categoryName, item);
     }
 
@@ -121,29 +102,14 @@ public class AddItemCommandParser {
         assert input != null : "AddItemCommandParser received null meat input.";
         logger.log(Level.INFO, "Parsing add-item command for meat.");
         InputValidator.validate(input, "category/", "item/", "bin/", "qty/",
-                "expiryDate/", "meatType/", "origin/", "isFrozen/");
+                "expiryDate/", "meatType/", "isFrozen/");
 
         CommonFieldParser commonFields = CommonFieldParser.parse(input, "meatType/");
         MeatParser meatFields = MeatParser.parse(input);
         Item item = new Meat(commonFields.itemName, commonFields.quantity, commonFields.bin,
-                commonFields.expiryDate, meatFields.meatType, meatFields.origin, meatFields.isFrozen);
+                commonFields.expiryDate, meatFields.meatType, meatFields.isFrozen);
 
         logger.log(Level.INFO, "Created meat item command for category: " + commonFields.categoryName);
-        return new AddItemCommand(commonFields.categoryName, item);
-    }
-
-    public Command handlePetFood(String input) throws InventoryDockException {
-        assert input != null : "AddItemCommandParser received null pet food input.";
-        logger.log(Level.INFO, "Parsing add-item command for pet food.");
-        InputValidator.validate(input, "category/", "item/", "bin/", "qty/",
-                "expiryDate/", "petType/", "brand/", "isDry/");
-
-        CommonFieldParser commonFields = CommonFieldParser.parse(input, "petType/");
-        PetFoodParser petFoodFields = PetFoodParser.parse(input);
-        Item item = new PetFood(commonFields.itemName, commonFields.quantity, commonFields.bin,
-                commonFields.expiryDate, petFoodFields.petType, petFoodFields.brand, petFoodFields.isDry);
-
-        logger.log(Level.INFO, "Created pet food item command for category: " + commonFields.categoryName);
         return new AddItemCommand(commonFields.categoryName, item);
     }
 
@@ -151,13 +117,12 @@ public class AddItemCommandParser {
         assert input != null : "AddItemCommandParser received null accessories input.";
         logger.log(Level.INFO, "Parsing add-item command for accessories.");
         InputValidator.validate(input, "category/", "item/", "bin/", "qty/",
-                "expiryDate/", "type/", "material/", "isFragile/");
+                "expiryDate/", "type/", "isFragile/");
 
         CommonFieldParser commonFields = CommonFieldParser.parse(input, "type/");
         AccessoriesParser accessoriesFields = AccessoriesParser.parse(input);
         Item item = new Accessories(commonFields.itemName, commonFields.quantity, commonFields.bin,
-                commonFields.expiryDate, accessoriesFields.type, accessoriesFields.material,
-                accessoriesFields.isFragile);
+                commonFields.expiryDate, accessoriesFields.type, accessoriesFields.isFragile);
 
         logger.log(Level.INFO, "Created accessories item command for category: " + commonFields.categoryName);
         return new AddItemCommand(commonFields.categoryName, item);

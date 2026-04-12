@@ -4,6 +4,7 @@ import seedu.inventorydock.exception.InventoryDockException;
 import seedu.inventorydock.exception.InvalidCommandException;
 import seedu.inventorydock.exception.MissingArgumentException;
 import seedu.inventorydock.parser.FieldParser;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -38,10 +39,7 @@ public class FruitParser {
         assert input != null : "FruitParser received null input.";
 
         String size = FieldParser.extractField(input, "size/", "isRipe/");
-        if (size == null || size.trim().isEmpty()) {
-            logger.log(Level.WARNING, "Missing size for fruit.");
-            throw new MissingArgumentException("Missing size for fruit.");
-        }
+        size = parseFruitSize(size);
 
         String ripeString = FieldParser.extractField(input, "isRipe/", null);
         if (ripeString == null || ripeString.trim().isEmpty()) {
@@ -56,5 +54,16 @@ public class FruitParser {
         boolean isRipe = Boolean.parseBoolean(ripeString);
 
         return new FruitParser(size, isRipe);
+    }
+
+    private static String parseFruitSize(String size) throws InventoryDockException {
+        String parsedSize = SpecificFieldValidator.parseStringOnlyField(size, "size", "fruit");
+        if (!(parsedSize.equalsIgnoreCase("small")
+                || parsedSize.equalsIgnoreCase("medium")
+                || parsedSize.equalsIgnoreCase("large"))) {
+            logger.log(Level.WARNING, "Size for fruit must be small, medium, or large.");
+            throw new InvalidCommandException("Size for fruit must be small, medium, or large.");
+        }
+        return parsedSize.toLowerCase();
     }
 }

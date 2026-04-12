@@ -14,8 +14,8 @@ participant ":AddItemCommandParser" as AddItemCommandParser
 note right of AddCommandParser
 Supported add categories:
 fruits, vegetables, toiletries,
-snacks, drinks, seafood,
-meat, petfood, accessories.
+snacks, drinks, meat,
+accessories.
 end note
 
 User -> UI: enter add command
@@ -51,4 +51,5 @@ deactivate Parser
 deactivate InventoryDock
 deactivate UI
 @enduml
+
 

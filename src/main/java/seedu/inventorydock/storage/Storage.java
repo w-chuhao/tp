@@ -85,12 +85,8 @@ public class Storage {
             return parser.handleVegetables(line);
         case "drinks":
             return parser.handleDrinks(line);
-        case "seafood":
-            return parser.handleSeafood(line);
         case "meat":
             return parser.handleMeat(line);
-        case "petfood":
-            return parser.handlePetFood(line);
         case "accessories":
             return parser.handleAccessories(line);
         default:

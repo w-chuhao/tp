@@ -54,7 +54,7 @@ public class StorageTest {
 
         inventory.findCategoryByName("fruits").addItem(
                 new Fruit("apple", 3, "A-10",
-                        "2026-03-20", "big", true)
+                        "2026-03-20", "medium", true)
         );
         inventory.findCategoryByName("vegetables").addItem(
                 new Vegetable("spinach", 4, "V-01",
@@ -99,10 +99,10 @@ public class StorageTest {
         Storage storage = new Storage(FILE_PATH);
 
         List<String> lines = List.of(
-                "category/fruits item/apple bin/A-10 qty/3 expiryDate/2026-03-20 size/big isRipe/true",
+                "category/fruits item/apple bin/A-10 qty/3 expiryDate/2026-03-20 size/medium isRipe/true",
                 "category/vegetables item/spinach bin/V-01 qty/4 expiryDate/2026-03-18 origin/Malaysia isLeafy/true",
                 "Corrupted line.",
-                "category/snacks item/chips bin/S-07 qty/6 expiryDate/2026-06-01 brand/lays, isCrunchy/true"
+                "category/snacks item/chips bin/S-07 qty/6 expiryDate/2026-06-01 brand/lays isCrunchy/true"
         );
 
         Files.write(Path.of(FILE_PATH), lines);
@@ -128,3 +128,4 @@ public class StorageTest {
                 inventory.findCategoryByName("toiletries").getItemCount());
     }
 }
+

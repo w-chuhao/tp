@@ -66,12 +66,8 @@ public class AddCommandParser {
             return parser.handleVegetables(input);
         case "drinks":
             return parser.handleDrinks(input);
-        case "seafood":
-            return parser.handleSeafood(input);
         case "meat":
             return parser.handleMeat(input);
-        case "petfood":
-            return parser.handlePetFood(input);
         case "accessories":
             return parser.handleAccessories(input);
         default:

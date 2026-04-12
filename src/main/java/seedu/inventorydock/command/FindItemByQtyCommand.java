@@ -70,13 +70,13 @@ public class FindItemByQtyCommand extends Command {
         assert inventory != null : "FindItemByQtyCommand received null inventory.";
         assert ui != null : "FindItemByQtyCommand received null UI.";
 
-        List<Item> matches = new ArrayList<>();
+        List<String> matches = new ArrayList<>();
         List<Category> categories = inventory.getCategories();
 
         for (Category category : categories) {
             for (Item item : category.getItems()) {
                 if (item.getQuantity() <= qtyInput) {
-                    matches.add(item);
+                    matches.add(category.getName() + ": " + item);
                 }
             }
         }
@@ -96,3 +96,4 @@ public class FindItemByQtyCommand extends Command {
         ui.showDivider();
     }
 }
+

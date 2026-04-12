@@ -23,6 +23,8 @@ Notes about command syntax:
 * For `add`, fields must be entered in the correct order for the selected category.
 * Boolean fields only accept `true` or `false`.
 * Quantities must be positive integers.
+* The 5th field for every category must contain letters and spaces only.
+* For fruits, `size/` only accepts `small`, `medium`, or `large`.
 * Dates must use `yyyy-M-d`, for example `2026-3-9` or `2026-12-31`.
 * Bin searches accept `LETTER-NUMBER`, `LETTER`, or `NUMBER`, such as `A-10`, `A`, or `10`.
 * Quantity searches return items whose quantity is less than or equal to the specified positive integer.
@@ -71,21 +73,17 @@ Supported categories and category-specific fields(i.e. last 2 fields):
 * Snacks
   `add category/snacks item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE brand/BRAND isCrunchy/BOOLEAN`
 * Drinks
-  `add category/drinks item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE brand/BRAND flavour/FLAVOUR isCarbonated/BOOLEAN`
-* Seafood
-  `add category/seafood item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE seafoodType/TYPE origin/ORIGIN isFresh/BOOLEAN`
+  `add category/drinks item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE brand/BRAND isCarbonated/BOOLEAN`
 * Meat
-  `add category/meat item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE meatType/TYPE origin/ORIGIN isFrozen/BOOLEAN`
-* Pet food
-  `add category/petfood item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE petType/TYPE brand/BRAND isDry/BOOLEAN`
+  `add category/meat item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE meatType/TYPE isFrozen/BOOLEAN`
 * Accessories
-  `add category/accessories item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE type/TYPE material/MATERIAL isFragile/BOOLEAN`
+  `add category/accessories item/ITEM bin/BIN qty/QUANTITY expiryDate/DATE type/TYPE isFragile/BOOLEAN`
 
 Examples:
 
-* `add category/fruits item/apple bin/A-10 qty/40 expiryDate/2026-10-3 size/big isRipe/true`
+* `add category/fruits item/apple bin/A-10 qty/40 expiryDate/2026-10-3 size/large isRipe/true`
 * `add category/snacks item/potato chips bin/D-5 qty/50 expiryDate/2026-8-12 brand/Lays isCrunchy/true`
-* `add category/drinks item/apple_juice bin/F-1 qty/24 expiryDate/2026-10-3 brand/Marigold flavour/Apple isCarbonated/true`
+* `add category/drinks item/apple_juice bin/F-1 qty/24 expiryDate/2026-10-3 brand/Marigold isCarbonated/true`
 * `add category/vegetables item/spinach bin/B-2 qty/30 expiryDate/2026-6-1 origin/Malaysia isLeafy/true`
 
 Expected result:
@@ -274,7 +272,7 @@ Notes:
 
 * `INDEX` is the item number within that category, using 1-based indexing.
 * You must provide at least one field to update.
-* Category-specific fields such as `brand/`, `isRipe/`, or `flavour/` cannot be updated with this command.
+* Category-specific fields such as `brand/`, `isRipe/`, or `meatType/` cannot be updated with this command.
 * `update` also enforces duplicate-batch checks that is same as add command.
 Examples:
 
@@ -363,7 +361,7 @@ When an error occurs, the app prints an error message and waits for the next com
 
 **A:** No. InventoryDock works with a fixed set of built-in categories.
 
-**Q:** Can I update category-specific fields such as `brand/` or `origin/`?
+**Q:** Can I update category-specific fields such as `brand/` or `meatType/`?
 
 **A:** No. The `update` command only supports `newItem/`, `bin/`, `qty/`, and `expiryDate/`.
 
@@ -400,6 +398,10 @@ When an error occurs, the app prints an error message and waits for the next com
   `delete category/CATEGORY index/INDEX`
 * Clear a category
   `delete category/CATEGORY`
+
+
+
+
 
 
 

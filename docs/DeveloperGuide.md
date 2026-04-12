@@ -96,7 +96,7 @@ the `add` command.
 This feature is necessary because the application is fundamentally an inventory manager. Users need
 to record newly stocked products together with shared fields such as name, quantity, bin location,
 and expiry date, while also capturing category-specific attributes such as fruit size or drink
-flavour. The add-item flow solves this by routing the same high-level command through specialised
+brand. The add-item flow solves this by routing the same high-level command through specialised
 parsers based on the category provided by the user.
 
 For example, if the user enters
@@ -1174,7 +1174,7 @@ This section provides instructions for manually testing the application.
 1. Use the `add` command to insert sample items into different categories.
 2. Example:
     - `add category/fruits item/apple bin/A1 qty/10 expiryDate/2026-4-01 size/medium isRipe/true`
-    - `add category/drinks item/cola bin/B2 qty/5 expiryDate/2026-6-01 brand/coke flavour/original`
+    - `add category/drinks item/cola bin/B2 qty/5 expiryDate/2026-6-01 brand/coke isCarbonated/true`
 3. Run `list` to verify that the items are correctly added.
 
 After setting up the application, proceed to the individual test cases below.
@@ -1347,6 +1347,7 @@ o` and press enter.
 8. Run `find keyword/mango`.
 9. Verify that the application shows `No items found matching keyword: mango.` when there are no
    matches.
+
 
 
 

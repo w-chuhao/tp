@@ -39,19 +39,19 @@ public class FindItemByBinCommand extends Command {
         assert ui != null : "FindItemByBinCommand received null UI.";
         assert binInput != null : "FindItemByBinCommand received null bin input.";
 
-        List<Item> matches = new ArrayList<>();
+        List<String> matches = new ArrayList<>();
         List<Category> categories = inventory.getCategories();
 
         for (Category category : categories) {
             for (Item item : category.getItems()) {
                 if (isMatchingBin(item.getBinLocation(), binInput)) {
-                    matches.add(item);
+                    matches.add(category.getName() + ": " + item);
                 }
             }
         }
 
         if (matches.isEmpty()) {
-            String noItemsMessage = ui.formatNoItemsFoundMessage("in bin location: " + binInput);
+            String noItemsMessage = ui.formatNoItemsFoundMessage("in bin location: " + binInput.toUpperCase());
             logger.log(Level.INFO, noItemsMessage);
             ui.showMessage(noItemsMessage);
             return;
@@ -61,7 +61,7 @@ public class FindItemByBinCommand extends Command {
                 "in bin location '" + binInput.toUpperCase() + "'"));
 
         ui.showDivider();
-        ui.showMessage(ui.formatFindResultsHeader("in bin location: " + binInput));
+        ui.showMessage(ui.formatFindResultsHeader("in bin location: " + binInput.toUpperCase()));
         ui.showNumberedList(matches);
         ui.showDivider();
     }
@@ -102,4 +102,5 @@ public class FindItemByBinCommand extends Command {
         return binNumber.equals(binInput);
     }
 }
+
 

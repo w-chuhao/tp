@@ -7,7 +7,6 @@ import seedu.inventorydock.model.Item;
  */
 public class Meat extends Item {
     private String meatType;
-    private String origin;
     private boolean isFrozen;
 
     /**
@@ -18,25 +17,13 @@ public class Meat extends Item {
      * @param binLocation Storage bin location.
      * @param expiryDate Expiry date.
      * @param meatType Type of meat.
-     * @param origin Origin of the meat.
      * @param isFrozen Whether the meat is frozen.
      */
     public Meat(String name, int quantity, String binLocation,
-                String expiryDate, String meatType, String origin, boolean isFrozen) {
+                String expiryDate, String meatType, boolean isFrozen) {
         super(name, quantity, binLocation, expiryDate);
         this.meatType = meatType;
-        this.origin = origin;
         this.isFrozen = isFrozen;
-    }
-
-    /** @return Origin of the meat. */
-    public String getOrigin() {
-        return origin;
-    }
-
-    /** @param origin New meat origin. */
-    public void setOrigin(String origin) {
-        this.origin = origin;
     }
 
     /** @return Type of the meat. */
@@ -69,7 +56,6 @@ public class Meat extends Item {
     public String toStorageString(String categoryName) {
         return super.toStorageString(categoryName)
                 + " meatType/" + meatType
-                + " origin/" + origin
                 + " isFrozen/" + isFrozen;
     }
 
@@ -82,7 +68,6 @@ public class Meat extends Item {
     public String toString() {
         return "[Meat] " + super.toString()
                 + ", Meat Type: " + meatType
-                + ", Origin: " + origin
                 + ", Frozen: " + isFrozen;
     }
 }

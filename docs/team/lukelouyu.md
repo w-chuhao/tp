@@ -22,8 +22,6 @@ I implemented item subclasses under `src/main/java/seedu/inventorydock/model/ite
 - `Fruit.java`
 - `IceCream.java`
 - `Meat.java`
-- `PetFood.java`
-- `Seafood.java`
 - `SetMeal.java`
 - `Snack.java`
 - `Sweets.java`
@@ -54,8 +52,6 @@ I implemented category-specific parsers under `src/main/java/seedu/inventorydock
 - `FruitParser.java`
 - `IceCreamParser.java`
 - `MeatParser.java`
-- `PetFoodParser.java`
-- `SeafoodParser.java`
 - `SetMealParser.java`
 - `SnackParser.java`
 - `SweetsParser.java`
@@ -72,9 +68,7 @@ I updated `AddItemCommandParser.java` to integrate category-specific parsers int
 - `handleIceCream(String input)`
 - `handleSweets(String input)`
 - `handleSetMeal(String input)`
-- `handleSeafood(String input)`
 - `handleMeat(String input)`
-- `handlePetFood(String input)`
 - `handleAccessories(String input)`
 - `handleBurger(String input)`
 
@@ -95,3 +89,5 @@ These diagrams help document the design and interaction flow of the feature more
 ## Improved code quality and maintainability
 
 In addition to implementation work, I contributed to improving the overall quality of the codebase through testing, JavaDocs, and style-related fixes. This helped ensure that the new inventory features were easier to understand, easier to maintain, and better aligned with project coding standards.
+
+

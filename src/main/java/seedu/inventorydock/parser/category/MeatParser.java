@@ -15,12 +15,10 @@ public class MeatParser {
     private static final Logger logger = Logger.getLogger(MeatParser.class.getName());
 
     public final String meatType;
-    public final String origin;
     public final boolean isFrozen;
 
-    public MeatParser(String meatType, String origin, boolean isFrozen) {
+    public MeatParser(String meatType, boolean isFrozen) {
         this.meatType = meatType;
-        this.origin = origin;
         this.isFrozen = isFrozen;
     }
 
@@ -28,17 +26,8 @@ public class MeatParser {
         assert input != null : "MeatParser received null input.";
         logger.log(Level.INFO, "Processing Meat special fields.");
 
-        String meatType = FieldParser.extractField(input, "meatType/", "origin/");
-        if (meatType == null || meatType.trim().isEmpty()) {
-            logger.log(Level.WARNING, "Missing meatType for meat.");
-            throw new MissingArgumentException("Missing meatType for meat.");
-        }
-
-        String origin = FieldParser.extractField(input, "origin/", "isFrozen/");
-        if (origin == null || origin.trim().isEmpty()) {
-            logger.log(Level.WARNING, "Missing origin for meat.");
-            throw new MissingArgumentException("Missing origin for meat.");
-        }
+        String meatType = FieldParser.extractField(input, "meatType/", "isFrozen/");
+        meatType = SpecificFieldValidator.parseStringOnlyField(meatType, "meatType", "meat");
 
         String frozenString = FieldParser.extractField(input, "isFrozen/", null);
         if (frozenString == null || frozenString.trim().isEmpty()) {
@@ -53,6 +42,6 @@ public class MeatParser {
         boolean isFrozen = Boolean.parseBoolean(frozenString);
 
         logger.log(Level.INFO, "End of processing meat.");
-        return new MeatParser(meatType, origin, isFrozen);
+        return new MeatParser(meatType, isFrozen);
     }
 }

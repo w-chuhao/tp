@@ -42,9 +42,9 @@ public class FindItemByBinCommandTest {
         command.execute(inventory, ui);
 
         assertEquals(2, ui.dividerCount);
-        assertEquals("Items in bin location: a-1", ui.messages.get(0));
+        assertEquals("Items in bin location: A-1", ui.messages.get(0));
         assertTrue(ui.messages.stream().anyMatch(message ->
-                message.equals("1. Name: apple, Quantity: 40, Bin: A-1, Expiry: null")));
+                message.equals("1. fruits: Name: apple, Quantity: 40, Bin: A-1, Expiry: null")));
         assertFalse(ui.messages.stream().anyMatch(message -> message.contains("A-10")));
     }
 
@@ -55,9 +55,9 @@ public class FindItemByBinCommandTest {
 
         command.execute(inventory, ui);
 
-        assertEquals("Items in bin location: a", ui.messages.get(0));
-        assertTrue(ui.messages.stream().anyMatch(message -> message.contains("Name: apple")));
-        assertTrue(ui.messages.stream().anyMatch(message -> message.contains("Name: banana")));
+        assertEquals("Items in bin location: A", ui.messages.get(0));
+        assertTrue(ui.messages.stream().anyMatch(message -> message.contains("fruits: Name: apple")));
+        assertTrue(ui.messages.stream().anyMatch(message -> message.contains("fruits: Name: banana")));
         assertFalse(ui.messages.stream().anyMatch(message -> message.contains("Name: carrot")));
     }
 
@@ -69,8 +69,8 @@ public class FindItemByBinCommandTest {
         command.execute(inventory, ui);
 
         assertEquals("Items in bin location: 10", ui.messages.get(0));
-        assertTrue(ui.messages.stream().anyMatch(message -> message.contains("Name: banana")));
-        assertTrue(ui.messages.stream().anyMatch(message -> message.contains("Name: carrot")));
+        assertTrue(ui.messages.stream().anyMatch(message -> message.contains("fruits: Name: banana")));
+        assertTrue(ui.messages.stream().anyMatch(message -> message.contains("vegetables: Name: carrot")));
         assertFalse(ui.messages.stream().anyMatch(message -> message.contains("Name: apple")));
     }
 
@@ -82,7 +82,7 @@ public class FindItemByBinCommandTest {
         command.execute(inventory, ui);
 
         assertEquals(1, ui.messages.size());
-        assertEquals("No items found in bin location: z.", ui.messages.get(0));
+        assertEquals("No items found in bin location: Z.", ui.messages.get(0));
         assertEquals(0, ui.dividerCount);
     }
 
@@ -94,9 +94,9 @@ public class FindItemByBinCommandTest {
 
         command.execute(inventory, ui);
 
-        assertEquals("Items in bin location: a", ui.messages.get(0));
-        assertTrue(ui.messages.stream().anyMatch(message -> message.contains("Name: apple")));
-        assertTrue(ui.messages.stream().anyMatch(message -> message.contains("Name: banana")));
+        assertEquals("Items in bin location: A", ui.messages.get(0));
+        assertTrue(ui.messages.stream().anyMatch(message -> message.contains("fruits: Name: apple")));
+        assertTrue(ui.messages.stream().anyMatch(message -> message.contains("fruits: Name: banana")));
         assertFalse(ui.messages.stream().anyMatch(message -> message.contains("Name: brokenItem")));
     }
     private static class TestUI extends UI {
@@ -114,5 +114,6 @@ public class FindItemByBinCommandTest {
         }
     }
 }
+
 
 

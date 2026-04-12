@@ -7,7 +7,6 @@ import seedu.inventorydock.model.Item;
  */
 public class Drinks extends Item {
     private String brand;
-    private String flavour;
     private boolean isCarbonated;
 
     /**
@@ -18,14 +17,12 @@ public class Drinks extends Item {
      * @param binLocation Storage bin location.
      * @param expiryDate Expiry date.
      * @param brand Brand of the drink.
-     * @param flavour Flavour of the drink.
      * @param isCarbonated Whether the drink is carbonated.
      */
     public Drinks(String name, int quantity, String binLocation, String expiryDate,
-                  String brand, String flavour, boolean isCarbonated) {
+                  String brand, boolean isCarbonated) {
         super(name, quantity, binLocation, expiryDate);
         this.brand = brand;
-        this.flavour = flavour;
         this.isCarbonated = isCarbonated;
     }
 
@@ -37,16 +34,6 @@ public class Drinks extends Item {
     /** @param brand New drink brand. */
     public void setBrand(String brand) {
         this.brand = brand;
-    }
-
-    /** @return Flavour of the drink. */
-    public String getFlavour() {
-        return flavour;
-    }
-
-    /** @param flavour New drink flavour. */
-    public void setFlavour(String flavour) {
-        this.flavour = flavour;
     }
 
     /** @return {@code true} if the drink is carbonated. */
@@ -69,7 +56,6 @@ public class Drinks extends Item {
     public String toStorageString(String categoryName) {
         return super.toStorageString(categoryName)
                 + " brand/" + brand
-                + " flavour/" + flavour
                 + " isCarbonated/" + isCarbonated;
     }
 
@@ -82,7 +68,6 @@ public class Drinks extends Item {
     public String toString() {
         return "[Drinks] " + super.toString()
                 + ", Brand: " + brand
-                + ", Flavour: " + flavour
                 + ", Carbonated: " + isCarbonated;
     }
 }

@@ -4,6 +4,7 @@ import seedu.inventorydock.exception.InventoryDockException;
 import seedu.inventorydock.exception.InvalidCommandException;
 import seedu.inventorydock.exception.MissingArgumentException;
 import seedu.inventorydock.parser.FieldParser;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -31,10 +32,7 @@ public class VegetableParser {
         assert input != null : "VegetableParser received null inputs.";
 
         String origin = FieldParser.extractField(input, "origin/", "isLeafy/");
-        if (origin == null || origin.trim().isEmpty()) {
-            logger.log(Level.WARNING, "Missing origin for vegetable.");
-            throw new MissingArgumentException("Missing origin for vegetable.");
-        }
+        origin = SpecificFieldValidator.parseStringOnlyField(origin, "origin", "vegetable");
 
         String leafyString = FieldParser.extractField(input, "isLeafy/", null);
         if (leafyString == null || leafyString.trim().isEmpty()) {

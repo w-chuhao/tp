@@ -4,6 +4,7 @@ import seedu.inventorydock.exception.InventoryDockException;
 import seedu.inventorydock.exception.InvalidCommandException;
 import seedu.inventorydock.exception.MissingArgumentException;
 import seedu.inventorydock.parser.FieldParser;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,10 +38,7 @@ public class ToiletriesParser {
     public static ToiletriesParser parse(String input) throws InventoryDockException {
         assert input != null : "ToiletriesParser received null inputs.";
         String brand = FieldParser.extractField(input, "brand/", "isLiquid/");
-        if (brand == null || brand.trim().isEmpty()) {
-            logger.log(Level.WARNING, "Missing brand for toiletries.");
-            throw new MissingArgumentException("Missing brand for toiletries.");
-        }
+        brand = SpecificFieldValidator.parseStringOnlyField(brand, "brand", "toiletries");
 
         String liquidString = FieldParser.extractField(input, "isLiquid/", null);
         if (liquidString == null || liquidString.trim().isEmpty()) {
@@ -57,4 +55,3 @@ public class ToiletriesParser {
         return new ToiletriesParser(brand, isLiquid);
     }
 }
-

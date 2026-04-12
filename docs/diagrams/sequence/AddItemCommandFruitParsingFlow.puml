@@ -9,6 +9,7 @@ participant ":AddItemCommandParser" as AddItemCommandParser
 participant ":InputValidator" as InputValidator
 participant ":CommonFieldParser" as CommonFieldParser
 participant ":FruitParser" as FruitParser
+participant ":SpecificFieldValidator" as SpecificFieldValidator
 
 AddCommandParser -> AddItemCommandParser: handleFruit(trimmedInput)
 activate AddItemCommandParser
@@ -25,6 +26,10 @@ deactivate CommonFieldParser
 
 AddItemCommandParser -> FruitParser: parse(input)
 activate FruitParser
+FruitParser -> SpecificFieldValidator: parseStringOnlyField(size, "size", "fruit")
+activate SpecificFieldValidator
+SpecificFieldValidator --> FruitParser: validatedSize
+deactivate SpecificFieldValidator
 FruitParser --> AddItemCommandParser: fruitFields
 deactivate FruitParser
 
@@ -37,5 +42,3 @@ deactivate AddItemCommand
 AddItemCommandParser --> AddCommandParser: command
 deactivate AddItemCommandParser
 @enduml
-
-
