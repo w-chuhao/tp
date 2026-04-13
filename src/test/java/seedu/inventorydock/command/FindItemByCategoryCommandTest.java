@@ -16,6 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+
 public class FindItemByCategoryCommandTest {
     private Inventory inventory;
     private Category fruitsCategory;
@@ -62,7 +63,7 @@ public class FindItemByCategoryCommandTest {
 
         assertEquals(1, ui.messages.size());
         assertEquals("No items found in category: snacks.", ui.messages.get(0));
-        assertEquals(0, ui.dividerCount);
+        assertEquals(1, ui.dividerCount);
     }
 
     @Test
@@ -114,6 +115,29 @@ public class FindItemByCategoryCommandTest {
         assertEquals("Category must be a string.", exception.getMessage());
     }
 
+    @Test
+    public void parseCategoryInput_emptyInput_throwsException() {
+        MissingArgumentException exception = assertThrows(
+                MissingArgumentException.class,
+                () -> FindItemByCategoryCommand.parseCategoryInput(""));
+        assertEquals("Category cannot be empty.", exception.getMessage());
+    }
+
+    @Test
+    public void parseCategoryInput_whitespaceOnly_throwsException() {
+        MissingArgumentException exception = assertThrows(
+                MissingArgumentException.class,
+                () -> FindItemByCategoryCommand.parseCategoryInput("   "));
+        assertEquals("Category cannot be empty.", exception.getMessage());
+    }
+
+    @Test
+    public void parseCategoryInput_negativeNumber_throwsException() {
+        InvalidCommandException exception = assertThrows(
+                InvalidCommandException.class,
+                () -> FindItemByCategoryCommand.parseCategoryInput("-5"));
+        assertEquals("Category must be a string.", exception.getMessage());
+    }
 
     private static class TestUI extends UI {
         private final List<String> messages = new ArrayList<>();
@@ -136,8 +160,3 @@ public class FindItemByCategoryCommandTest {
         }
     }
 }
-
-
-
-
-

@@ -9,6 +9,15 @@ Hello from
 
 Hello! Welcome to InventoryDock!
 What can I do for you?
+
+Quick start:
+  Type 'help' to see all available commands.
+  Type 'list' to view your current inventory.
+  Type 'bye' to exit.
 _________________________________________________________________________________________________________
+_________________________________________________________________________________________________________
+Thank you for using InventoryDock!
+Your inventory has been saved to data/inventory.txt.
+
 Goodbye! See you next time!
 _________________________________________________________________________________________________________
