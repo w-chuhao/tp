@@ -512,7 +512,7 @@ The main interaction for this flow is illustrated in below.
 Duplicate check and result reporting:
 
 <p align="center">
-  <img src="diagrams/sequence/UpdateItemCommandDuplicateCheckFlow.png" width="800">
+  <img src="diagrams/sequence/UpdateItemCommandDuplicateCheckFlow.png" width="500">
 </p>
 
 The main structural relationships for this feature are shown below.
@@ -556,12 +556,14 @@ The central logic is:
 ```java
 Category category = inventory.findCategoryByName(categoryName);
 if (category == null) {
-   throw new CategoryNotFoundException("Category '" + categoryName + "' does not exist.");
+   throw new CategoryNotFoundException(
+           "Category '" + categoryName + "' does not exist.");
 }
 
 if (itemIndex < 1 || itemIndex > category.getItemCount()) {
    throw new ItemNotFoundException(
-           "Item at index " + itemIndex + " not found in category '" + categoryName + "'.");
+           "Item at index " + itemIndex + 
+                " not found in category '" + categoryName + "'.");
 }
 
 Item item = category.getItem(itemIndex - 1);
@@ -1013,10 +1015,10 @@ Sequence Diagram:
 Class and object diagrams:
 
 <p align="center">
-  <img src="diagrams/class/DeleteItemCommandClassDiagram.png" width="400">
+  <img src="diagrams/class/DeleteItemCommandClassDiagram.png" width="800">
 </p>
 <p align="center">
-  <img src="diagrams/object/DeleteItemCommandObjectDiagram.png" width="400">
+  <img src="diagrams/object/DeleteItemCommandObjectDiagram.png" width="800">
 </p>
 
 ### Clear Category Feature
