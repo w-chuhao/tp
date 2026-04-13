@@ -29,7 +29,7 @@ alt category not found
     activate UI
     UI --> InventoryDock: display error
     deactivate UI
-else category found
+else else
     loop for each existing item in category
         AddItemCommand -> DuplicateIdentityParser: buildBatchIdentityKey(categoryName, candidate)
         activate DuplicateIdentityParser
@@ -48,7 +48,7 @@ else category found
         activate UI
         UI --> InventoryDock: display error
         deactivate UI
-    else no duplicate
+    else else
         AddItemCommand -> Category: addItem(item)
         activate Category
         Category --> AddItemCommand
@@ -78,3 +78,4 @@ Deactivate AddItemCommand
 InventoryDock --> User
 Deactivate InventoryDock
 @enduml
+
