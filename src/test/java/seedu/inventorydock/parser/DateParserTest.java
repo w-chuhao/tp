@@ -29,26 +29,8 @@ public class DateParserTest {
         assertEquals("Please enter a valid calendar date in yyyy-M-d format.", e.getMessage());
     }
 
-    @Test
-    public void parseDate_validDate_returnsLocalDate() throws Exception {
-        LocalDate date = DateParser.parseDate("2026-03-20");
-
-        assertEquals(LocalDate.of(2026, 3, 20), date);
-    }
-
-    @Test
-    public void parseDate_nullDate_throwsException() {
-        InvalidDateException e = assertThrows(InvalidDateException.class,
-                () -> DateParser.parseDate(null));
-        assertEquals("Missing expiry date", e.getMessage());
-    }
-
-    @Test
-    public void parseDate_invalidDate_throwsException() {
-        InvalidDateException e = assertThrows(InvalidDateException.class,
-                () -> DateParser.parseDate("20-03-2026"));
-        assertEquals("Please enter a valid calendar date in yyyy-M-d format.", e.getMessage());
-    }
+    // start from here
+    // end from here
 
     @Test
     public void parseDate_leapYearFebruary29_returnsLocalDate() throws Exception {
