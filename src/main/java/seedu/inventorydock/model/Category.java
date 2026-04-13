@@ -35,7 +35,11 @@ public class Category {
     public List<Item> getItems() {
         return items;
     }
-    
+
+    public void addItem(Item item) {
+        items.add(item);
+        logger.log(Level.INFO, "Added item '" + item.getName() + "' to category '" + name + "'.");
+    }
 
     public Item getItem(int index) {
         return items.get(index);
@@ -48,7 +52,6 @@ public class Category {
     public boolean isEmpty() {
         return items.isEmpty();
     }
-
 
     /**
      * Removes the item at the specified zero-based index.
