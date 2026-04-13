@@ -3,7 +3,7 @@
 ## Overview
 InventoryDock is a CLI based inventory management application that enables users to manage stock through structured 
 commands. It supports category-based organisation, field validation, and persistent storage, allowing efficient 
-tracking of items by quantity, expiry date, and bin location.
+tracking of items by quantity, expiry date, etc.
 
 ### Summary of Contributions
 
@@ -53,7 +53,7 @@ tracking of items by quantity, expiry date, and bin location.
 The following are the reviews I have made to help improve the structure or quality of our code:
 [#26](https://github.com/AY2526S2-CS2113-W09-2/tp/pull/26), [#41](https://github.com/AY2526S2-CS2113-W09-2/tp/pull/41), [#75](https://github.com/AY2526S2-CS2113-W09-2/tp/pull/75), [#77](https://github.com/AY2526S2-CS2113-W09-2/tp/pull/77), [#120](https://github.com/AY2526S2-CS2113-W09-2/tp/pull/120)
 
-Additionally, I have also help team `CS2113-W13-3` to identify bugs and suggest possible areas of improvement
+I have also help team `CS2113-W13-3` to identify bugs and possible areas of improvement.
 
 ### Contributions to the User Guide
 
