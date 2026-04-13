@@ -1,0 +1,68 @@
+@startuml
+title Object Diagram for SummaryCommand Feature
+hide circle
+left to right direction
+
+object "<u>summaryParser:SummaryCommandParser</u>" as parser
+object "<u>cmd:SummaryCommand</u>" as command {
+  summaryType = ALL
+}
+object "<u>inventory:Inventory</u>" as inventory
+object "<u>fruits:Category</u>" as fruits {
+  name = "fruits"
+}
+object "<u>apple:Item</u>" as apple {
+  name = "apple"
+  quantity = 10
+  expiryDate = "2026-3-19"
+}
+object "<u>banana:Item</u>" as banana {
+  name = "banana"
+  quantity = 10
+  expiryDate = "2026-3-25"
+}
+object "<u>fruitSummary:CategorySummary</u>" as fruitSummary {
+  categoryName = "fruits"
+  itemCount = 2
+}
+object "<u>lowest1:IndexedItem</u>" as lowest1 {
+  index = 1
+}
+object "<u>lowest2:IndexedItem</u>" as lowest2 {
+  index = 2
+}
+object "<u>earliest1:IndexedItem</u>" as earliest1 {
+  index = 1
+}
+object "<u>:UI</u>" as ui
+object "<u>:DateParser</u>" as dateParser
+
+note as N1
+  This snapshot shows one representative
+  execution of summary all.
+
+  The command reads the inventory,
+  builds one CategorySummary for the
+  fruits category, and prepares indexed
+  items for the lowest-stock and
+  earliest-expiry results shown by UI.
+end note
+
+parser --> command : creates >
+command --> inventory : reads from >
+inventory --> fruits : contains >
+fruits --> apple : contains >
+fruits --> banana : contains >
+
+command --> fruitSummary : builds >
+fruitSummary --> lowest1 : lowest stock >
+fruitSummary --> lowest2 : lowest stock >
+fruitSummary --> earliest1 : earliest expiry >
+
+lowest1 --> apple : wraps >
+lowest2 --> banana : wraps >
+earliest1 --> apple : wraps >
+
+command ..> dateParser : parses dates with >
+command --> ui : displays through >
+@enduml

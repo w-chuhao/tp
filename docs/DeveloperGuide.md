@@ -937,6 +937,12 @@ The main interaction for this flow is illustrated in below.
   <img src="diagrams/sequence/SummaryCommandMainFlow.png" width="800">
 </p>
 
+A representative object snapshot for this feature is shown below.
+
+<p align="center">
+  <img src="diagrams/object/SummaryObjectDiagram.png" width="800">
+</p>
+
 ### Storage feature
 
 This product includes a storage component that is responsible for persisting inventory data between application 
