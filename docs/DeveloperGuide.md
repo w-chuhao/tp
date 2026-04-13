@@ -1181,15 +1181,6 @@ This section provides instructions for manually testing the application.
 2. Compile and run the `InventoryDock` class.
 3. Verify that the application starts successfully and displays the welcome message.
 
-### Adding sample data
-
-1. Use the `add` command to insert sample items into different categories.
-2. Example:
-    - `add category/fruits item/apple bin/A-1 qty/10 expiryDate/2026-4-01 isRipe/true`
-    - `add category/drinks item/cola bin/B-2 qty/5 expiryDate/2026-6-01 isCarbonated/true`
-3. Run `list` to verify that the items are correctly added.
-
-After setting up the application, proceed to the individual test cases below.
 
 ### Testing add item
 
@@ -1225,8 +1216,8 @@ After setting up the application, proceed to the individual test cases below.
 3. Verify that only items in bin `A-1` are shown, and items in `A-10` are not included.
 4. Run `find bin/A`.
 5. Verify that all items with matching bin letter `A` are shown.
-6. Run `find bin/10`.
-7. Verify that items in bins such as `A-10` and `B-10` are shown.
+6. Run `find bin/1`.
+7. Verify that items in bins such as `A-1` and `B-1` are shown.
 8. Run `find bin/Z`.
 9. Verify that the application shows `No items found in bin location: z.` or the corresponding no-match message.
 
@@ -1278,9 +1269,9 @@ After setting up the application, proceed to the individual test cases below.
 5. Run `update category/unknown index/1 qty/10`
 6. Verify that the application shows a `Not found` error for the missing category.
 7. Run `update category/fruits index/100 qty/10`
-8. Verify that the application shows an `Invalid input` error indicating the index is out of range.
+8. Verify that the application shows a `Not found` error indicating the index is out of range.
 9. Run `update category/fruits index/abc qty/10`
-10. Verify that the application shows `Item index must be an integer.`
+10. Verify that the application shows an `Invalid input` error indicating item index must be an integer.
 11. Run `update category/fruits index/1`
 12. Verify that the application shows `at least one field to update is required.`
 13. Run `update index/1 qty/10`
@@ -1290,13 +1281,13 @@ After setting up the application, proceed to the individual test cases below.
 17. Run `update category/fruits index/1 qty/-5`
 18. Verify that the application shows an `Invalid input` error for the invalid quantity.
 19. Run `update category/fruits index/1 expiryDate/2026/05/01`
-20. Verify that the application shows `Please enter a valid calendar date in yyyy-M-d format.`
+20. Verify that the application shows an `Invalid input` error for wrong date format.
 21. Run `update category/fruits index/1 bin/`
-22. Verify that the application shows `Update token 'bin/' is invalid.`
+22. Verify that the application shows an `Invalid input` error for invalid token.
 23. Run `update category/fruits index/1 isRipe/false`
 24. Verify that the application updates the fruit's ripe status successfully.
 25. Run `update category/fruits index/1 brand/test`
-26. Verify that the application shows `Unsupported update field: brand/.`
+26. Verify that the application shows  an `Invalid input` error for unsupported field.
 27. Run `update category/fruits index/1 isFrozen/true`
 28. Verify that the application shows `isFrozen/ can only be updated for meat.`
 29. Run `update category/fruits index/1 newItem/red apple`
