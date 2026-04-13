@@ -39,7 +39,7 @@ else else
     end
 
     alt duplicate found
-        AddItemCommand --> InventoryDock: throw InventoryDockException("Duplicate item found...")
+        AddItemCommand --> InventoryDock: throw DuplicateItemException("Duplicate item found...")
         deactivate AddItemCommand
         InventoryDock -> UI: showError("Duplicate item found...")
         UI --> User: display error
