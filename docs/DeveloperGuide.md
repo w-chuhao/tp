@@ -507,7 +507,7 @@ At a high level, the flow is as follows:
 * `UpdateItemCommand` locates the item, applies the updates, checks for duplicate-batch conflicts, and
   reports the result through `UI`.
 
-The main interaction for this flow is illustrated in [ListCommandMainFlow](diagrams/sequence/ListCommandMainFlow.png) below.
+The main interaction for this flow is illustrated in below.
 
 Duplicate check and result reporting:
 
@@ -657,7 +657,7 @@ A representative object snapshot for this feature is shown below.
   <img src="diagrams/object/ListCommandObjectDiagram.png" width="750">
 </p>
 
-The main interaction for this flow is illustrated in [ListCommandMainFlow](diagrams/sequence/ListCommandMainFlow.png) below.
+The main interaction for this flow is illustrated in below.
 
 <p align="center">
   <img src="diagrams/sequence/ListCommandMainFlow.png" width="800">
@@ -929,7 +929,7 @@ When the user enters a summary command, the implementation performs the followin
 5. `SummaryCommand` passes the prepared summary data to `UI`.
 6. `UI` formats and displays the summary view.
 
-The main interaction for this flow is illustrated in [ListCommandMainFlow](diagrams/sequence/ListCommandMainFlow.png) below.
+The main interaction for this flow is illustrated in below.
 
 <p align="center">
   <img src="diagrams/sequence/SummaryCommandMainFlow.png" width="800">
@@ -967,7 +967,7 @@ When the application saves, `Storage` performs the following sequence:
 2. Convert each item into its storage format using `toStorageString(categoryName)`. 
 3. Write the resulting lines to the storage file.
 
-The main interaction for this flow is illustrated in [ListCommandMainFlow](diagrams/sequence/ListCommandMainFlow.png) below.
+The main interaction for this flow is illustrated in below.
 
 <p align="center">
   <img src="diagrams/sequence/StorageSavingMainFlow.png" width="800">
@@ -982,7 +982,7 @@ When the application loads data from file, `Storage` performs the following sequ
 3. Execute the parsed command to rebuild the inventory state in memory. 
 4. Skip malformed lines where appropriate and continue loading the remaining valid lines.
 
-The main interaction for this flow is illustrated in [ListCommandMainFlow](diagrams/sequence/ListCommandMainFlow.png) below.
+The main interaction for this flow is illustrated in below.
 
 <p align="center">
   <img src="diagrams/sequence/StorageLoadingMainFlow.png" width="800">
