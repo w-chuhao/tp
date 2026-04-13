@@ -206,6 +206,26 @@ Expected result:
 * Items with quantity lower than the given value are also included.
 * If nothing matches, the app shows `No items found with quantity: QUANTITY.`
 
+### Viewing inventory summary: `summary`
+Displays a category-based summary of the inventory.
+
+Format:
+* `summary`
+* `summary stock`
+* `summary expirydate`
+
+Expected result:
+* `summary` shows each category with its item count, tied lowest-stock items, and tied earliest-expiry items.
+* `summary stock` shows each category with its item count and tied lowest-stock items only.
+* `summary expirydate` shows each category with its item count and tied earliest-expiry items only.
+* Item indices shown are category-local indices, matching the numbering used in `list`.
+* If a category has no matching items to display, the app shows `N/A`.
+
+Examples:
+* `summary`
+* `summary stock`
+* `summary expirydate`
+
 ### View help: `help`
 Shows the list of available commands and the link to the published user guide.
 
@@ -401,6 +421,12 @@ Error messages use a consistent format such as `[Error] Invalid input: ...`, `[E
   `find bin/BIN_INPUT`
 * Find items by quantity:
   `find qty/QUANTITY`
+* View inventory summary:
+    `summary`
+* View inventory summary by lowest stock:
+  `summary stock`
+* View inventory summary by earliest expiry:
+  `summary expirydate`
 * Update an item:
   `update category/CATEGORY index/INDEX [newItem/NEW_NAME] [bin/NEW_BIN] [qty/NEW_QUANTITY] [expiryDate/NEW_DATE]`
 * Delete an item

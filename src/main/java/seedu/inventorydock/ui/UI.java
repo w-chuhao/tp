@@ -1,5 +1,6 @@
 package seedu.inventorydock.ui;
 
+import seedu.inventorydock.command.SummaryCommand;
 import seedu.inventorydock.exception.InventoryDockException;
 import seedu.inventorydock.model.Category;
 import seedu.inventorydock.model.Inventory;
@@ -199,6 +200,63 @@ public class UI {
         showDivider();
     }
 
+    public void showInventorySummary(List<SummaryCommand.CategorySummary> summaries,
+                                     SummaryCommand.SummaryType summaryType) {
+        if (summaries.isEmpty()) {
+            System.out.println("Inventory is empty.");
+            return;
+        }
+
+        showDivider();
+        System.out.println(formatSummaryHeader(summaryType));
+        System.out.println();
+
+        for (int i = 0; i < summaries.size(); i++) {
+            SummaryCommand.CategorySummary summary = summaries.get(i);
+
+            System.out.println((i + 1) + ". " + capitalise(summary.getCategoryName())
+                    + " (" + formatItemCount(summary.getItemCount()) + ")");
+
+            if (summaryType == SummaryCommand.SummaryType.ALL
+                    || summaryType == SummaryCommand.SummaryType.STOCK) {
+                System.out.println("   Lowest stock:");
+                printIndexedItems(summary.getLowestStockItems());
+            }
+
+            if (summaryType == SummaryCommand.SummaryType.ALL
+                    || summaryType == SummaryCommand.SummaryType.EXPIRYDATE) {
+                System.out.println("   Earliest expiry:");
+                printIndexedItems(summary.getEarliestExpiryItems());
+            }
+
+            System.out.println();
+        }
+
+        showDivider();
+    }
+
+    private String formatSummaryHeader(SummaryCommand.SummaryType summaryType) {
+        switch (summaryType) {
+        case STOCK:
+            return "Inventory Summary (lowest stock):";
+        case EXPIRYDATE:
+            return "Inventory Summary (earliest expiry):";
+        default:
+            return "Inventory Summary:";
+        }
+    }
+
+    private void printIndexedItems(List<SummaryCommand.IndexedItem> indexedItems) {
+        if (indexedItems.isEmpty()) {
+            System.out.println("   N/A");
+            return;
+        }
+
+        for (SummaryCommand.IndexedItem indexedItem : indexedItems) {
+            System.out.println("   [Item " + indexedItem.getIndex() + "] " + indexedItem.getItem());
+        }
+    }
+
     public void showSkippedLine(String line, String reason) {
         showDivider();
         System.out.println("Skip corrupted line: " + line);
@@ -208,7 +266,7 @@ public class UI {
 
     public void showHelp() {
         showDivider();
-        System.out.println("Available commands: " + "add, delete, update, find, list, help, bye");
+        System.out.println("Available commands: " + "add, delete, update, find, sort, summary, list, help, bye");
         System.out.println();
         System.out.println("For detailed usage and examples, " + "refer to our User Guide:");
         System.out.println("https://ay2425s2-cs2113-w09-2.github.io/tp/UserGuide.html");

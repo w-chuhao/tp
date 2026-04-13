@@ -1,0 +1,72 @@
+@startuml
+title Class Diagram for Summary Feature
+skinparam classAttributeIconSize 0
+hide circle
+left to right direction
+
+class "{abstract}\nCommand" as Command {
+  + execute(inventory: Inventory, ui: UI)
+}
+
+class SummaryCommandParser {
+  + parse(arguments: String)
+}
+
+class SummaryCommand {
+  - summaryType: SummaryType
+  + execute(inventory: Inventory, ui: UI)
+  - buildCategorySummaries(inventory: Inventory)
+  - getLowestStockItems(category: Category)
+  - getEarliestExpiryItems(category: Category)
+  - parseExpiryDate(expiryDate: String)
+}
+
+enum "{enumeration}\nSummaryType" as SummaryType {
+  ALL
+  STOCK
+  EXPIRYDATE
+}
+
+class CategorySummary {
+  - categoryName: String
+  - itemCount: int
+  - lowestStockItems: List<IndexedItem>
+  - earliestExpiryItems: List<IndexedItem>
+}
+
+class IndexedItem {
+  - index: int
+  - item: Item
+}
+
+class Inventory {
+  + getCategories()
+}
+
+class Category {
+  + getItems()
+}
+
+class Item
+
+class DateParser {
+  + parseDate(expiryDate: String)
+}
+
+class UI {
+  + showInventorySummary(summaries: List<CategorySummary>, summaryType: SummaryType)
+}
+
+Command <|-- SummaryCommand
+SummaryCommandParser ..> SummaryCommand : creates
+SummaryCommand --> SummaryType : uses
+SummaryCommand --> Inventory : reads from
+SummaryCommand --> Category : reads from
+SummaryCommand --> CategorySummary : creates
+CategorySummary *-- IndexedItem
+IndexedItem --> Item : wraps
+SummaryCommand ..> DateParser : uses for expiry parsing
+SummaryCommand --> UI : displays through
+Inventory "1" o-- "*" Category
+Category "1" o-- "*" Item
+@enduml

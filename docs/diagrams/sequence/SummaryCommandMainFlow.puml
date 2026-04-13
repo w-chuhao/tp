@@ -1,0 +1,86 @@
+@startuml
+title Sequence Diagram for SummaryCommand
+
+autonumber
+hide footbox
+
+actor User
+participant ":UI" as UI
+participant ":InventoryDock" as InventoryDock
+participant ":Parser" as Parser
+participant ":SummaryCommandParser" as SummaryCommandParser
+participant ":SummaryCommand" as SummaryCommand
+participant ":Inventory" as Inventory
+participant ":Category" as Category
+participant ":DateParser" as DateParser
+
+User -> UI: enter summary command
+activate UI
+UI -> InventoryDock: input
+activate InventoryDock
+InventoryDock -> Parser: parse(input)
+activate Parser
+
+Parser -> SummaryCommandParser: parse(arguments)
+activate SummaryCommandParser
+
+alt arguments are empty
+    create ":SummaryCommand" as SummaryCommand
+    SummaryCommandParser -> SummaryCommand: SummaryCommand(ALL)
+    activate SummaryCommand
+    SummaryCommand --> SummaryCommandParser: command
+    deactivate SummaryCommand
+else arguments are "stock"
+    create ":SummaryCommand" as SummaryCommand
+    SummaryCommandParser -> SummaryCommand: SummaryCommand(STOCK)
+    activate SummaryCommand
+    SummaryCommand --> SummaryCommandParser: command
+    deactivate SummaryCommand
+else arguments are "expirydate"
+    create ":SummaryCommand" as SummaryCommand
+    SummaryCommandParser -> SummaryCommand: SummaryCommand(EXPIRYDATE)
+    activate SummaryCommand
+    SummaryCommand --> SummaryCommandParser: command
+    deactivate SummaryCommand
+else invalid argument
+    SummaryCommandParser --> Parser: throw InvalidCommandException
+end
+
+SummaryCommandParser --> Parser: command / exception
+deactivate SummaryCommandParser
+Parser --> InventoryDock: command / exception
+deactivate Parser
+
+InventoryDock -> SummaryCommand: execute(inventory, ui)
+activate SummaryCommand
+
+SummaryCommand -> Inventory: getCategories()
+activate Inventory
+Inventory --> SummaryCommand: categories
+deactivate Inventory
+
+loop for each category
+    SummaryCommand -> Category: getItems()
+    activate Category
+    Category --> SummaryCommand: items
+    deactivate Category
+
+    opt summaryType includes expirydate
+        loop for each relevant item
+            SummaryCommand -> DateParser: parseDate(expiryDate)
+            activate DateParser
+            DateParser --> SummaryCommand: LocalDate / InvalidDateException
+            deactivate DateParser
+        end
+    end
+end
+
+SummaryCommand -> UI: showInventorySummary(summaries, summaryType)
+activate UI
+UI -> User: display summary view
+deactivate UI
+
+deactivate SummaryCommand
+deactivate InventoryDock
+deactivate UI
+@enduml

@@ -7,6 +7,7 @@ import seedu.inventorydock.command.FindItemByCategoryCommand;
 import seedu.inventorydock.command.HelpCommand;
 import seedu.inventorydock.command.ListCommand;
 import seedu.inventorydock.command.SortCommand;
+import seedu.inventorydock.command.SummaryCommand;
 import seedu.inventorydock.command.UpdateItemCommand;
 import seedu.inventorydock.exception.InventoryDockException;
 
@@ -83,6 +84,12 @@ public class ParserTest {
         Parser parser = new Parser();
 
         assertInstanceOf(ExitCommand.class, parser.parse("bye"));
+    }
+
+    @Test
+    public void parse_summary_returnsSummaryCommand() throws InventoryDockException {
+        Parser parser = new Parser();
+        assertInstanceOf(SummaryCommand.class, parser.parse("summary"));
     }
 }
 

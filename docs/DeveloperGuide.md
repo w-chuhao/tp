@@ -15,6 +15,7 @@
    - [Update Item Feature](#update-item-feature)
    - [List Feature](#list-feature)
    - [Sort Feature](#sort-feature)
+   - [Summary Feature](#summary-feature)
    - [Storage Feature](#storage-feature)
    - [Delete Feature](#delete-feature)
      - [Delete Item Feature](#delete-item)
@@ -38,6 +39,7 @@
    - [Storage Feature](#testing-storage)
    - [Delete Category](#testing-delete-category)
    - [Find by Keyword](#testing-find-by-keyword)
+   - [Summary](#testing-summary-command)
 
 ---
 
@@ -739,17 +741,7 @@ introducing a completely separate output style.
 
 #### Component-level implementation
 
-The feature is mainly implemented using the following classes:
-
-- `Parser`
-- `SortCommandParser`
-- `SortCommand`
-- `Inventory`
-- `Category`
-- `Item`
-- `UI`
-
-The responsibilities these classes are as follows:
+The feature is implemented using the following and their responsibilities are as follows:
 
 - `Parser` detects the `sort` command and delegates argument parsing to `SortCommandParser`.
 - `SortCommandParser` validates the user supplied sort type and constructs the corresponding command.
@@ -827,7 +819,7 @@ The sorted item lists are then passed to the UI for display.
 The most important design choice in this feature is that sorting is performed on copied item lists instead of
 changing the order of items inside the actual inventory.
 
-This was chosen for three reasons.
+This was chosen for two reasons.
 
 First, the feature is intended to provide an alternative view of the inventory rather than mutate the underlying data.
 A user who runs `sort name` is usually asking to inspect the data in a different order, not to permanently reorder the
@@ -837,12 +829,6 @@ Second, it avoids unintended side effects. If the underlying item order were mod
 depend on the original ordering, such as deletion or updating by index, could behave differently in ways the user
 did not expect.
 
-Third, it keeps the implementation simple and safe. By sorting copies of the item lists, the command can generate the
-desired output without changing the model state.
-
-Another deliberate design choice is that the category order is preserved. Only the items within each category are
-sorted. This keeps the output structure familiar and consistent with the normal `list` command.
-
 #### Error handling and validation
 
 Input validation is handled mainly by `SortCommandParser`.
@@ -851,36 +837,89 @@ If the user enters `sort` without providing a sort type, the parser throws a `Mi
 that a valid sort type is required.
 
 If the user provides an unsupported sort type, the parser throws a `InvalidCommandException` listing the valid options,
-such as 
-ame`, `expirydate`, and `qty`.
+such as `name`, `expirydate`, and `qty`.
 
 At execution time, the command handles an empty inventory gracefully. The UI displays the appropriate empty inventory
 message instead of failing.
 
+### Summary Feature
+
+The product also supports displaying a category-based summary of the current inventory using the `summary` command. 
+This feature is useful when the user wants a quicker overview of important inventory information. 
+Instead of showing every item directly, the command summarises each category using item count, lowest stock, and 
+earliest expiry date.
+
+The feature supports three command forms:
+* `summary` which displays both tied lowest-stock items and tied earliest-expiry items for each category.
+* `summary stock` which displays only the tied lowest-stock items for each category.
+* `summary expirydate` which displays only the tied earliest-expiry items for each category.
+
+#### High-level design
+
+At a high level, this feature fits into the same command-based architecture used throughout the application. The flow is as follows:
+
+1. The user enters a `summary` command with an optional mode.
+2. `Parser` recognises the command word and delegates the argument to `SummaryCommandParser`.
+3. `SummaryCommandParser` validates the argument and creates a `SummaryCommand`.
+4. `SummaryCommand` scans each category in the inventory and prepares the summary data.
+5. `UI` displays the summary view.
+
+The main structural relationships for the storage feature are shown below.
+
+![SummaryClassDiagram](diagrams/class/SummaryClassDiagram.png)
+
+#### Implementation details
+
+The feature is mainly implemented using the following classes: `Parser`, `SummaryCommandParser`, `SummaryCommand`,
+`Inventory`, `Category`, `Item`, `DateParser`, `UI`.
+
+For stock summary, the command finds the minimum quantity in each category and collects all items tied at that value. 
+For expiry-date summary, the command parses item expiry dates using `DateParser`, determines the earliest valid date 
+in each category, and collects all items tied at that date. Items with invalid or missing expiry dates are ignored for 
+this calculation.
+
+#### Why the feature is implemented this way
+
+The summary feature is designed to complement `list`, not replace it. While `list` is useful when the user wants to 
+inspect the full inventory, `summary` is more useful when the user wants to identify categories that may need attention.
+Separating the feature into `summary`, `summary stock`, and `summary expirydate` also keeps the command flexible while 
+keeping the interface simple.
+
+#### Command execution flow
+
+When the user enters a summary command, the implementation performs the following sequence:
+
+1. `Parser` recognises the `summary` command and delegates the optional argument to `SummaryCommandParser`.
+2. `SummaryCommandParser` validates the mode and creates a `SummaryCommand`.
+3. `SummaryCommand.execute()` retrieves the categories from `Inventory`.
+4. For each category, the command collects the relevant items based on the selected summary mode:
+    * tied lowest-stock items for `summary stock`
+    * tied earliest-expiry items for `summary expirydate`
+    * both groups for `summary`
+5. `SummaryCommand` passes the prepared summary data to `UI`.
+6. `UI` formats and displays the summary view.
+
+The main interaction for this flow is illustrated below.
+
+![SummaryCommandMainFlow](diagrams/sequence/SummaryCommandMainFlow.png)
+
 ### Storage feature
 
-This product includes a storage component that is responsible for persisting inventory data
-between application runs.
-
-This component is necessary because the inventory should not be lost when the program exits, as
-users expect their items to remain available the next time they launch the application.
-
-The storage feature solves this by writing the current inventory to a file and reconstructing it
-when the application starts again.
+This product includes a storage component that is responsible for persisting inventory data between application 
+sessions. This is necessary because users should be able to continue from their previous inventory state after 
+closing and reopening the application. The storage mechanism is facilitated by `Storage`, which is responsible for 
+saving the current `Inventory` to file and loading it back when the application starts.
 
 #### Implementation
-
-The storage mechanism is facilitated by `Storage`, which is responsible for saving the current `Inventory`
-to file and loading it back into memory.
 
 It supports two main operations:
 
 - `save(Inventory inventory)` which writes the current inventory to the storage file.
 - `load(Inventory inventory, UI ui)` which reads the storage file and reconstructs the inventory state.
 
-The save format is text-based. Each item is stored on a separate line together with its common fields and any
-additional fields required by its specific category. This allows all supported item types to be saved in a
-single format while preserving the extra data needed for each subtype.
+If the storage file does not exist, the application starts with an empty inventory and creates the file automatically.
+If a line is malformed, the exception is caught and the line is skipped. The user is informed through the UI,
+together with the reason the line was skipped.
 
 The main structural relationships for the storage feature are shown below.
 
@@ -889,94 +928,33 @@ The main structural relationships for the storage feature are shown below.
 #### Saving execution flow
 
 When the application saves, `Storage` performs the following sequence:
-1. Open the data file for writing.
-2. Retrieve all categories from the inventory.
-3. Iterate through each `Category`.
-4. Within each category, iterate through each `Item`.
-5. Convert each item into a formatted text line.
-6. Write the formatted line into the file.
-7. Repeat until all items have been written.
-8. Close the file.
 
-The formatting logic is delegated to the `Item` class via polymorphism, instead of being centralized
-in the `Storage` class.
-
-A simplified example of the base formatting logic is:
-```java
-public String toStorageString(String categoryName) {
-    return "category/" + categoryName
-            + " item/" + name
-            + " bin/" + binLocation
-            + " qty/" + quantity
-            + " expiryDate/" + expiryDate;
-}
-```
-
-Subclasses extend this behaviour by appending their own fields. For example, the `Fruit` class
-adds its category-specific boolean field:
-```java
-public String toStorageString(String categoryName) {
-    return super.toStorageString(categoryName)
-            + " isRipe/" + isRipe;
-}
-```
-
-This design ensures that each subclass is responsible for serializing its own data,
-while the `Storage` class remains independent of specific item types.
+1. Traverse all items in each categories in `Inventory`.
+2. Convert each item into its storage format using `toStorageString(categoryName)`. 
+3. Write the resulting lines to the storage file.
 
 The main interaction for this flow is illustrated below.
 
 ![StorageSavingMainFlow](diagrams/sequence/StorageSavingMainFlow.png)
 
-A representative object snapshot for the storage loading workflow is shown below.
-
-![StorageSavingObjectDiagram](diagrams/object/StorageSavingObjectDiagram.png)
-
 #### Loading execution flow
 
 When the application loads data from file, `Storage` performs the following sequence:
-1. Ensure the storage file exists. If not, it is created automatically.
-2. Read the file line by line.
-3. Extract the category from the line.
-4. Use the category to determine the appropriate parsing method.
-5. Convert the line into a `Command` using `AddItemCommandParser`.
-6. Execute the command to reconstruct the item in the inventory.
-7. Skip malformed lines where appropriate.
-8. Continue until the entire file has been processed.
 
-This design allows the application to reconstruct the same logical inventory state from the saved text data. 
-This approach reuses existing parsing logic, ensuring consistency between user input handling and
-stored data reconstruction.
+1. Read the file line by line. 
+2. Reuse the add item parsing flow to reconstruct each stored item. 
+3. Execute the parsed command to rebuild the inventory state in memory. 
+4. Skip malformed lines where appropriate and continue loading the remaining valid lines.
 
 The main interaction for this flow is illustrated below.
 
 ![StorageLoadingMainFlow](diagrams/sequence/StorageLoadingMainFlow.png)
 
-A representative object snapshot for the storage loading workflow is shown below.
-
-![StorageLoadingObjectDiagram](diagrams/object/StorageLoadingObjectDiagram.png)
-
-#### Error handling and validation
-
-The storage component also handles cases where the save file is missing, or contains invalid data.
-
-If the file does not exist, the application can start with an empty inventory instead of
-crashing. This is because the absence of a save file may simply mean that the program is being
-run for the first time.
-
-If a line is malformed, the exception is caught and the line is skipped. The user is informed via the UI, detailing 
-the line that was skipped and the reason for skipping.
-
 #### Why the storage component is implemented this way
 
-The simple text-based format is chosen instead of a more complex format such as JSON or database
-for several reasons.
-
-First, this keeps the implementation lightweight. The project does not require any external
-libraries or database setup, which makes the application easier to develop and test.
-
-Second, the saved data is readable which is useful during debugging because we can inspect the
-contents of the file directly and verify whether items are being written correctly.
+A simple text-based format is used because it is lightweight, easy to inspect during debugging, and does not require 
+external libraries or database setup. Reusing the existing add-item parsing flow also avoids duplicating parsing 
+logic and helps keep storage behaviour consistent with normal command handling.
 
 ### Delete Feature
 
@@ -1100,6 +1078,8 @@ complex interfaces.
 | v2.0    | user     | find items by expiry date | identify batches that need attention before they expire     |
 | v2.0    | user     | sort items                | review inventory in a meaningful order for faster scanning  |
 | v2.0    | user     | update items              | correct data-entry mistakes without re-adding the whole item |
+| v2.0    | user     | view an inventory summary | quickly identify low-stock or early-expiring items in each category |
+
 
 ## Non-Functional Requirements
 
@@ -1305,3 +1285,18 @@ o` and press enter.
 8. Run `find keyword/mango`.
 9. Verify that the application shows `No items found matching keyword: mango.` when there are no
    matches.
+
+### Testing Summary Command
+
+1. Add several items into at least one category with different quantities and expiry dates.
+2. Run `summary`.
+3. Verify that the application displays each category with its item count, tied lowest stock items, and tied earliest expiry items.
+4. Run `summary stock`.
+5. Verify that the application displays each category with its item count and tied lowest stock items only.
+6. Run `summary expirydate`.
+7. Verify that the application displays each category with its item count and tied earliest expiry items only.
+8. Verify that item indices shown in the summary match the category-local indices shown in `list`. 
+9. Run the command on an empty category. 
+10. Verify that the application shows `N/A` for the corresponding summary fields.
+11. Run `summary invalidType`. 
+12. Verify that the application shows the appropriate invalid summary type error message.

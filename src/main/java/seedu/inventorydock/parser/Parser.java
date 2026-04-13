@@ -35,6 +35,8 @@ public class Parser {
             return new SortCommandParser().parse(arguments);
         case "list":
             return new ListCommand();
+        case "summary":
+            return new SummaryCommandParser().parse(arguments);
         case "help":
             return new HelpCommand();
         case "bye":
