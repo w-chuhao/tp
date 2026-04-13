@@ -5,13 +5,14 @@ autonumber
 hide footbox
 
 actor User
+participant ":UI" as UI
 participant ":InventoryDock" as InventoryDock
 participant ":AddItemCommand" as AddItemCommand
 participant ":Inventory" as Inventory
 participant ":Category" as Category
 participant ":DuplicateIdentityParser" as DuplicateIdentityParser
-participant ":UI" as UI
 
+activate UI
 activate InventoryDock
 
 InventoryDock -> AddItemCommand: execute(inventory, ui)
@@ -26,9 +27,7 @@ alt category not found
     AddItemCommand --> InventoryDock: throw CategoryNotFoundException
 
     InventoryDock -> UI: showError(...)
-    activate UI
     UI --> User: display error
-    deactivate UI
 
 else else
     AddItemCommand -> DuplicateIdentityParser: buildBatchIdentityKey(categoryName, item)
@@ -47,9 +46,7 @@ else else
         AddItemCommand --> InventoryDock: throw DuplicateItemException
 
         InventoryDock -> UI: showError(...)
-        activate UI
         UI --> User: display error
-        deactivate UI
 
     else else
         AddItemCommand -> Category: addItem(item)
@@ -58,15 +55,14 @@ else else
         deactivate Category
 
         AddItemCommand -> UI: showItemAdded(...)
-        activate UI
         UI --> User: display confirmation
-        deactivate UI
 
         AddItemCommand --> InventoryDock --: return
     end
 end
 
-InventoryDock --> User
+InventoryDock --> UI
 deactivate InventoryDock
+UI --> User
+deactivate UI
 @enduml
-
