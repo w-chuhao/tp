@@ -53,7 +53,7 @@ Given below are my contributions to the project.
   - PRs reviewed (with non-trivial review comments): [#28](https://github.com/AY2526S2-CS2113-W09-2/tp/pull/28), [#32](https://github.com/AY2526S2-CS2113-W09-2/tp/pull/32), [#39](https://github.com/AY2526S2-CS2113-W09-2/tp/pull/39), [#50](https://github.com/AY2526S2-CS2113-W09-2/tp/pull/50), [#55](https://github.com/AY2526S2-CS2113-W09-2/tp/pull/55), [#57](https://github.com/AY2526S2-CS2113-W09-2/tp/pull/57), [#63](https://github.com/AY2526S2-CS2113-W09-2/tp/pull/63), [#86](https://github.com/AY2526S2-CS2113-W09-2/tp/pull/86)
   - Reported bugs and suggestions for other teams in the class: helped team `CS2113-T11-2` identify bugs and improvement areas.
 
-### Contributions to the User Guide
+### Contributions to the User Guide (Extracts)
 
 - [Adding an item](../UserGuide.md#adding-an-item-add): Documented the add command format, supported category-specific fields, examples, and duplicate-batch behaviour.
 - [Listing all items](../UserGuide.md#listing-all-items-list): Documented the list command format and expected inventory display behaviour.
@@ -61,7 +61,7 @@ Given below are my contributions to the project.
 - [Finding items by bin](../UserGuide.md#finding-items-by-bin-find-bin): Documented supported bin input forms and matching behaviour.
 - [Finding items by quantity](../UserGuide.md#finding-items-by-quantity-find-qty): Documented threshold-based quantity matching and expected results.
 
-### Contributions to the Developer Guide
+### Contributions to the Developer Guide (Extracts)
 
 - [AddItemCommandParseRoutingFlow](../diagrams/sequence/AddItemCommandParseRoutingFlow.png): Sequence diagram showing add-command parse routing with the fruit example.
 - [AddItemCommandExecutionDisplayFlow](../diagrams/sequence/AddItemCommandExecutionDisplayFlow.png): Sequence diagram showing add-command execution, duplicate checking, and UI reporting.
