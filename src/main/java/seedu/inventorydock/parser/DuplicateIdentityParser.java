@@ -47,6 +47,9 @@ public class DuplicateIdentityParser {
 
         String candidateIdentity = buildBatchIdentityKey(category.getName(), candidate);
         for (Item existing : category.getItems()) {
+            if (existing == candidate) {
+                continue;
+            }
             String existingIdentity = buildBatchIdentityKey(category.getName(), existing);
             if (existingIdentity.equals(candidateIdentity)) {
                 return existing;
